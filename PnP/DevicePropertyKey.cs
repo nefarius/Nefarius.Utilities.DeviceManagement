@@ -73,6 +73,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         public static DevicePropertyKey InstanceId = new DevicePropertyDeviceInstanceId();
         
         public static DevicePropertyKey Parent = new DevicePropertyDeviceParent();
+        
+        public static DevicePropertyKey Children = new DevicePropertyDeviceChildren();
 
         private DevicePropertyDevice(uint propertyIdentifier, Type propertyType) : this(
             Guid.Parse("{0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}}"),
@@ -143,6 +145,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             public DevicePropertyDeviceParent()
                 : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
                     8, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceChildren : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceChildren()
+                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
+                    9, typeof(string[]))
             {
             }
         }
