@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.0</Version>
+    <PackageIcon>NSS-128x128.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</PackageProjectUrl>
+    <Authors>Benjamin Höglinger-Stelzer</Authors>
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <Copyright>Copyright © Benjamin Höglinger-Stelzer 2022</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="assets\NSS-128x128.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
