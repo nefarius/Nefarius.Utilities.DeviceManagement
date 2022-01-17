@@ -6,7 +6,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     ///     Describes a unified device property.
     /// </summary>
     /// <remarks>https://docs.microsoft.com/en-us/windows-hardware/drivers/install/unified-device-property-model--windows-vista-and-later-</remarks>
-    public abstract class DevicePropertyKey : IComparable
+    public abstract class DevicePropertyKey : IEquatable<DevicePropertyKey>
     {
         protected DevicePropertyKey(
             Guid categoryGuid,
@@ -34,11 +34,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public Type PropertyType { get; }
 
-        public int CompareTo(object obj)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         ///     Returns native type for managed type.
         /// </summary>
@@ -46,6 +41,29 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         internal SetupApiWrapper.DevPropKey ToNativeType()
         {
             return new SetupApiWrapper.DevPropKey(CategoryGuid, PropertyIdentifier);
+        }
+
+        public bool Equals(DevicePropertyKey other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return CategoryGuid.Equals(other.CategoryGuid) && PropertyIdentifier == other.PropertyIdentifier && PropertyType.Equals(other.PropertyType);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || obj is DevicePropertyKey other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = CategoryGuid.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int)PropertyIdentifier;
+                hashCode = (hashCode * 397) ^ PropertyType.GetHashCode();
+                return hashCode;
+            }
         }
     }
 
