@@ -93,37 +93,41 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (managedType == typeof(string))
                 {
                     var value = Marshal.PtrToStringUni(buffer);
-                    return (T) Convert.ChangeType(value, typeof(T));
+                    return (T)Convert.ChangeType(value, typeof(T));
                 }
 
                 // Double-null-terminated string to list
                 if (managedType == typeof(string[]))
-                    return (T) (object) Marshal.PtrToStringUni(buffer, (int) size / 2).TrimEnd('\0').Split('\0')
+                    return (T)(object)Marshal.PtrToStringUni(buffer, (int)size / 2).TrimEnd('\0').Split('\0')
                         .ToArray();
 
                 // Byte & SByte
                 if (managedType == typeof(sbyte)
                     || managedType == typeof(byte))
-                    return (T) (object) Marshal.ReadByte(buffer);
+                    return (T)(object)Marshal.ReadByte(buffer);
 
                 // (U)Int16
                 if (managedType == typeof(short)
                     || managedType == typeof(ushort))
-                    return (T) (object) (ushort) Marshal.ReadInt16(buffer);
+                    return (T)(object)(ushort)Marshal.ReadInt16(buffer);
 
                 // (U)Int32
                 if (managedType == typeof(int)
                     || managedType == typeof(uint))
-                    return (T) Convert.ChangeType(Marshal.ReadInt32(buffer), managedType);
+                    return (T)Convert.ChangeType(Marshal.ReadInt32(buffer), managedType);
 
                 // (U)Int64
                 if (managedType == typeof(long)
                     || managedType == typeof(ulong))
-                    return (T) (object) (ulong) Marshal.ReadInt64(buffer);
+                    return (T)(object)(ulong)Marshal.ReadInt64(buffer);
 
                 // FILETIME/DateTimeOffset
                 if (managedType == typeof(DateTimeOffset))
-                    return (T) (object) DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
+                    return (T)(object)DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
+
+                // GUID
+                if (managedType == typeof(Guid))
+                    return (T)(object)(Guid)Marshal.PtrToStructure<Guid>(buffer);
 
                 #endregion
 
@@ -168,9 +172,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             // Regular strings
             if (managedType == typeof(string))
             {
-                var value = (string) (object) propertyValue;
+                var value = (string)(object)propertyValue;
                 buffer = Marshal.StringToHGlobalUni(value);
-                propBufSize = (uint) ((value.Length + 1) * 2);
+                propBufSize = (uint)((value.Length + 1) * 2);
             }
 
             // Double-null-terminated string to list
@@ -182,9 +186,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             if (managedType == typeof(sbyte)
                 || managedType == typeof(byte))
             {
-                var value = (byte) (object) propertyValue;
-                propBufSize = (uint) Marshal.SizeOf(managedType);
-                buffer = Marshal.AllocHGlobal((int) propBufSize);
+                var value = (byte)(object)propertyValue;
+                propBufSize = (uint)Marshal.SizeOf(managedType);
+                buffer = Marshal.AllocHGlobal((int)propBufSize);
                 Marshal.WriteByte(buffer, value);
             }
             /*
@@ -197,9 +201,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             if (managedType == typeof(int)
                 || managedType == typeof(uint))
             {
-                var value = (uint) (object) propertyValue;
-                propBufSize = (uint) Marshal.SizeOf(managedType);
-                buffer = Marshal.AllocHGlobal((int) propBufSize);
+                var value = (uint)(object)propertyValue;
+                propBufSize = (uint)Marshal.SizeOf(managedType);
+                buffer = Marshal.AllocHGlobal((int)propBufSize);
                 Marshal.WriteInt32(buffer, (int)value);
             }
             /*
@@ -212,6 +216,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             if (managedType == typeof(DateTimeOffset))
                 return (T) (object) DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
             */
+
+            if (managedType == typeof(Guid))
+            {
+                var value = (Guid)(object)propertyValue;
+                Marshal.StructureToPtr(value, buffer, false);
+                propBufSize = (uint)Marshal.SizeOf(managedType);
+            }
+
             #endregion
 
             if (buffer == IntPtr.Zero)
@@ -246,7 +258,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             valueBufferSize = 2018;
 
-            valueBuffer = Marshal.AllocHGlobal((int) valueBufferSize);
+            valueBuffer = Marshal.AllocHGlobal((int)valueBufferSize);
 
             var ret = SetupApiWrapper.CM_Get_DevNode_Property(
                 _instanceHandle,
