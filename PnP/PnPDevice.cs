@@ -46,7 +46,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <summary>
         ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
         /// </summary>
-        /// <typeparam name="T">The managed type of the fetched porperty value.</typeparam>
+        /// <typeparam name="T">The managed type of the fetched property value.</typeparam>
         /// <param name="propertyKey">The <see cref="DevicePropertyKey" /> to query for.</param>
         /// <returns>On success, the value of the queried property.</returns>
         T GetProperty<T>(DevicePropertyKey propertyKey);
