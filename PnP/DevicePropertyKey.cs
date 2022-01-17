@@ -106,6 +106,16 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     The list of compatible IDs.
         /// </summary>
         public static DevicePropertyKey CompatibleIds = new DevicePropertyDeviceCompatibleIds();
+        
+        /// <summary>
+        ///     The device class name.
+        /// </summary>
+        public static DevicePropertyKey Class = new DevicePropertyDeviceClass();
+
+        /// <summary>
+        ///     The device class guid.
+        /// </summary>
+        public static DevicePropertyKey ClassGuid = new DevicePropertyDeviceClassGuid();
 
         /// <summary>
         ///     The manufacturer string.
@@ -167,6 +177,20 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         private class DevicePropertyDeviceCompatibleIds : DevicePropertyDevice
         {
             public DevicePropertyDeviceCompatibleIds() : base(4, typeof(string[]))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceClass : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceClass() : base(9, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceClassGuid : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceClassGuid() : base(10, typeof(Guid))
             {
             }
         }
