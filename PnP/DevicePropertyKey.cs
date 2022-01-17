@@ -19,10 +19,19 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             PropertyType = propertyType;
         }
 
+        /// <summary>
+        ///     The <see cref="Guid"/> for teh category this property belongs to.
+        /// </summary>
         public Guid CategoryGuid { get; }
 
+        /// <summary>
+        ///     The unique identifier withing the category group for this property.
+        /// </summary>
         public uint PropertyIdentifier { get; }
 
+        /// <summary>
+        ///     The managed type of the property (integer, string, array, ...).
+        /// </summary>
         public Type PropertyType { get; }
 
         public int CompareTo(object obj)
@@ -30,6 +39,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        ///     Returns native type for managed type.
+        /// </summary>
+        /// <returns>The native <see cref="SetupApiWrapper.DevPropKey"/>.</returns>
         internal SetupApiWrapper.DevPropKey ToNativeType()
         {
             return new SetupApiWrapper.DevPropKey(CategoryGuid, PropertyIdentifier);
@@ -56,24 +69,54 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
     }
 
+    /// <summary>
+    ///     Common device property definitions.
+    /// </summary>
     public abstract class DevicePropertyDevice : DevicePropertyKey
     {
+        /// <summary>
+        ///     The Device Description.
+        /// </summary>
         public static DevicePropertyKey DeviceDesc = new DevicePropertyDeviceDeviceDesc();
 
+        /// <summary>
+        ///     The list of hardware IDs.
+        /// </summary>
         public static DevicePropertyKey HardwareIds = new DevicePropertyDeviceHardwareIds();
 
+        /// <summary>
+        ///     The list of compatible IDs.
+        /// </summary>
         public static DevicePropertyKey CompatibleIds = new DevicePropertyDeviceCompatibleIds();
 
+        /// <summary>
+        ///     The manufacturer string.
+        /// </summary>
         public static DevicePropertyKey Manufacturer = new DevicePropertyDeviceManufacturer();
 
+        /// <summary>
+        ///     The friendly display name.
+        /// </summary>
         public static DevicePropertyKey FriendlyName = new DevicePropertyDeviceFriendlyName();
 
+        /// <summary>
+        ///     The enumerator name.
+        /// </summary>
         public static DevicePropertyKey EnumeratorName = new DevicePropertyDeviceEnumeratorName();
         
+        /// <summary>
+        ///     The instance ID.
+        /// </summary>
         public static DevicePropertyKey InstanceId = new DevicePropertyDeviceInstanceId();
         
+        /// <summary>
+        ///     The parent instance ID.
+        /// </summary>
         public static DevicePropertyKey Parent = new DevicePropertyDeviceParent();
         
+        /// <summary>
+        ///     The list of child instances, if any.
+        /// </summary>
         public static DevicePropertyKey Children = new DevicePropertyDeviceChildren();
 
         private DevicePropertyDevice(uint propertyIdentifier, Type propertyType) : this(
