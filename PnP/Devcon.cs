@@ -17,7 +17,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <param name="target">The device class GUID.</param>
         /// <param name="hardwareId">The hardware ID to search for.</param>
         /// <returns>True if found, false otherwise.</returns>
-        private static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId)
+        public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId)
         {
             var found = false;
             var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
