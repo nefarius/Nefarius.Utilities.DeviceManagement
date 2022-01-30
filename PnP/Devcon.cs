@@ -17,8 +17,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <param name="path">The device path of the enumerated device.</param>
         /// <param name="instanceId">The instance ID of the enumerated device.</param>
         /// <param name="instance">Optional instance ID (zero-based) specifying the device to process on multiple matches.</param>
+        /// <param name="presentOnly">
+        ///     Only enumerate currently connected devices by default, set to False to also include phantom
+        ///     devices.
+        /// </param>
         /// <returns>True if at least one device was found with the provided class, false otherwise.</returns>
-        public static bool Find(Guid target, out string path, out string instanceId, int instance = 0)
+        public static bool Find(Guid target, out string path, out string instanceId, int instance = 0,
+            bool presentOnly = true)
         {
             var detailDataBuffer = IntPtr.Zero;
             var deviceInfoSet = IntPtr.Zero;
@@ -29,13 +34,17 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     da = new SetupApiWrapper.SP_DEVINFO_DATA();
                 int bufferSize = 0, memberIndex = 0;
 
-                deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero,
-                    SetupApiWrapper.DIGCF_PRESENT | SetupApiWrapper.DIGCF_DEVICEINTERFACE);
+                var flags = SetupApiWrapper.DIGCF_DEVICEINTERFACE;
+
+                if (presentOnly)
+                    flags |= SetupApiWrapper.DIGCF_PRESENT;
+
+                deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero, flags);
 
                 deviceInterfaceData.cbSize = da.cbSize = Marshal.SizeOf(deviceInterfaceData);
 
                 while (SetupApiWrapper.SetupDiEnumDeviceInterfaces(deviceInfoSet, IntPtr.Zero, ref target, memberIndex,
-                    ref deviceInterfaceData))
+                           ref deviceInterfaceData))
                 {
                     SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData, IntPtr.Zero,
                         0,
@@ -47,8 +56,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                             IntPtr.Size == 4 ? 4 + Marshal.SystemDefaultCharSize : 8);
 
                         if (SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData,
-                            detailDataBuffer,
-                            bufferSize, ref bufferSize, ref da))
+                                detailDataBuffer,
+                                bufferSize, ref bufferSize, ref da))
                         {
                             var pDevicePathName = detailDataBuffer + 4;
 
@@ -106,48 +115,48 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <returns>True on success, false otherwise.</returns>
         public static bool Create(string className, Guid classGuid, string node)
         {
-            var deviceInfoSet = (IntPtr) (-1);
+            var deviceInfoSet = (IntPtr)(-1);
             var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
 
             try
             {
                 deviceInfoSet = SetupApiWrapper.SetupDiCreateDeviceInfoList(ref classGuid, IntPtr.Zero);
 
-                if (deviceInfoSet == (IntPtr) (-1))
+                if (deviceInfoSet == (IntPtr)(-1))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
 
                 if (!SetupApiWrapper.SetupDiCreateDeviceInfo(
-                    deviceInfoSet,
-                    className,
-                    ref classGuid,
-                    null,
-                    IntPtr.Zero,
-                    SetupApiWrapper.DICD_GENERATE_ID,
-                    ref deviceInfoData
-                ))
+                        deviceInfoSet,
+                        className,
+                        ref classGuid,
+                        null,
+                        IntPtr.Zero,
+                        SetupApiWrapper.DICD_GENERATE_ID,
+                        ref deviceInfoData
+                    ))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 if (!SetupApiWrapper.SetupDiSetDeviceRegistryProperty(
-                    deviceInfoSet,
-                    ref deviceInfoData,
-                    SetupApiWrapper.SPDRP_HARDWAREID,
-                    node,
-                    node.Length * 2
-                ))
+                        deviceInfoSet,
+                        ref deviceInfoData,
+                        SetupApiWrapper.SPDRP_HARDWAREID,
+                        node,
+                        node.Length * 2
+                    ))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 if (!SetupApiWrapper.SetupDiCallClassInstaller(
-                    SetupApiWrapper.DIF_REGISTERDEVICE,
-                    deviceInfoSet,
-                    ref deviceInfoData
-                ))
+                        SetupApiWrapper.DIF_REGISTERDEVICE,
+                        deviceInfoSet,
+                        ref deviceInfoData
+                    ))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
             }
             finally
             {
-                if (deviceInfoSet != (IntPtr) (-1))
+                if (deviceInfoSet != (IntPtr)(-1))
                     SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
 
@@ -190,15 +199,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 );
 
                 if (SetupApiWrapper.SetupDiOpenDeviceInfo(
-                    deviceInfoSet,
-                    instanceId,
-                    IntPtr.Zero,
-                    0,
-                    ref deviceInfoData
-                ))
+                        deviceInfoSet,
+                        instanceId,
+                        IntPtr.Zero,
+                        0,
+                        ref deviceInfoData
+                    ))
                 {
                     var props = new SetupApiWrapper.SP_REMOVEDEVICE_PARAMS
-                        {ClassInstallHeader = new SetupApiWrapper.SP_CLASSINSTALL_HEADER()};
+                        { ClassInstallHeader = new SetupApiWrapper.SP_CLASSINSTALL_HEADER() };
 
                     props.ClassInstallHeader.cbSize = Marshal.SizeOf(props.ClassInstallHeader);
                     props.ClassInstallHeader.InstallFunction = SetupApiWrapper.DIF_REMOVE;
@@ -208,15 +217,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
                     // Prepare class (un-)installer
                     if (SetupApiWrapper.SetupDiSetClassInstallParams(
-                        deviceInfoSet,
-                        ref deviceInfoData,
-                        ref props,
-                        Marshal.SizeOf(props)
-                    ))
+                            deviceInfoSet,
+                            ref deviceInfoData,
+                            ref props,
+                            Marshal.SizeOf(props)
+                        ))
                     {
                         // Invoke class installer with uninstall action
                         if (!SetupApiWrapper.SetupDiCallClassInstaller(SetupApiWrapper.DIF_REMOVE, deviceInfoSet,
-                            ref deviceInfoData))
+                                ref deviceInfoData))
                             throw new Win32Exception(Marshal.GetLastWin32Error());
 
                         // Fill cbSize field
@@ -228,7 +237,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
                         // Fill SP_DEVINSTALL_PARAMS struct
                         if (!SetupApiWrapper.SetupDiGetDeviceInstallParams(deviceInfoSet, ref deviceInfoData,
-                            installParams))
+                                installParams))
                             throw new Win32Exception(Marshal.GetLastWin32Error());
 
                         // Grab Flags field of SP_DEVINSTALL_PARAMS (offset of 32 bits)
@@ -266,7 +275,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             if (SetupApiWrapper.CM_Locate_DevNode_Ex(out var devRoot, IntPtr.Zero, 0, IntPtr.Zero) !=
                 SetupApiWrapper.ConfigManagerResult.Success) return false;
-            return SetupApiWrapper.CM_Reenumerate_DevNode_Ex(devRoot, 0, IntPtr.Zero) == SetupApiWrapper.ConfigManagerResult.Success;
+            return SetupApiWrapper.CM_Reenumerate_DevNode_Ex(devRoot, 0, IntPtr.Zero) ==
+                   SetupApiWrapper.ConfigManagerResult.Success;
         }
 
         /// <summary>
