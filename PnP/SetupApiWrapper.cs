@@ -306,7 +306,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         [DllImport("setupapi.dll", SetLastError = true)]
         internal static extern bool SetupDiEnumDeviceInfo(IntPtr deviceInfoSet,
             UInt32 memberIndex,
-            [Out] out SP_DEVINFO_DATA deviceInfoData);
+            ref SP_DEVINFO_DATA deviceInfoData);
 
         [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
         internal static extern IntPtr SetupDiGetClassDevs(ref Guid ClassGuid, IntPtr Enumerator, IntPtr hwndParent,

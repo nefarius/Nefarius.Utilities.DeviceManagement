@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
@@ -10,6 +11,53 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <remarks>https://docs.microsoft.com/en-us/windows-hardware/drivers/install/setupapi</remarks>
     public static class Devcon
     {
+        /// <summary>
+        ///     Attempts to find a device within a specified device class by a given hardware ID.
+        /// </summary>
+        /// <param name="target">The device class GUID.</param>
+        /// <param name="hardwareId">The hardware ID to search for.</param>
+        /// <returns>True if found, false otherwise.</returns>
+        private static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId)
+        {
+            var found = false;
+            var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
+            deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
+            var deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero, 0);
+
+            try
+            {
+                for (
+                    uint i = 0;
+                    !found && SetupApiWrapper.SetupDiEnumDeviceInfo(deviceInfoSet, i, ref deviceInfoData);
+                    i++
+                )
+                {
+                    const int nBytes = 256;
+                    var ptrInstanceBuf = Marshal.AllocHGlobal(nBytes);
+
+                    SetupApiWrapper.CM_Get_Device_ID(deviceInfoData.DevInst, ptrInstanceBuf, nBytes, 0);
+
+                    var instanceId = (Marshal.PtrToStringAuto(ptrInstanceBuf) ?? string.Empty).ToUpper();
+
+                    Marshal.FreeHGlobal(ptrInstanceBuf);
+
+                    var device = PnPDevice.GetDeviceByInstanceId(instanceId);
+
+                    var hardwareIds = device.GetProperty<string[]>(DevicePropertyDevice.HardwareIds)
+                        .Select(id => id.ToUpper()).ToList();
+
+                    if (hardwareIds.Contains(hardwareId.ToUpper()))
+                        found = true;
+                }
+            }
+            finally
+            {
+                if (deviceInfoSet != IntPtr.Zero) SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            }
+
+            return found;
+        }
+
         /// <summary>
         ///     Searches for devices matching the provided interface GUID and returns the device path and instance ID.
         /// </summary>
