@@ -143,5 +143,104 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             {
             }
         }
+
+        private class DevicePropertyDeviceInstanceId : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceInstanceId()
+                : base(Guid.Parse("{0x78c34fc8, 0x104a, 0x4aca, {0x9e, 0xa4, 0x52, 0x4d, 0x52, 0x99, 0x6e, 0x57}}"),
+                    256, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceParent : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceParent()
+                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
+                    8, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceChildren : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceChildren()
+                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
+                    9, typeof(string[]))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceSiblings : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceSiblings()
+                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
+                    10, typeof(string[]))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceDriverDate : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceDriverDate()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    2, typeof(DateTimeOffset))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceDriverVersion : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceDriverVersion()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    3, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceDriverDesc : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceDriverDesc()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    4, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceDriverInfPath : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceDriverInfPath()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    5, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceDriverInfSection : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceDriverInfSection()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    6, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceMatchingDeviceId : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceMatchingDeviceId()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    8, typeof(string))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceDriverProvider : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceDriverProvider()
+                : base(Guid.Parse("{0xa8b865dd, 0x2e3d, 0x4094, {0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6}}"),
+                    9, typeof(string))
+            {
+            }
+        }
     }
 }

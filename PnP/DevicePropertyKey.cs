@@ -212,6 +212,41 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public static DevicePropertyKey Siblings = new DevicePropertyDeviceSiblings();
 
+        /// <summary>
+        ///     The driver release date.
+        /// </summary>
+        public static DevicePropertyKey DriverDate = new DevicePropertyDeviceDriverDate();
+
+        /// <summary>
+        ///     The driver version.
+        /// </summary>
+        public static DevicePropertyKey DriverVersion = new DevicePropertyDeviceDriverVersion();
+
+        /// <summary>
+        ///     The driver description.
+        /// </summary>
+        public static DevicePropertyKey DriverDesc = new DevicePropertyDeviceDriverDesc();
+
+        /// <summary>
+        ///     The driver INF path.
+        /// </summary>
+        public static DevicePropertyKey DriverInfPath = new DevicePropertyDeviceDriverInfPath();
+
+        /// <summary>
+        ///     The driver INF section.
+        /// </summary>
+        public static DevicePropertyKey DriverInfSection = new DevicePropertyDeviceDriverInfSection();
+
+        /// <summary>
+        ///     The matching device ID.
+        /// </summary>
+        public static DevicePropertyKey MatchingDeviceId = new DevicePropertyDeviceMatchingDeviceId();
+
+        /// <summary>
+        ///     The driver provider name.
+        /// </summary>
+        public static DevicePropertyKey DriverProvider = new DevicePropertyDeviceDriverProvider();
+
         private DevicePropertyDevice(uint propertyIdentifier, Type propertyType) : this(
             Guid.Parse("{0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}}"),
             propertyIdentifier,
@@ -223,42 +258,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         protected DevicePropertyDevice(Guid categoryGuid, uint propertyIdentifier, Type propertyType)
             : base(categoryGuid, propertyIdentifier, propertyType)
         {
-        }
-        
-        private class DevicePropertyDeviceInstanceId : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceInstanceId()
-                : base(Guid.Parse("{0x78c34fc8, 0x104a, 0x4aca, {0x9e, 0xa4, 0x52, 0x4d, 0x52, 0x99, 0x6e, 0x57}}"),
-                    256, typeof(string))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceParent : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceParent()
-                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
-                    8, typeof(string))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceChildren : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceChildren()
-                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
-                    9, typeof(string[]))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceSiblings : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceSiblings()
-                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
-                    10, typeof(string[]))
-            {
-            }
         }
     }
 }
