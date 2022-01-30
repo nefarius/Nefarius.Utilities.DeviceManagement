@@ -112,7 +112,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             );
 
             if (ret == SetupApiWrapper.ConfigManagerResult.NoSuchDevinst)
-                throw new ArgumentException("The supplied instance wasn't found.", nameof(flags));
+                throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
 
             if (ret != SetupApiWrapper.ConfigManagerResult.Success)
                 throw new Win32Exception(Marshal.GetLastWin32Error());

@@ -41,7 +41,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
                     Marshal.FreeHGlobal(ptrInstanceBuf);
 
-                    var device = PnPDevice.GetDeviceByInstanceId(instanceId);
+                    var device = PnPDevice.GetDeviceByInstanceId(instanceId, DeviceLocationFlags.Phantom);
 
                     var hardwareIds = device.GetProperty<string[]>(DevicePropertyDevice.HardwareIds)
                         .Select(id => id.ToUpper()).ToList();
