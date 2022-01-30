@@ -90,7 +90,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <summary>
     ///     Common device property definitions.
     /// </summary>
-    public abstract class DevicePropertyDevice : DevicePropertyKey
+    public abstract partial class DevicePropertyDevice : DevicePropertyKey
     {
         /// <summary>
         ///     The Device Description.
@@ -106,6 +106,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     The list of compatible IDs.
         /// </summary>
         public static DevicePropertyKey CompatibleIds = new DevicePropertyDeviceCompatibleIds();
+
+        /// <summary>
+        ///     The service name.
+        /// </summary>
+        public static DevicePropertyKey Service = new DevicePropertyDeviceService();
         
         /// <summary>
         ///     The device class name.
@@ -118,6 +123,16 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         public static DevicePropertyKey ClassGuid = new DevicePropertyDeviceClassGuid();
 
         /// <summary>
+        ///     The driver name.
+        /// </summary>
+        public static DevicePropertyKey Driver = new DevicePropertyDeviceDriver();
+
+        /// <summary>
+        ///     Possible configuration flags.
+        /// </summary>
+        public static DevicePropertyKey ConfigFlags = new DevicePropertyDeviceConfigFlags();
+
+        /// <summary>
         ///     The manufacturer string.
         /// </summary>
         public static DevicePropertyKey Manufacturer = new DevicePropertyDeviceManufacturer();
@@ -127,6 +142,51 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public static DevicePropertyKey FriendlyName = new DevicePropertyDeviceFriendlyName();
 
+        /// <summary>
+        ///     The location information.
+        /// </summary>
+        public static DevicePropertyKey LocationInfo = new DevicePropertyDeviceLocationInfo();
+
+        /// <summary>
+        ///     The Physical Device Object name.
+        /// </summary>
+        public static DevicePropertyKey PDOName = new DevicePropertyDevicePDOName();
+
+        /// <summary>
+        ///     The device capabilities.
+        /// </summary>
+        public static DevicePropertyKey Capabilities = new DevicePropertyDeviceCapabilities();
+
+        /// <summary>
+        ///     The UI number.
+        /// </summary>
+        public static DevicePropertyKey UINumber = new DevicePropertyDeviceUINumber();
+
+        /// <summary>
+        ///     The upper filters list.
+        /// </summary>
+        public static DevicePropertyKey UpperFilters = new DevicePropertyDeviceUpperFilters();
+
+        /// <summary>
+        ///     The lower filters list.
+        /// </summary>
+        public static DevicePropertyKey LowerFilters = new DevicePropertyDeviceLowerFilters();
+
+        /// <summary>
+        ///     The bus type GUILD.
+        /// </summary>
+        public static DevicePropertyKey BusTypeGuid = new DevicePropertyDeviceBusTypeGuid();
+
+        /// <summary>
+        ///     The legacy bus type.
+        /// </summary>
+        public static DevicePropertyKey LegacyBusType = new DevicePropertyDeviceLegacyBusType();
+
+        /// <summary>
+        ///     The bus number.
+        /// </summary>
+        public static DevicePropertyKey BusNumber = new DevicePropertyDeviceBusNumber();
+        
         /// <summary>
         ///     The enumerator name.
         /// </summary>
@@ -147,6 +207,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public static DevicePropertyKey Children = new DevicePropertyDeviceChildren();
 
+        /// <summary>
+        ///     The list of siblings, if any.
+        /// </summary>
+        public static DevicePropertyKey Siblings = new DevicePropertyDeviceSiblings();
+
         private DevicePropertyDevice(uint propertyIdentifier, Type propertyType) : this(
             Guid.Parse("{0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}}"),
             propertyIdentifier,
@@ -159,63 +224,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             : base(categoryGuid, propertyIdentifier, propertyType)
         {
         }
-
-        private class DevicePropertyDeviceDeviceDesc : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceDeviceDesc() : base(2, typeof(string))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceHardwareIds : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceHardwareIds() : base(3, typeof(string[]))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceCompatibleIds : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceCompatibleIds() : base(4, typeof(string[]))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceClass : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceClass() : base(9, typeof(string))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceClassGuid : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceClassGuid() : base(10, typeof(Guid))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceManufacturer : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceManufacturer() : base(13, typeof(string))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceFriendlyName : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceFriendlyName() : base(14, typeof(string))
-            {
-            }
-        }
-
-        private class DevicePropertyDeviceEnumeratorName : DevicePropertyDevice
-        {
-            public DevicePropertyDeviceEnumeratorName() : base(24, typeof(string))
-            {
-            }
-        }
-
+        
         private class DevicePropertyDeviceInstanceId : DevicePropertyDevice
         {
             public DevicePropertyDeviceInstanceId()
@@ -239,6 +248,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             public DevicePropertyDeviceChildren()
                 : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
                     9, typeof(string[]))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceSiblings : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceSiblings()
+                : base(Guid.Parse("{0x4340a6c5, 0x93fa, 0x4706, {0x97, 0x2c, 0x7b, 0x64, 0x80, 0x08, 0xa5, 0xa7}}"),
+                    10, typeof(string[]))
             {
             }
         }
