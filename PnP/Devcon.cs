@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -19,6 +20,19 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <returns>True if found, false otherwise.</returns>
         public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId)
         {
+            return FindInDeviceClassByHardwareId(target, hardwareId, out _);
+        }
+
+        /// <summary>
+        ///     Attempts to find a device within a specified device class by a given hardware ID.
+        /// </summary>
+        /// <param name="target">The device class GUID.</param>
+        /// <param name="hardwareId">The hardware ID to search for.</param>
+        /// <param name="instanceIds">A list of instances found for the given search criteria.</param>
+        /// <returns>True if found, false otherwise.</returns>
+        public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId, out IEnumerable<string> instanceIds)
+        {
+            instanceIds = new List<string>();
             var found = false;
             var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
             deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
@@ -28,7 +42,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             {
                 for (
                     uint i = 0;
-                    !found && SetupApiWrapper.SetupDiEnumDeviceInfo(deviceInfoSet, i, ref deviceInfoData);
+                    SetupApiWrapper.SetupDiEnumDeviceInfo(deviceInfoSet, i, ref deviceInfoData);
                     i++
                 )
                 {
@@ -38,6 +52,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     SetupApiWrapper.CM_Get_Device_ID(deviceInfoData.DevInst, ptrInstanceBuf, nBytes, 0);
 
                     var instanceId = (Marshal.PtrToStringAuto(ptrInstanceBuf) ?? string.Empty).ToUpper();
+
+                    ((List<string>)instanceIds).Add(instanceId);
 
                     Marshal.FreeHGlobal(ptrInstanceBuf);
 
