@@ -5,7 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/x6ylnh2c6p3l12pw?svg=true)](https://ci.appveyor.com/project/nefarius/nefarius-utilities-devicemanagement) 
 [![Nuget](https://img.shields.io/nuget/v/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/) [![Nuget](https://img.shields.io/nuget/dt/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
 
-Managed wrappers around SetupAPI and Cfgmgr32.
+Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.
 
 ## Sources & 3rd party credits
 
