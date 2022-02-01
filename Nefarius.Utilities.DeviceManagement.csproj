@@ -13,6 +13,7 @@
     <OutputPath>$(SolutionDir)bin\</OutputPath>
     <Copyright>Copyright © Benjamin Höglinger-Stelzer 2022</Copyright>
     <LangVersion>latest</LangVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
