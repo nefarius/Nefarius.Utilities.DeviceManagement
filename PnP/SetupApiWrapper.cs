@@ -278,6 +278,23 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             PNP_VetoInsufficientRights      // Name is unspecified
         }
 
+        /// <summary>
+        ///     Flags for DiUninstallDriver
+        /// </summary>
+        [Flags]
+        internal enum DIURFLAG
+        {
+            NO_REMOVE_INF = 0x00000001, // Do not remove inf from the system
+            UNCONFIGURE_INF = 0x00000002 // Unconfigure inf, if possible
+        }
+
+        [Flags]
+        internal enum SetupUOInfFlags : uint
+        {
+            NONE = 0x0000,
+            SUOI_FORCEDELETE = 0x0001
+        }
+
         #endregion
 
         #region Interop Definitions
@@ -378,6 +395,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             [In] uint OpenFlags,
             [In] [Out] ref SP_DEVICE_INTERFACE_DATA DeviceInterfaceData
         );
+
+        [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetupUninstallOEMInf(
+            [MarshalAs(UnmanagedType.LPWStr)] string infName,
+            SetupUOInfFlags flags,
+            IntPtr reserved);
 
         #endregion
 
@@ -509,6 +533,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             [In] string FullInfPath,
             [In] uint InstallFlags,
             [Out] out bool bRebootRequired
+        );
+
+        [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        internal static extern bool DiUninstallDriver(
+            [In] IntPtr hwndParent,
+            [In] string infPath,
+            [In] DIURFLAG flags,
+            [Out] out bool needReboot
         );
 
         #endregion

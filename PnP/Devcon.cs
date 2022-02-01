@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -435,6 +436,39 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             return SetupApiWrapper.UpdateDriverForPlugAndPlayDevices(IntPtr.Zero, hardwareId, fullInfPath,
                 SetupApiWrapper.INSTALLFLAG_FORCE | SetupApiWrapper.INSTALLFLAG_NONINTERACTIVE, out rebootRequired);
+        }
+
+        /// <summary>
+        ///     Uninstalls a driver identified via a given INF and optionally removes it from the driver store as well.
+        /// </summary>
+        /// <param name="oemInfName">The OEM INF name (name and extension only).</param>
+        /// <param name="fullInfPath">The fully qualified absolute path to the INF to remove from driver store.</param>
+        /// <param name="forceDelete">Remove driver store copy, if true.</param>
+        public static void DeleteDriver(string oemInfName, string fullInfPath = default, bool forceDelete = false)
+        {
+            if (string.IsNullOrEmpty(oemInfName))
+            {
+                throw new ArgumentNullException(nameof(oemInfName));
+            }
+
+            if (forceDelete
+                && Kernel32.MethodExists("newdev.dll", "DiUninstallDriverW")
+                && !SetupApiWrapper.DiUninstallDriver(
+                    IntPtr.Zero,
+                    fullInfPath,
+                    SetupApiWrapper.DIURFLAG.NO_REMOVE_INF,
+                    out _))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            if (!SetupApiWrapper.SetupUninstallOEMInf(
+                    oemInfName,
+                    forceDelete ? SetupApiWrapper.SetupUOInfFlags.SUOI_FORCEDELETE : SetupApiWrapper.SetupUOInfFlags.NONE,
+                    IntPtr.Zero))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
         }
     }
 }
