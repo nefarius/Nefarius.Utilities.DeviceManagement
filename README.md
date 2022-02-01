@@ -7,6 +7,10 @@
 
 Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.
 
+## Documentation
+
+[Link to API docs](docs/index.md).
+
 ## Sources & 3rd party credits
 
 - [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
