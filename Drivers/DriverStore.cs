@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -208,6 +209,8 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
     /// </summary>
     public static class DriverStore
     {
+        private static readonly string WinDir = Environment.GetEnvironmentVariable("WINDIR");
+
         /// <summary>
         ///     Gets a list of existing packages (absolute INF paths) in the local driver store.
         /// </summary>
@@ -236,7 +239,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
 
                         return 1;
                     }
-                    , IntPtr.Zero, Environment.GetEnvironmentVariable("WINDIR"));
+                    , IntPtr.Zero, WinDir);
 
                 if ((ntStatus & 0x80000000) != 0)
                 {
@@ -245,6 +248,19 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
 
                 return existingDrivers;
             }
+        }
+
+        /// <summary>
+        ///     Removes a driver identified by absolute package path.
+        /// </summary>
+        /// <param name="driverStoreFileName">The absolute package path to remove.</param>
+        public static void RemoveDriver(string driverStoreFileName)
+        {
+            uint ntStatus;
+
+            ntStatus = DriverStoreNative.DriverStoreOfflineDeleteDriverPackage(driverStoreFileName, 0, IntPtr.Zero,
+                WinDir, Path.GetPathRoot(WinDir));
+            if ((ntStatus & 0x80000000) != 0) throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }
 
