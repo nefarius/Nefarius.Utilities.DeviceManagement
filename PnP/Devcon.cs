@@ -422,6 +422,20 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         /// <summary>
+        ///     Instructs the system to re-enumerate hardware devices including disconnected ones.
+        /// </summary>
+        /// <returns>True on success, false otherwise.</returns>
+        public static bool RefreshPhantom()
+        {
+            if (SetupApiWrapper.CM_Locate_DevNode_Ex(out var devRoot, IntPtr.Zero,
+                    (uint)SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_PHANTOM, IntPtr.Zero) !=
+                SetupApiWrapper.ConfigManagerResult.Success) return false;
+            return SetupApiWrapper.CM_Reenumerate_DevNode_Ex(devRoot, SetupApiWrapper.CM_REENUMERATE_SYNCHRONOUS,
+                       IntPtr.Zero) ==
+                   SetupApiWrapper.ConfigManagerResult.Success;
+        }
+
+        /// <summary>
         ///     Given an INF file and a hardware ID, this function installs updated drivers for devices that match the hardware ID.
         /// </summary>
         /// <param name="hardwareId">A string that supplies the hardware identifier to match existing devices on the computer.</param>
