@@ -6,3 +6,10 @@
 [![Nuget](https://img.shields.io/nuget/v/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/) [![Nuget](https://img.shields.io/nuget/dt/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
 
 Managed wrappers around SetupAPI and Cfgmgr32.
+
+## Sources & 3rd party credits
+
+- [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
+- [ViGEm.Management](https://github.com/ViGEm/ViGEm.Management)
+- [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
+- [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
