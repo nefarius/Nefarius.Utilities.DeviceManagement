@@ -214,7 +214,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
         /// <summary>
         ///     Gets a list of existing packages (absolute INF paths) in the local driver store.
         /// </summary>
-        public static IEnumerable<string> ExistingPackages
+        public static IEnumerable<string> ExistingDrivers
         {
             get
             {
