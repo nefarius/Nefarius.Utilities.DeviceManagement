@@ -58,6 +58,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         void Restart();
 
+        /// <summary>
+        ///     Attempts to remove this device node.
+        /// </summary>
         void Remove();
 
         /// <summary>
@@ -179,6 +182,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
+        /// <summary>
+        ///     Attempts to remove this device node.
+        /// </summary>
         public void Remove()
         {
             var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
