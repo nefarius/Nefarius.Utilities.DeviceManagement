@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -199,6 +200,41 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
         SkipExistingCopyInfs = 4,
         SystemDefaultLocale = 8,
         Hardlink = 16
+    }
+
+    public static class DriverStore
+    {
+        public static IEnumerable<string> DriverStoreEntries
+        {
+            get
+            {
+                List<string> existingDrivers = new();
+
+                uint ntStatus = DriverStoreNative.DriverStoreOfflineEnumDriverPackage(
+                    (
+                        string DriverPackageInfPath,
+                        IntPtr Ptr,
+                        IntPtr Unknown
+                    ) =>
+                    {
+                        DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo
+                            DriverStoreOfflineEnumDriverPackageInfoW =
+                                (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(Ptr,
+                                    typeof(DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo));
+                        Console.Title =
+                            $"Driver Updater - DriverStoreOfflineEnumDriverPackage - {DriverPackageInfPath}";
+                        if (DriverStoreOfflineEnumDriverPackageInfoW.InboxInf == 0)
+                        {
+                            existingDrivers.Add(DriverPackageInfPath);
+                        }
+
+                        return 1;
+                    }
+                    , IntPtr.Zero, Environment.GetEnvironmentVariable("%WINDIR%"));
+
+                return existingDrivers;
+            }
+        }
     }
 
     internal static class DriverStoreNative
