@@ -53,9 +53,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     SetupApiWrapper.CM_Get_Device_ID(deviceInfoData.DevInst, ptrInstanceBuf, nBytes, 0);
 
                     var instanceId = (Marshal.PtrToStringAuto(ptrInstanceBuf) ?? string.Empty).ToUpper();
-
-                    ((List<string>)instanceIds).Add(instanceId);
-
+                    
                     Marshal.FreeHGlobal(ptrInstanceBuf);
 
                     var device = PnPDevice.GetDeviceByInstanceId(instanceId, DeviceLocationFlags.Phantom);
@@ -63,8 +61,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     var hardwareIds = device.GetProperty<string[]>(DevicePropertyDevice.HardwareIds)
                         .Select(id => id.ToUpper()).ToList();
 
-                    if (hardwareIds.Contains(hardwareId.ToUpper()))
-                        found = true;
+                    if (!hardwareIds.Contains(hardwareId.ToUpper())) continue;
+
+                    ((List<string>)instanceIds).Add(instanceId);
+                    found = true;
                 }
             }
             finally
