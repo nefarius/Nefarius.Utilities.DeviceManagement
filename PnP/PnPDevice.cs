@@ -58,6 +58,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         void Restart();
 
+        void Remove();
+
         /// <summary>
         ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
         /// </summary>
@@ -175,6 +177,18 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 && ret != SetupApiWrapper.ConfigManagerResult.Success)
                 if (ret != SetupApiWrapper.ConfigManagerResult.Success)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
+
+        public void Remove()
+        {
+            var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
+                _instanceHandle,
+                IntPtr.Zero, IntPtr.Zero, 0,
+                SetupApiWrapper.CM_QUERY_AND_REMOVE_SUBTREE_FLAGS.CM_REMOVE_NO_RESTART
+            );
+
+            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
+                throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
         /// <summary>
