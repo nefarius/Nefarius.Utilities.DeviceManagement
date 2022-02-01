@@ -222,8 +222,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
                             DriverStoreOfflineEnumDriverPackageInfoW =
                                 (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(Ptr,
                                     typeof(DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo));
-                        Console.Title =
-                            $"Driver Updater - DriverStoreOfflineEnumDriverPackage - {DriverPackageInfPath}";
+
                         if (DriverStoreOfflineEnumDriverPackageInfoW.InboxInf == 0)
                         {
                             existingDrivers.Add(DriverPackageInfPath);
@@ -231,7 +230,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
 
                         return 1;
                     }
-                    , IntPtr.Zero, Environment.GetEnvironmentVariable("%WINDIR%"));
+                    , IntPtr.Zero, Environment.GetEnvironmentVariable("WINDIR"));
 
                 if ((ntStatus & 0x80000000) != 0)
                 {
