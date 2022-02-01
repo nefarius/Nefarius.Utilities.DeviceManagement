@@ -203,9 +203,15 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
         Hardlink = 16
     }
 
+    /// <summary>
+    ///     Driver Store enumeration and manipulation utility.
+    /// </summary>
     public static class DriverStore
     {
-        public static IEnumerable<string> DriverStoreEntries
+        /// <summary>
+        ///     Gets a list of existing packages (absolute INF paths) in the local driver store.
+        /// </summary>
+        public static IEnumerable<string> ExistingPackages
         {
             get
             {
@@ -213,19 +219,19 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
 
                 uint ntStatus = DriverStoreNative.DriverStoreOfflineEnumDriverPackage(
                     (
-                        string DriverPackageInfPath,
-                        IntPtr Ptr,
-                        IntPtr Unknown
+                        string driverPackageInfPath,
+                        IntPtr ptr,
+                        IntPtr unknown
                     ) =>
                     {
                         DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo
-                            DriverStoreOfflineEnumDriverPackageInfoW =
-                                (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(Ptr,
+                            driverStoreOfflineEnumDriverPackageInfoW =
+                                (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(ptr,
                                     typeof(DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo));
 
-                        if (DriverStoreOfflineEnumDriverPackageInfoW.InboxInf == 0)
+                        if (driverStoreOfflineEnumDriverPackageInfoW.InboxInf == 0)
                         {
-                            existingDrivers.Add(DriverPackageInfPath);
+                            existingDrivers.Add(driverPackageInfPath);
                         }
 
                         return 1;
@@ -234,7 +240,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
 
                 if ((ntStatus & 0x80000000) != 0)
                 {
-                    throw new Win32Exception($"DriverStoreOfflineEnumDriverPackage: ntStatus={ntStatus}");
+                    throw new Win32Exception($"DriverStoreOfflineEnumDriverPackage: ntStatus=0x{ntStatus:x8}");
                 }
 
                 return existingDrivers;
