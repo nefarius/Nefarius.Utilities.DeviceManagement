@@ -24,6 +24,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -231,6 +232,11 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
                         return 1;
                     }
                     , IntPtr.Zero, Environment.GetEnvironmentVariable("%WINDIR%"));
+
+                if ((ntStatus & 0x80000000) != 0)
+                {
+                    throw new Win32Exception($"DriverStoreOfflineEnumDriverPackage: ntStatus={ntStatus}");
+                }
 
                 return existingDrivers;
             }
