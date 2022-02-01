@@ -317,7 +317,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         /// <summary>
-        ///     Removed a device node identified by class GUID, path and instance ID.
+        ///     Removed a device node identified by interface GUID and instance ID.
         /// </summary>
         /// <param name="classGuid">The device class GUID.</param>
         /// <param name="instanceId">The instance ID.</param>
