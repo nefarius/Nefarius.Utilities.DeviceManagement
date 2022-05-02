@@ -265,7 +265,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
 
         /// <summary>
-        ///     The driver last remo
+        ///     The driver last removal date
         /// </summary>
         public static DevicePropertyKey LastRemovalDate = new DevicePropertyDeviceLastRemovalDate();
 
