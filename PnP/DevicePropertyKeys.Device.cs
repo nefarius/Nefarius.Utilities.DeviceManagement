@@ -242,5 +242,45 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             {
             }
         }
+
+        //
+        // Device activity timestamp properties
+        //
+
+        private class DevicePropertyDeviceInstallDate : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceInstallDate()
+                : base(Guid.Parse("{0x83da6326, 0x97a6, 0x4088, {0x94, 0x53, 0xa1, 0x92, 0x3f, 0x57, 0x3b, 0x29}}"),
+                    100, typeof(DateTimeOffset))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceFirstInstallDate : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceFirstInstallDate()
+                : base(Guid.Parse("{0x83da6326, 0x97a6, 0x4088, {0x94, 0x53, 0xa1, 0x92, 0x3f, 0x57, 0x3b, 0x29}}"),
+                    101, typeof(DateTimeOffset))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceLastArrivalDate : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceLastArrivalDate()
+                : base(Guid.Parse("{0x83da6326, 0x97a6, 0x4088, {0x94, 0x53, 0xa1, 0x92, 0x3f, 0x57, 0x3b, 0x29}}"),
+                    102, typeof(DateTimeOffset))
+            {
+            }
+        }
+
+        private class DevicePropertyDeviceLastRemovalDate : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceLastRemovalDate()
+                : base(Guid.Parse("{0x83da6326, 0x97a6, 0x4088, {0x94, 0x53, 0xa1, 0x92, 0x3f, 0x57, 0x3b, 0x29}}"),
+                    103, typeof(DateTimeOffset))
+            {
+            }
+        }
     }
 }

@@ -247,6 +247,29 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public static DevicePropertyKey DriverProvider = new DevicePropertyDeviceDriverProvider();
 
+        /// <summary>
+        ///     The driver install date.
+        /// </summary>
+        public static DevicePropertyKey InstallDate = new DevicePropertyDeviceInstallDate();
+
+        /// <summary>
+        ///     The driver first install date.
+        /// </summary>
+        public static DevicePropertyKey FirstInstallDate = new DevicePropertyDeviceFirstInstallDate();
+
+
+        /// <summary>
+        ///     The driver last arrival date.
+        /// </summary>
+        public static DevicePropertyKey LastArrivalDate = new DevicePropertyDeviceLastArrivalDate();
+
+
+        /// <summary>
+        ///     The driver last remo
+        /// </summary>
+        public static DevicePropertyKey LastRemovalDate = new DevicePropertyDeviceLastRemovalDate();
+
+
         private DevicePropertyDevice(uint propertyIdentifier, Type propertyType) : this(
             Guid.Parse("{0xa45c254e, 0xdf1c, 0x4efd, {0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0}}"),
             propertyIdentifier,
