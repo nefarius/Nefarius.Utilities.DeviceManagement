@@ -248,6 +248,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         public static DevicePropertyKey DriverProvider = new DevicePropertyDeviceDriverProvider();
 
         /// <summary>
+        ///     The address (bus index, port number) the enumerator assigned to the device.
+        /// </summary>
+        public static DevicePropertyKey Address = new DevicePropertyDeviceAddress();
+
+        /// <summary>
         ///     The driver install date.
         /// </summary>
         public static DevicePropertyKey InstallDate = new DevicePropertyDeviceInstallDate();

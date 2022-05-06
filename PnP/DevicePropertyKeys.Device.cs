@@ -144,6 +144,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
+        private class DevicePropertyDeviceAddress : DevicePropertyDevice
+        {
+            public DevicePropertyDeviceAddress() : base(30, typeof(UInt32))
+            {
+            }
+        }
+
         private class DevicePropertyDeviceInstanceId : DevicePropertyDevice
         {
             public DevicePropertyDeviceInstanceId()
