@@ -17,3 +17,4 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on W
 - [ViGEm.Management](https://github.com/ViGEm/ViGEm.Management)
 - [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
 - [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
+- [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
