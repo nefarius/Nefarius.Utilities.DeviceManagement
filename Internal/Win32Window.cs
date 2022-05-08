@@ -22,7 +22,7 @@ namespace Nefarius.Utilities.DeviceManagement.Internal
         private DeviceManagement.WndProc delegWndProc = null; // = myWndProc;
         private Thread WndProcThread;
 
-        internal IntPtr WinFromHwnd;
+        internal IntPtr WinFromHwnd { get; private set; }
         //[DllImport("user32.dll")]
         //static extern bool TranslateMessage([In] ref MSG lpMsg);
 
