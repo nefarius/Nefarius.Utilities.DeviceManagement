@@ -79,11 +79,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         // Class GUID: {A5DCBF10-6530-11D2-901F-00C04FB951ED}
         private static readonly Guid GUID_DEVINTERFACE_USB_DEVICE = new Guid("A5DCBF10-6530-11D2-901F-00C04FB951ED");
 
-        private Win32Window _window;
-
-        private Internal.DeviceManagement.WndProc _wndProc;
-
         #endregion
+
+        private readonly Win32Window _window;
+
+        private readonly Internal.DeviceManagement.WndProc _wndProc;
 
         public event Action<string> DeviceArrived;
 
@@ -96,6 +96,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             _interfaceGuid = deviceInterfaceGuid;
             _wndProc = WndProc;
             _window = new Win32Window(_wndProc);
+            _window.Create();
         }
 
         public void StartListening()

@@ -37,19 +37,20 @@ namespace Nefarius.Utilities.DeviceManagement.Internal
 
         private void MessagePool()
         {
-            DeviceManagement.WNDCLASS wind_class = new DeviceManagement.WNDCLASS();
-            //wind_class.cbSize = Marshal.SizeOf(typeof(DeviceManagement.WNDCLASS));
-            //wind_class.style = (int)(DeviceManagement.CS_HREDRAW | DeviceManagement.CS_VREDRAW | DeviceManagement.CS_DBLCLKS); //Doubleclicks are active
-            //wind_class.hbrBackground = (IntPtr)COLOR_BACKGROUND + 1; //Black background, +1 is necessary
-            wind_class.cbClsExtra = 0;
-            wind_class.cbWndExtra = 0;
-            wind_class.hInstance = Process.GetCurrentProcess().Handle;
-            wind_class.hIcon = IntPtr.Zero;
-            wind_class.hCursor =
-                DeviceManagement.LoadCursor(IntPtr.Zero, (int)DeviceManagement.IDC_CROSS); // Crosshair cursor;
-            wind_class.lpszMenuName = null;
-            wind_class.lpszClassName = "myClass";
-            wind_class.lpfnWndProc = Marshal.GetFunctionPointerForDelegate(delegWndProc);
+            DeviceManagement.WNDCLASS wind_class = new DeviceManagement.WNDCLASS
+            {
+                //wind_class.hbrBackground = (IntPtr)COLOR_BACKGROUND + 1; //Black background, +1 is necessary
+                //wind_class.style = (int)(DeviceManagement.CS_HREDRAW | DeviceManagement.CS_VREDRAW | DeviceManagement.CS_DBLCLKS); //Doubleclicks are active
+                //wind_class.cbSize = Marshal.SizeOf(typeof(DeviceManagement.WNDCLASS));
+                cbClsExtra = 0,
+                cbWndExtra = 0,
+                hInstance = Process.GetCurrentProcess().Handle,
+                hIcon = IntPtr.Zero,
+                hCursor = DeviceManagement.LoadCursor(IntPtr.Zero, (int)DeviceManagement.IDC_CROSS), // Crosshair cursor;
+                lpszMenuName = null,
+                lpszClassName = "myClass",
+                lpfnWndProc = Marshal.GetFunctionPointerForDelegate(delegWndProc)
+            };
             //wind_class.hIconSm = IntPtr.Zero;
             ushort regResult = DeviceManagement.RegisterClass(ref wind_class);
 
@@ -110,9 +111,11 @@ namespace Nefarius.Utilities.DeviceManagement.Internal
                 return false;
             }
 
-            WndProcThread = new Thread(MessagePool);
-            WndProcThread.IsBackground = true;
-            WndProcThread.Name = "Win32Window Message Pool Thread";
+            WndProcThread = new Thread(MessagePool)
+            {
+                IsBackground = true,
+                Name = "Win32Window Message Pool Thread"
+            };
             WndProcThread.Start();
             while (CreateWindowOperationCompleteFlag == false) ; //don't worry,so fast!
             return true;
