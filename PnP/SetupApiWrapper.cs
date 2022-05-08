@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
@@ -115,6 +116,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             CM_LOCATE_DEVNODE_CANCELREMOVE = 0x00000002,
             CM_LOCATE_DEVNODE_NOVALIDATION = 0x00000004,
             CM_LOCATE_DEVNODE_BITS = 0x00000007,
+        }
+
+        internal enum CM_GET_DEVICE_INTERFACE_LIST_FLAG : uint
+        {
+            CM_GET_DEVICE_INTERFACE_LIST_ALL_DEVICES = 0x00000001,
+            CM_GET_DEVICE_INTERFACE_LIST_PRESENT = 0x00000000
         }
 
         internal enum ConfigManagerResult : uint
@@ -504,6 +511,23 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         internal static extern ConfigManagerResult CM_Setup_DevNode(
             uint dnDevInst,
             CM_SETUP_DEVINST_FLAGS ulFlags
+        );
+
+        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern ConfigManagerResult CM_Get_Device_Interface_List_SizeW(
+            [Out] out UInt32 pulLen,
+            [In] ref Guid InterfaceClassGuid,
+            [In] string pDeviceID,
+            [In] CM_GET_DEVICE_INTERFACE_LIST_FLAG ulFlags
+        );
+
+        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        internal static extern ConfigManagerResult CM_Get_Device_Interface_ListW(
+            [In] ref Guid InterfaceClassGuid,
+            [In] string pDeviceID,
+            [Out] IntPtr Buffer,
+            [In] UInt32 BufferLen,
+            [In] CM_GET_DEVICE_INTERFACE_LIST_FLAG ulFlags
         );
 
         #endregion
