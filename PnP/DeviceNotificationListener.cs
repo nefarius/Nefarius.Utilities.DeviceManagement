@@ -1,34 +1,182 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Nefarius.Utilities.DeviceManagement.Internal;
+using System.Threading;
+using System.Threading.Tasks;
+using PInvoke;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
     /// <summary>
-    ///     Listens for device arrival and removal window messages.
+    ///     Utility class to add device arrival/removal notifications to WPF window.
     /// </summary>
-    /// <remarks>
-    ///     Modified from https://gist.github.com/emoacht/73eff195317e387f4cda
-    /// </remarks>
+    /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
     public class DeviceNotificationListener
     {
+        public event Action<string> DeviceArrived;
+        public event Action<string> DeviceRemoved;
+        private IntPtr _notificationHandle;
+        private Task listenerTask;
+        private Guid interfaceGuid = Guid.Empty;
+        private readonly CancellationTokenSource cancellationTokenSource = new();
+        private IntPtr windowHandle;
+
+        #region Start/End
+
+        public unsafe void StartListen(Guid interfaceGuid)
+        {
+            this.interfaceGuid = interfaceGuid;
+            listenerTask = Task.Run(() =>
+            {
+                var className = "2qSvqygCSO";
+                var wndClass = User32.WNDCLASSEX.Create();
+
+                fixed (char* cln = className)
+                {
+                    wndClass.lpszClassName = cln;
+                }
+
+                wndClass.style = User32.ClassStyles.CS_HREDRAW | User32.ClassStyles.CS_VREDRAW;
+                wndClass.lpfnWndProc = WndProc2;
+                wndClass.cbClsExtra = 0;
+                wndClass.cbWndExtra = 0;
+                wndClass.hInstance = Marshal.GetHINSTANCE(this.GetType().Module);
+
+                User32.RegisterClassEx(ref wndClass);
+
+                windowHandle = User32.CreateWindowEx(0, className, "fprDXWtVyk", 0, 0, 0, 0, 0,
+                    new IntPtr(-3), IntPtr.Zero, wndClass.hInstance, IntPtr.Zero);
+                MessagePump(windowHandle);
+            }, cancellationTokenSource.Token);
+        }
+
+        public void StopListen()
+        {
+            cancellationTokenSource.Cancel();
+        }
+
+        private unsafe IntPtr WndProc2(IntPtr hwnd, User32.WindowMessage msg, void* wParam, void* lParam)
+        {
+            switch (msg)
+            {
+                case User32.WindowMessage.WM_CREATE:
+                {
+                    RegisterUsbDeviceNotification(hwnd, interfaceGuid);
+                    break;
+                }
+                case User32.WindowMessage.WM_DEVICECHANGE:
+                {
+                    var handled = false;
+                    return WndProc(hwnd, (int)msg, (IntPtr)wParam, (IntPtr)lParam, ref handled);
+                }
+            }
+
+            return User32.DefWindowProc(hwnd, msg, (IntPtr)wParam, (IntPtr)lParam);
+        }
+
+        private void MessagePump(IntPtr hwnd)
+        {
+            IntPtr msg = Marshal.AllocHGlobal(Marshal.SizeOf<User32.MSG>());
+            int retVal;
+            while ((retVal = User32.GetMessage(msg, IntPtr.Zero, 0, 0)) != 0 &&
+                   !cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                if (retVal == -1)
+                {
+                    break;
+                }
+                else
+                {
+                    User32.TranslateMessage(msg);
+                    User32.DispatchMessage(msg);
+                }
+            }
+        }
+
+        private void RegisterUsbDeviceNotification(IntPtr windowHandle, Guid interfaceGuid)
+        {
+            var dbcc = new DEV_BROADCAST_DEVICEINTERFACE
+            {
+                dbcc_size = (uint)Marshal.SizeOf(typeof(DEV_BROADCAST_DEVICEINTERFACE)),
+                dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE,
+                dbcc_classguid = interfaceGuid
+            };
+
+            var notificationFilter = Marshal.AllocHGlobal(Marshal.SizeOf(dbcc));
+            Marshal.StructureToPtr(dbcc, notificationFilter, true);
+
+            _notificationHandle =
+                RegisterDeviceNotification(windowHandle, notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
+            if (_notificationHandle == IntPtr.Zero)
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to register device notifications.");
+        }
+
+        private void UnregisterUsbDeviceNotification()
+        {
+            if (_notificationHandle != IntPtr.Zero)
+                UnregisterDeviceNotification(_notificationHandle);
+        }
+
+        #endregion
+
+        #region Processing
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == (int)User32.WindowMessage.WM_DEVICECHANGE)
+            {
+                DEV_BROADCAST_HDR hdr;
+
+                switch ((int)wParam)
+                {
+                    case DBT_DEVICEARRIVAL:
+                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
+
+                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                        {
+                            var deviceInterface =
+                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
+                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
+
+                            DeviceArrived?.Invoke(deviceInterface.dbcc_name);
+                        }
+
+                        break;
+
+                    case DBT_DEVICEREMOVECOMPLETE:
+                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
+
+                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                        {
+                            var deviceInterface =
+                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
+                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
+
+                            DeviceRemoved?.Invoke(deviceInterface.dbcc_name);
+                        }
+
+                        break;
+                }
+            }
+
+            return IntPtr.Zero;
+        }
+
+        #endregion
+
         #region Win32
 
-        [DllImport("User32.dll", SetLastError = true)]
+        [DllImport(nameof(User32), SetLastError = true)]
         private static extern IntPtr RegisterDeviceNotification(
             IntPtr hRecipient,
             IntPtr NotificationFilter,
             uint Flags);
 
-        [DllImport("User32.dll", SetLastError = true)]
+        [DllImport(nameof(User32), SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool UnregisterDeviceNotification(IntPtr Handle);
 
         private const uint DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000;
-
-        private const int WM_DEVICECHANGE = 0x0219;
 
         private const int
             DBT_DEVICEARRIVAL =
@@ -46,21 +194,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             public readonly uint dbch_reserved;
         }
 
-        private const uint DBT_DEVTYP_VOLUME = 0x00000002;
         private const uint DBT_DEVTYP_DEVICEINTERFACE = 0x00000005;
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct DEV_BROADCAST_VOLUME
-        {
-            public readonly uint dbcv_size;
-            public readonly uint dbcv_devicetype;
-            public readonly uint dbcv_reserved;
-            public readonly uint dbcv_unitmask;
-            public readonly ushort dbcv_flags;
-        }
-
-        private const ushort DBTF_MEDIA = 0x0001; // Media in drive changed.
-        private const ushort DBTF_NET = 0x0002; // Network drive is changed.
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct DEV_BROADCAST_DEVICEINTERFACE
@@ -73,113 +207,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             // To get value from lParam of WM_DEVICECHANGE, this length must be longer than 1.
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 255)]
             public readonly string dbcc_name;
-        }
-
-        // Identifier: GUID_DEVINTERFACE_USB_DEVICE
-        // Class GUID: {A5DCBF10-6530-11D2-901F-00C04FB951ED}
-        private static readonly Guid GUID_DEVINTERFACE_USB_DEVICE = new Guid("A5DCBF10-6530-11D2-901F-00C04FB951ED");
-
-        #endregion
-
-        private readonly Win32Window _window;
-
-        private readonly Internal.DeviceManagement.WndProc _wndProc;
-
-        public event Action<string> DeviceArrived;
-
-        public event Action<string> DeviceRemoved;
-
-        #region Start/End
-
-        public DeviceNotificationListener(Guid deviceInterfaceGuid)
-        {
-            _interfaceGuid = deviceInterfaceGuid;
-            _wndProc = WndProc;
-            _window = new Win32Window(_wndProc);
-            _window.Create();
-        }
-
-        public void StartListening()
-        {
-            RegisterUsbDeviceNotification(_window.WinFromHwnd, _interfaceGuid);
-        }
-
-        public void EndListening()
-        {
-            UnregisterUsbDeviceNotification();
-        }
-
-        private readonly Guid _interfaceGuid;
-
-        private IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wparam, IntPtr lparam)
-        {
-            if (msg == WM_DEVICECHANGE)
-            {
-                DEV_BROADCAST_HDR hdr;
-
-                switch ((int)wparam)
-                {
-                    case DBT_DEVICEARRIVAL:
-                        Debug.WriteLine("Device added.");
-
-                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lparam, typeof(DEV_BROADCAST_HDR));
-
-                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
-                        {
-                            var deviceInterface =
-                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lparam,
-                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
-
-                            DeviceArrived?.Invoke(deviceInterface.dbcc_name);
-                        }
-
-                        break;
-
-                    case DBT_DEVICEREMOVECOMPLETE:
-                        Debug.WriteLine("Device removed.");
-
-                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lparam, typeof(DEV_BROADCAST_HDR));
-
-                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
-                        {
-                            var deviceInterface =
-                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lparam,
-                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
-
-                            DeviceRemoved?.Invoke(deviceInterface.dbcc_name);
-                        }
-
-                        break;
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private IntPtr _notificationHandle;
-
-        private void RegisterUsbDeviceNotification(IntPtr windowHandle, Guid classGuid)
-        {
-            var dbcc = new DEV_BROADCAST_DEVICEINTERFACE
-            {
-                dbcc_size = (uint)Marshal.SizeOf(typeof(DEV_BROADCAST_DEVICEINTERFACE)),
-                dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE,
-                dbcc_classguid = classGuid
-            };
-
-            var notificationFilter = Marshal.AllocHGlobal(Marshal.SizeOf(dbcc));
-            Marshal.StructureToPtr(dbcc, notificationFilter, true);
-
-            _notificationHandle =
-                RegisterDeviceNotification(windowHandle, notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
-            if (_notificationHandle == IntPtr.Zero)
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to register device notifications.");
-        }
-
-        private void UnregisterUsbDeviceNotification()
-        {
-            if (_notificationHandle != IntPtr.Zero)
-                UnregisterDeviceNotification(_notificationHandle);
         }
 
         #endregion
