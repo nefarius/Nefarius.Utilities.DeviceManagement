@@ -184,7 +184,7 @@ True on success, false otherwise.
 
 ### **Remove(Guid, String, Boolean&)**
 
-Removed a device node identified by class GUID, path and instance ID.
+Removed a device node identified by interface GUID and instance ID.
 
 ```csharp
 public static bool Remove(Guid classGuid, string instanceId, Boolean& rebootRequired)
@@ -212,6 +212,19 @@ Instructs the system to re-enumerate hardware devices.
 
 ```csharp
 public static bool Refresh()
+```
+
+#### Returns
+
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True on success, false otherwise.
+
+### **RefreshPhantom()**
+
+Instructs the system to re-enumerate hardware devices including disconnected ones.
+
+```csharp
+public static bool RefreshPhantom()
 ```
 
 #### Returns

@@ -261,6 +261,46 @@ The driver provider name.
 public static DevicePropertyKey DriverProvider;
 ```
 
+### **Address**
+
+The address (bus index, port number) the enumerator assigned to the device.
+
+```csharp
+public static DevicePropertyKey Address;
+```
+
+### **InstallDate**
+
+The driver install date.
+
+```csharp
+public static DevicePropertyKey InstallDate;
+```
+
+### **FirstInstallDate**
+
+The driver first install date.
+
+```csharp
+public static DevicePropertyKey FirstInstallDate;
+```
+
+### **LastArrivalDate**
+
+The driver last arrival date.
+
+```csharp
+public static DevicePropertyKey LastArrivalDate;
+```
+
+### **LastRemovalDate**
+
+The driver last removal date
+
+```csharp
+public static DevicePropertyKey LastRemovalDate;
+```
+
 ## Properties
 
 ### **CategoryGuid**

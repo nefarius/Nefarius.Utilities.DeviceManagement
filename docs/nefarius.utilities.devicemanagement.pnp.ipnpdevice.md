@@ -44,6 +44,14 @@ Attempts to restart this device.
 void Restart()
 ```
 
+### **Remove()**
+
+Attempts to remove this device node.
+
+```csharp
+void Remove()
+```
+
 ### **GetProperty&lt;T&gt;(DevicePropertyKey)**
 
 Returns a device instance property identified by [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md).

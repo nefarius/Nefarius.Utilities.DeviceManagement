@@ -46,6 +46,14 @@ Attempts to restart this device. Device restart may fail if it has open handles 
 public void Restart()
 ```
 
+### **Remove()**
+
+Attempts to remove this device node.
+
+```csharp
+public void Remove()
+```
+
 ### **GetDeviceByInstanceId(String)**
 
 Return device identified by instance ID.
