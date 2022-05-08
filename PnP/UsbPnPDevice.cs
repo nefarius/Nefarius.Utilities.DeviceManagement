@@ -34,6 +34,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <summary>
         ///     Power-cycles the hub port this device is attached to, causing it to restart.
         /// </summary>
+        /// <remarks>Requires administrative privileges.</remarks>
         public void CyclePort()
         {
             var parameters = new USB_CYCLE_PORT_PARAMS
@@ -43,6 +44,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
             var hubDevice = this;
 
+            // find root hub
             while (hubDevice is not null)
             {
                 var parentId = hubDevice.GetProperty<string>(DevicePropertyDevice.Parent);
@@ -86,7 +88,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (ret != SetupApiWrapper.ConfigManagerResult.Success)
                     throw new Win32Exception(PInvoke.Kernel32.GetLastError(), "Failed to get device interface list.");
 
-                var hubPath = listBuffer.MultiSzPointerToStringArray(bytesRequired).First();
+                var hubPath = listBuffer.MultiSzPointerToStringArray(bytesRequired).FirstOrDefault();
+
+                if (hubPath is null)
+                    throw new ArgumentException("Failed to get device interface path.");
 
                 using var hubHandle = PInvoke.Kernel32.CreateFile(hubPath,
                     PInvoke.Kernel32.ACCESS_MASK.GenericRight.GENERIC_READ |
@@ -104,24 +109,25 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
                 Marshal.StructureToPtr(parameters, buffer, false);
 
-                //
-                // TODO: check for errors
-                // 
-
-                PInvoke.Kernel32.DeviceIoControl(
+                // request hub to power-cycle port, effectively force-restarting the device
+                var success = PInvoke.Kernel32.DeviceIoControl(
                     hubHandle,
                     IOCTL_USB_HUB_CYCLE_PORT,
                     buffer,
                     size,
                     buffer,
                     size,
-                    out var bytesReturned,
+                    out _,
                     IntPtr.Zero
                 );
 
+                if (!success && PInvoke.Kernel32.GetLastError() == Win32ErrorCode.ERROR_GEN_FAILURE)
+                    throw new ArgumentException("Request failed, this operation requires administrative privileges.");
+
                 var result = Marshal.PtrToStructure<USB_CYCLE_PORT_PARAMS>(buffer);
 
-                var error = Marshal.GetLastWin32Error();
+                if (result.Status != 0)
+                    throw new ArgumentException("Port cycle request failed.");
             }
             finally
             {
