@@ -18,9 +18,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         internal UsbPnPDevice(string instanceId, DeviceLocationFlags flags) : base(instanceId, flags)
         {
-            var className = GetProperty<string>(DevicePropertyDevice.Class);
+            var enumerator = GetProperty<string>(DevicePropertyDevice.EnumeratorName);
 
-            if (!Equals(className, "USB"))
+            if (!Equals(enumerator, "USB"))
                 throw new ArgumentException("This device is not a USB device.");
 
             Port = GetProperty<UInt32>(DevicePropertyDevice.Address);
