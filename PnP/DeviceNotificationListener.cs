@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using PInvoke;
 using Win32Exception = System.ComponentModel.Win32Exception;
 
@@ -17,7 +16,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         private readonly CancellationTokenSource cancellationTokenSource = new();
         private Guid _interfaceGuid = Guid.Empty;
         private IntPtr _notificationHandle;
-        private Task listenerTask;
+        private Thread _listenerThread;
         private IntPtr windowHandle;
         public event Action<string> DeviceArrived;
         public event Action<string> DeviceRemoved;
@@ -101,31 +100,34 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     subscribed to <see cref="DeviceArrived" /> and <see cref="DeviceRemoved" /> events.
         /// </summary>
         /// <param name="interfaceGuid">The device interface GUID to listen for.</param>
-        public unsafe void StartListen(Guid interfaceGuid)
+        public void StartListen(Guid interfaceGuid)
         {
             _interfaceGuid = interfaceGuid;
-            listenerTask = Task.Run(() =>
+            _listenerThread = new Thread(Start);
+            _listenerThread.Start();
+        }
+
+        private unsafe void Start()
+        {
+            var className = GenerateRandomString(); // random string to avoid conflicts
+            var wndClass = User32.WNDCLASSEX.Create();
+
+            fixed (char* cln = className)
             {
-                var className = GenerateRandomString(); // random string to avoid conflicts
-                var wndClass = User32.WNDCLASSEX.Create();
+                wndClass.lpszClassName = cln;
+            }
 
-                fixed (char* cln = className)
-                {
-                    wndClass.lpszClassName = cln;
-                }
+            wndClass.style = User32.ClassStyles.CS_HREDRAW | User32.ClassStyles.CS_VREDRAW;
+            wndClass.lpfnWndProc = WndProc2;
+            wndClass.cbClsExtra = 0;
+            wndClass.cbWndExtra = 0;
+            wndClass.hInstance = Marshal.GetHINSTANCE(GetType().Module);
 
-                wndClass.style = User32.ClassStyles.CS_HREDRAW | User32.ClassStyles.CS_VREDRAW;
-                wndClass.lpfnWndProc = WndProc2;
-                wndClass.cbClsExtra = 0;
-                wndClass.cbWndExtra = 0;
-                wndClass.hInstance = Marshal.GetHINSTANCE(GetType().Module);
+            User32.RegisterClassEx(ref wndClass);
 
-                User32.RegisterClassEx(ref wndClass);
-
-                windowHandle = User32.CreateWindowEx(0, className, GenerateRandomString(), 0, 0, 0, 0, 0,
-                    new IntPtr(-3), IntPtr.Zero, wndClass.hInstance, IntPtr.Zero);
-                MessagePump(windowHandle);
-            }, cancellationTokenSource.Token);
+            windowHandle = User32.CreateWindowEx(0, className, GenerateRandomString(), 0, 0, 0, 0, 0,
+                new IntPtr(-3), IntPtr.Zero, wndClass.hInstance, IntPtr.Zero);
+            MessagePump(windowHandle);
         }
 
         /// <summary>
@@ -135,6 +137,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         public void StopListen()
         {
             cancellationTokenSource.Cancel();
+            User32.PostMessage(windowHandle, User32.WindowMessage.WM_QUIT, IntPtr.Zero, IntPtr.Zero);
+            _listenerThread.Join(TimeSpan.FromSeconds(3));
         }
 
         private unsafe IntPtr WndProc2(IntPtr hwnd, User32.WindowMessage msg, void* wParam, void* lParam)
