@@ -159,6 +159,32 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         /// <summary>
+        ///     Searches for devices matching the provided interface GUID and returns a <see cref="PnPDevice"/>.
+        /// </summary>
+        /// <param name="target">The interface GUID to enumerate.</param>
+        /// <param name="device">The <see cref="PnPDevice"/> wrapper object.</param>
+        /// <param name="instance">Optional instance ID (zero-based) specifying the device to process on multiple matches.</param>
+        /// <param name="presentOnly">
+        ///     Only enumerate currently connected devices by default, set to False to also include phantom
+        ///     devices.
+        /// </param>
+        /// <returns>True if at least one device was found with the provided class, false otherwise.</returns>
+        public static bool FindByInterfaceGuid(Guid target, out PnPDevice device, int instance = 0,
+            bool presentOnly = true)
+        {
+            var ret = FindByInterfaceGuid(target, out _, out var instanceId, instance, presentOnly);
+
+            device = PnPDevice.GetDeviceByInstanceId(
+                instanceId,
+                presentOnly
+                    ? DeviceLocationFlags.Normal
+                    : DeviceLocationFlags.Phantom
+            );
+
+            return ret;
+        }
+
+        /// <summary>
         ///     Searches for devices matching the provided interface GUID and returns the device path and instance ID.
         /// </summary>
         /// <param name="target">The class GUID to enumerate.</param>
