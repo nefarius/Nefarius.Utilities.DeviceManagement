@@ -121,7 +121,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             wndClass.lpfnWndProc = WndProc2;
             wndClass.cbClsExtra = 0;
             wndClass.cbWndExtra = 0;
-            wndClass.hInstance = Marshal.GetHINSTANCE(GetType().Module);
+            wndClass.hInstance = GetModuleHandle(IntPtr.Zero);
 
             User32.RegisterClassEx(ref wndClass);
 
@@ -204,6 +204,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         #endregion
 
         #region Win32
+
+        [DllImport("coredll.dll")]  
+        public static extern IntPtr GetModuleHandle(IntPtr lpModuleName); 
 
         [DllImport(nameof(User32), SetLastError = true)]
         private static extern IntPtr RegisterDeviceNotification(
