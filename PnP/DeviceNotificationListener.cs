@@ -76,7 +76,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Processing
 
-        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private IntPtr WndProc(Guid interfaceGuid, IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == (int)User32.WindowMessage.WM_DEVICECHANGE)
             {
@@ -92,12 +92,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                             var deviceInterface =
                                 (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                     typeof(DEV_BROADCAST_DEVICEINTERFACE));
-
-                            var listenerItem = listeners.Single(i => i.WindowHandle == hwnd);
-
+                            
                             var arrivedEvent = new DeviceEventArgs
                             {
-                                InterfaceGuid = listenerItem.InterfaceGuid,
+                                InterfaceGuid = interfaceGuid,
                                 SymLink = deviceInterface.dbcc_name
                             };
                             
@@ -114,12 +112,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                             var deviceInterface =
                                 (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                     typeof(DEV_BROADCAST_DEVICEINTERFACE));
-
-                            var listenerItem = listeners.Single(i => i.WindowHandle == hwnd);
-
+                            
                             var removedEvent = new DeviceEventArgs
                             {
-                                InterfaceGuid = listenerItem.InterfaceGuid,
+                                InterfaceGuid = interfaceGuid,
                                 SymLink = deviceInterface.dbcc_name
                             };
 
@@ -222,9 +218,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             {
                 wndClass.lpszClassName = cln;
             }
-
+            
+            var wndProc = new User32.WndProc((wnd, msg, param, lParam) => WndProc2(listenerItem.InterfaceGuid, wnd, msg, param, lParam));
+            
             wndClass.style = User32.ClassStyles.CS_HREDRAW | User32.ClassStyles.CS_VREDRAW;
-            wndClass.lpfnWndProc = WndProc2;
+            wndClass.lpfnWndProc = wndProc;
             wndClass.cbClsExtra = 0;
             wndClass.cbWndExtra = 0;
             wndClass.hInstance = GetModuleHandle(IntPtr.Zero);
@@ -258,19 +256,19 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        private unsafe IntPtr WndProc2(IntPtr hwnd, User32.WindowMessage msg, void* wParam, void* lParam)
+        private unsafe IntPtr WndProc2(Guid interfaceGuid, IntPtr hwnd, User32.WindowMessage msg, void* wParam, void* lParam)
         {
             switch (msg)
             {
                 case User32.WindowMessage.WM_CREATE:
                 {
-                    RegisterUsbDeviceNotification(hwnd);
+                    RegisterUsbDeviceNotification(interfaceGuid, hwnd);
                     break;
                 }
                 case User32.WindowMessage.WM_DEVICECHANGE:
                 {
                     var handled = false;
-                    return WndProc(hwnd, (int)msg, (IntPtr)wParam, (IntPtr)lParam, ref handled);
+                    return WndProc(interfaceGuid, hwnd, (int)msg, (IntPtr)wParam, (IntPtr)lParam, ref handled);
                 }
             }
 
@@ -294,10 +292,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 }
         }
 
-        private void RegisterUsbDeviceNotification(IntPtr windowHandle)
+        private void RegisterUsbDeviceNotification(Guid interfaceGuid, IntPtr windowHandle)
         {
-            var listenerItem = listeners.Single(i => i.WindowHandle == windowHandle);
-            var interfaceGuid = listenerItem.InterfaceGuid;
+            var listenerItem = listeners.Single(i => i.InterfaceGuid == interfaceGuid);
 
             var dbcc = new DEV_BROADCAST_DEVICEINTERFACE
             {
