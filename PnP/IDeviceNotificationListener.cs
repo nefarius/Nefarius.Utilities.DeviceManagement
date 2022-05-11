@@ -32,9 +32,30 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         void StopListen(Guid? interfaceGuid = null);
 
+        /// <summary>
+        ///     Subscribe a custom event handler to device arrival events.
+        /// </summary>
+        /// <param name="handler">The event handler to invoke.</param>
+        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
         void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null);
+
+        /// <summary>
+        ///     Unsubscribe a previously registered event handler.
+        /// </summary>
+        /// <param name="handler">The event handler to unsubscribe.</param>
         void UnregisterDeviceArrived(Action<DeviceEventArgs> handler);
+
+        /// <summary>
+        ///     Subscribe a custom event handler to device removal events.
+        /// </summary>
+        /// <param name="handler">The event handler to invoke.</param>
+        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
         void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null);
+
+        /// <summary>
+        ///     Unsubscribe a previously registered event handler.
+        /// </summary>
+        /// <param name="handler">The event handler to unsubscribe.</param>
         void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler);
     }
 }

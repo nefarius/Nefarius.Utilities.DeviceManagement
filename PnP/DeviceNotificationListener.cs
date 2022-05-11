@@ -30,6 +30,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Registration
 
+        /// <inheritdoc />
         public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
         {
             if (_arrivedRegistrations.All(i => i.Handler != handler))
@@ -42,6 +43,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
+        /// <inheritdoc />
         public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
         {
             foreach (var arrivedRegistration in _arrivedRegistrations.ToList())
@@ -53,6 +55,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
+        /// <inheritdoc />
         public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
         {
             if (_removedRegistrations.All(i => i.Handler != handler))
@@ -65,6 +68,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
+        /// <inheritdoc />
         public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
         {
             foreach (var removedRegistration in _removedRegistrations.ToList())
