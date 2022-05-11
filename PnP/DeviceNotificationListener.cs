@@ -13,7 +13,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     ///     Utility class to listen for system-wide device arrivals and removals based on a provided device interface GUID.
     /// </summary>
     /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
-    public class DeviceNotificationListener : IDeviceNotificationListener
+    public class DeviceNotificationListener : IDeviceNotificationListener, IDisposable
     {
         private readonly CancellationTokenSource cancellationTokenSource = new();
         public event Action<DeviceEventArgs> DeviceArrived;
@@ -387,6 +387,23 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             public Action<DeviceEventArgs> Handler { get; set; }
             public Guid InterfaceGuid { get; set; }
+        }
+
+        public void Dispose()
+        {
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                arrivedRegistrations.Clear();
+                removedRegistrations.Clear();
+            }
         }
     }
 }
