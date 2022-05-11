@@ -15,59 +15,63 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
     public class DeviceNotificationListener : IDeviceNotificationListener, IDisposable
     {
-        private readonly CancellationTokenSource cancellationTokenSource = new();
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+        /// <inheritdoc />
         public event Action<DeviceEventArgs> DeviceArrived;
+
+        /// <inheritdoc />
         public event Action<DeviceEventArgs> DeviceRemoved;
 
-        private List<ListenerItem> listeners = new();
+        private readonly List<ListenerItem> _listeners = new();
 
-        private List<DeviceEventRegistration> arrivedRegistrations = new List<DeviceEventRegistration>();
-        private List<DeviceEventRegistration> removedRegistrations = new List<DeviceEventRegistration>();
+        private readonly List<DeviceEventRegistration> _arrivedRegistrations = new();
+        private readonly List<DeviceEventRegistration> _removedRegistrations = new();
 
         #region Registration
 
         public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
         {
-            if (arrivedRegistrations.All(i => i.Handler != handler))
+            if (_arrivedRegistrations.All(i => i.Handler != handler))
             {
-                arrivedRegistrations.Add(new DeviceEventRegistration
+                _arrivedRegistrations.Add(new DeviceEventRegistration
                 {
                     Handler = handler,
-                    InterfaceGuid = interfaceGuid.HasValue ? interfaceGuid.Value : Guid.Empty
+                    InterfaceGuid = interfaceGuid ?? Guid.Empty
                 });
             }
         }
 
         public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
         {
-            foreach (var arrivedRegistrion in arrivedRegistrations.ToList())
+            foreach (var arrivedRegistration in _arrivedRegistrations.ToList())
             {
-                if (arrivedRegistrion.Handler == handler)
+                if (arrivedRegistration.Handler == handler)
                 {
-                    arrivedRegistrations.Remove(arrivedRegistrion);
+                    _arrivedRegistrations.Remove(arrivedRegistration);
                 }
             }
         }
 
         public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
         {
-            if (removedRegistrations.All(i => i.Handler != handler))
+            if (_removedRegistrations.All(i => i.Handler != handler))
             {
-                removedRegistrations.Add(new DeviceEventRegistration
+                _removedRegistrations.Add(new DeviceEventRegistration
                 {
                     Handler = handler,
-                    InterfaceGuid = interfaceGuid.HasValue ? interfaceGuid.Value : Guid.Empty
+                    InterfaceGuid = interfaceGuid ?? Guid.Empty
                 });
             }
         }
 
         public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
         {
-            foreach (var removedRegistration in removedRegistrations.ToList())
+            foreach (var removedRegistration in _removedRegistrations.ToList())
             {
                 if (removedRegistration.Handler == handler)
                 {
-                    removedRegistrations.Remove(removedRegistration);
+                    _removedRegistrations.Remove(removedRegistration);
                 }
             }
         }
@@ -133,12 +137,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             DeviceArrived?.Invoke(args);
 
-            foreach (var arrivedRegistrion in arrivedRegistrations)
+            foreach (var arrivedRegistration in _arrivedRegistrations)
             {
-                if (arrivedRegistrion.InterfaceGuid == args.InterfaceGuid ||
-                    arrivedRegistrion.InterfaceGuid == Guid.Empty)
+                if (arrivedRegistration.InterfaceGuid == args.InterfaceGuid ||
+                    arrivedRegistration.InterfaceGuid == Guid.Empty)
                 {
-                    arrivedRegistrion.Handler(args);
+                    arrivedRegistration.Handler(args);
                 }
             }
         }
@@ -147,7 +151,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             DeviceRemoved?.Invoke(args);
 
-            foreach (var removedRegistration in removedRegistrations)
+            foreach (var removedRegistration in _removedRegistrations)
             {
                 if (removedRegistration.InterfaceGuid == args.InterfaceGuid ||
                     removedRegistration.InterfaceGuid == Guid.Empty)
@@ -158,6 +162,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         #endregion
+
+        #region Util
 
         private static string GenerateRandomString()
         {
@@ -186,16 +192,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             return sb.ToString();
         }
 
+        #endregion
+
         #region Start/End
 
-        /// <summary>
-        ///     Start listening for device arrivals/removals using the provided <see cref="Guid" />. Call this after you've
-        ///     subscribed to <see cref="DeviceArrived" /> and <see cref="DeviceRemoved" /> events.
-        /// </summary>
-        /// <param name="interfaceGuid">The device interface GUID to listen for.</param>
+        /// <inheritdoc />
         public void StartListen(Guid interfaceGuid)
         {
-            if (listeners.All(i => i.InterfaceGuid != interfaceGuid))
+            if (_listeners.All(i => i.InterfaceGuid != interfaceGuid))
             {
                 var listenerThread = new Thread(Start);
                 var listenerItem = new ListenerItem
@@ -203,7 +207,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     InterfaceGuid = interfaceGuid,
                     Thread = listenerThread
                 };
-                listeners.Add(listenerItem);
+                _listeners.Add(listenerItem);
                 listenerThread.Start(listenerItem);
             }
         }
@@ -236,15 +240,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             MessagePump();
         }
 
-        /// <summary>
-        ///     Stop listening. The events <see cref="DeviceArrived" /> and <see cref="DeviceRemoved" /> will not get invoked
-        ///     anymore after this call.
-        /// </summary>
+        /// <inheritdoc />
         public void StopListen(Guid? interfaceGuid = null)
         {
-            cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Cancel();
 
-            foreach (var listenerItem in listeners)
+            foreach (var listenerItem in _listeners)
             {
                 if (interfaceGuid == null || listenerItem.InterfaceGuid == interfaceGuid)
                 {
@@ -280,7 +281,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             var msg = Marshal.AllocHGlobal(Marshal.SizeOf<User32.MSG>());
             int retVal;
             while ((retVal = User32.GetMessage(msg, IntPtr.Zero, 0, 0)) != 0 &&
-                   !cancellationTokenSource.Token.IsCancellationRequested)
+                   !_cancellationTokenSource.Token.IsCancellationRequested)
                 if (retVal == -1)
                 {
                     break;
@@ -294,7 +295,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         private void RegisterUsbDeviceNotification(Guid interfaceGuid, IntPtr windowHandle)
         {
-            var listenerItem = listeners.Single(i => i.InterfaceGuid == interfaceGuid);
+            var listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
 
             var dbcc = new DEV_BROADCAST_DEVICEINTERFACE
             {
@@ -398,8 +399,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             if (disposing)
             {
-                arrivedRegistrations.Clear();
-                removedRegistrations.Clear();
+                _arrivedRegistrations.Clear();
+                _removedRegistrations.Clear();
             }
         }
     }

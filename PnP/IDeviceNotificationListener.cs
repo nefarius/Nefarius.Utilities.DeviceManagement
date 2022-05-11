@@ -8,7 +8,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
     public interface IDeviceNotificationListener
     {
+        /// <summary>
+        ///     Gets invoked when a new device has arrived (plugged in).
+        /// </summary>
         event Action<DeviceEventArgs> DeviceArrived;
+
+        /// <summary>
+        ///     Gets invoked when an existing device has been removed (unplugged).
+        /// </summary>
         event Action<DeviceEventArgs> DeviceRemoved;
 
         /// <summary>
@@ -20,7 +27,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         /// <summary>
         ///     Stop listening. The events <see cref="DeviceArrived" /> and <see cref="DeviceRemoved" /> will not get invoked
-        ///     anymore after this call.
+        ///     anymore after this call. If no <see cref="Guid" /> is specified, all currently registered interfaces will get
+        ///     unsubscribed.
         /// </summary>
         void StopListen(Guid? interfaceGuid = null);
 
