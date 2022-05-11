@@ -205,7 +205,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Win32
 
-        [DllImport("coredll.dll")]  
+        [DllImport(nameof(Kernel32), SetLastError = true)]  
         public static extern IntPtr GetModuleHandle(IntPtr lpModuleName); 
 
         [DllImport(nameof(User32), SetLastError = true)]
