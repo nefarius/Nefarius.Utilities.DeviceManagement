@@ -8,8 +8,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
     public interface IDeviceNotificationListener
     {
-        event Action<string> DeviceArrived;
-        event Action<string> DeviceRemoved;
+        event Action<DeviceEventArgs> DeviceArrived;
+        event Action<DeviceEventArgs> DeviceRemoved;
 
         /// <summary>
         ///     Start listening for device arrivals/removals using the provided <see cref="Guid" />. Call this after you've
@@ -23,5 +23,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     anymore after this call.
         /// </summary>
         void StopListen(Guid? interfaceGuid = null);
+
+        void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null);
+        void UnregisterDeviceArrived(Action<DeviceEventArgs> handler);
+        void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null);
+        void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler);
     }
 }

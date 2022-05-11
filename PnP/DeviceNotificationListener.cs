@@ -16,10 +16,63 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     public class DeviceNotificationListener : IDeviceNotificationListener
     {
         private readonly CancellationTokenSource cancellationTokenSource = new();
-        public event Action<string> DeviceArrived;
-        public event Action<string> DeviceRemoved;
+        public event Action<DeviceEventArgs> DeviceArrived;
+        public event Action<DeviceEventArgs> DeviceRemoved;
 
         private List<ListenerItem> listeners = new();
+
+        private List<DeviceEventRegistration> arrivedRegistrations = new List<DeviceEventRegistration>();
+        private List<DeviceEventRegistration> removedRegistrations = new List<DeviceEventRegistration>();
+
+        #region Registration
+
+        public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
+        {
+            if (arrivedRegistrations.All(i => i.Handler != handler))
+            {
+                arrivedRegistrations.Add(new DeviceEventRegistration
+                {
+                    Handler = handler,
+                    InterfaceGuid = interfaceGuid.HasValue ? interfaceGuid.Value : Guid.Empty
+                });
+            }
+        }
+
+        public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
+        {
+            foreach (var arrivedRegistrion in arrivedRegistrations.ToList())
+            {
+                if (arrivedRegistrion.Handler == handler)
+                {
+                    arrivedRegistrations.Remove(arrivedRegistrion);
+                }
+            }
+        }
+
+        public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
+        {
+            if (removedRegistrations.All(i => i.Handler != handler))
+            {
+                removedRegistrations.Add(new DeviceEventRegistration
+                {
+                    Handler = handler,
+                    InterfaceGuid = interfaceGuid.HasValue ? interfaceGuid.Value : Guid.Empty
+                });
+            }
+        }
+
+        public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
+        {
+            foreach (var removedRegistration in removedRegistrations.ToList())
+            {
+                if (removedRegistration.Handler == handler)
+                {
+                    removedRegistrations.Remove(removedRegistration);
+                }
+            }
+        }
+
+        #endregion
 
         #region Processing
 
@@ -40,7 +93,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                                 (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                     typeof(DEV_BROADCAST_DEVICEINTERFACE));
 
-                            DeviceArrived?.Invoke(deviceInterface.dbcc_name);
+                            var listenerItem = listeners.Single(i => i.WindowHandle == hwnd);
+
+                            var arrivedEvent = new DeviceEventArgs
+                            {
+                                InterfaceGuid = listenerItem.InterfaceGuid,
+                                SymLink = deviceInterface.dbcc_name
+                            };
+                            
+                            FireDeviceArrived(arrivedEvent);
                         }
 
                         break;
@@ -54,7 +115,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                                 (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                     typeof(DEV_BROADCAST_DEVICEINTERFACE));
 
-                            DeviceRemoved?.Invoke(deviceInterface.dbcc_name);
+                            var listenerItem = listeners.Single(i => i.WindowHandle == hwnd);
+
+                            var removedEvent = new DeviceEventArgs
+                            {
+                                InterfaceGuid = listenerItem.InterfaceGuid,
+                                SymLink = deviceInterface.dbcc_name
+                            };
+
+                            FireDeviceRemoved(removedEvent);
                         }
 
                         break;
@@ -62,6 +131,34 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
 
             return IntPtr.Zero;
+        }
+
+        private void FireDeviceArrived(DeviceEventArgs args)
+        {
+            DeviceArrived?.Invoke(args);
+
+            foreach (var arrivedRegistrion in arrivedRegistrations)
+            {
+                if (arrivedRegistrion.InterfaceGuid == args.InterfaceGuid ||
+                    arrivedRegistrion.InterfaceGuid == Guid.Empty)
+                {
+                    arrivedRegistrion.Handler(args);
+                }
+            }
+        }
+
+        private void FireDeviceRemoved(DeviceEventArgs args)
+        {
+            DeviceRemoved?.Invoke(args);
+
+            foreach (var removedRegistration in removedRegistrations)
+            {
+                if (removedRegistration.InterfaceGuid == args.InterfaceGuid ||
+                    removedRegistration.InterfaceGuid == Guid.Empty)
+                {
+                    removedRegistration.Handler(args);
+                }
+            }
         }
 
         #endregion
@@ -284,6 +381,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             public Thread Thread { get; set; }
             public IntPtr WindowHandle { get; set; }
             public IntPtr NotificationHandle { get; set; }
+        }
+
+        private class DeviceEventRegistration
+        {
+            public Action<DeviceEventArgs> Handler { get; set; }
+            public Guid InterfaceGuid { get; set; }
         }
     }
 }
