@@ -68,6 +68,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     || propertyType == SetupApiWrapper.DevPropType.Empty)
                     return default(T);
 
+                if (ret == SetupApiWrapper.ConfigManagerResult.BufferSmall)
+                    throw new Win32Exception("The buffer supplied to a function was too small");
+
                 if (ret != SetupApiWrapper.ConfigManagerResult.Success)
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
@@ -256,7 +259,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             out uint valueBufferSize
         )
         {
-            valueBufferSize = 2018;
+            valueBufferSize = 8192;
 
             valueBuffer = Marshal.AllocHGlobal((int)valueBufferSize);
 
