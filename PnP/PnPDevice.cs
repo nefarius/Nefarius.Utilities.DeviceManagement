@@ -83,7 +83,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <summary>
     ///     Describes an instance of a PNP device.
     /// </summary>
-    public partial class PnPDevice
+    public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     {
         private readonly uint _instanceHandle;
 
@@ -280,5 +280,36 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             return GetDeviceByInterfaceId(symbolicLink, DeviceLocationFlags.Normal);
         }
+
+        #region IEquatable
+
+        public bool Equals(PnPDevice other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(DeviceId, other.DeviceId, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || obj is PnPDevice other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return StringComparer.InvariantCultureIgnoreCase.GetHashCode(DeviceId);
+        }
+
+        public static bool operator ==(PnPDevice left, PnPDevice right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(PnPDevice left, PnPDevice right)
+        {
+            return !Equals(left, right);
+        }
+
+        #endregion
     }
 }
