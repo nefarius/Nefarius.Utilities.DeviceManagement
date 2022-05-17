@@ -249,7 +249,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             _cancellationTokenSource.Cancel();
 
-            foreach (var listenerItem in _listeners)
+            foreach (var listenerItem in _listeners.ToList())
             {
                 if (interfaceGuid == null || listenerItem.InterfaceGuid == interfaceGuid)
                 {
@@ -257,6 +257,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     User32.PostMessage(listenerItem.WindowHandle, User32.WindowMessage.WM_QUIT, IntPtr.Zero,
                         IntPtr.Zero);
                     listenerItem.Thread.Join(TimeSpan.FromSeconds(3));
+                    _listeners.Remove(listenerItem);
                 }
             }
         }
