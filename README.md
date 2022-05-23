@@ -21,7 +21,7 @@ The `Devcon` utility class offers helper methods to find devices.
 ```csharp
 var instance = 0;
 // enumerate all devices that export the GUID_DEVINTERFACE_USB_DEVICE interface
-while (Devcon.FindByInterfaceGuid(Guid.Parse("{a5dcbf10-6530-11d2-901f-00c04fb951ed}"), out var path,
+while (Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbDevice, out var path,
            out var instanceId, instance++))
 {
     Console.WriteLine($"Path: {path}, InstanceId: {instanceId}");
@@ -45,7 +45,7 @@ listener.DeviceArrived += Console.WriteLine;
 listener.DeviceRemoved += Console.WriteLine;
 
 // start listening for plugins or unplugs of GUID_DEVINTERFACE_USB_DEVICE interface devices
-listener.StartListen(Guid.Parse("{a5dcbf10-6530-11d2-901f-00c04fb951ed}"));
+listener.StartListen(DeviceInterfaceIds.UsbDevice);
 ```
 
 ### Get all driver packages in the Driver Store
