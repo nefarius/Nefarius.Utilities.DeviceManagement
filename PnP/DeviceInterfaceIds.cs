@@ -22,6 +22,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     An interface exposed on USB devices.
         /// </summary>
         public static Guid UsbDevice => Guid.Parse("{a5dcbf10-6530-11d2-901f-00c04fb951ed}");
+        
+        /// <summary>
+        ///     An interface exposed on XUSB (Xbox 360) or XGIP (Xbox One) compatible (XInput) devices.
+        /// </summary>
+        public static Guid XUsbDevice => Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
 
         /// <summary>
         ///     An interface exposed on HID devices.
