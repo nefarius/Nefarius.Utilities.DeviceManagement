@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -181,9 +182,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
 
             // Double-null-terminated string to list
-            //if (managedType == typeof(string[]))
-            //    return (T) (object) Marshal.PtrToStringUni(buffer, (int) size / 2).TrimEnd('\0').Split('\0')
-            //        .ToArray();
+            if (managedType == typeof(string[]))
+            {
+                var value = (string[])(object)propertyValue;
+                buffer = value.StringArrayToMultiSzPointer(out var length);
+                propBufSize = (uint)length;
+            }
 
             // Byte & SByte
             if (managedType == typeof(sbyte)
