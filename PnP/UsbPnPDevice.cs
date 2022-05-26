@@ -50,7 +50,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 var parentId = hubDevice.GetProperty<string>(DevicePropertyDevice.Parent);
                 var service = hubDevice.GetProperty<string>(DevicePropertyDevice.Service);
 
-                if (service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
+                if (service is not null && service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
                     break;
 
                 hubDevice = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom).ToUsbPnPDevice();
