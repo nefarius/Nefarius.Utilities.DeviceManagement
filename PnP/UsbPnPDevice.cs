@@ -37,12 +37,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <remarks>Requires administrative privileges.</remarks>
         public void CyclePort()
         {
-            var parameters = new USB_CYCLE_PORT_PARAMS
-            {
-                ConnectionIndex = Port
-            };
-
             var hubDevice = this;
+            var compositeDevice = this;
 
             // find root hub
             while (hubDevice is not null)
@@ -50,14 +46,26 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 var parentId = hubDevice.GetProperty<string>(DevicePropertyDevice.Parent);
                 var service = hubDevice.GetProperty<string>(DevicePropertyDevice.Service);
 
-                if (service is not null && service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
-                    break;
+                if (service is not null)
+                {
+                    // if one parent is a composite device, use their port number instead
+                    if (service.Equals("usbccgp", StringComparison.OrdinalIgnoreCase))
+                        compositeDevice = hubDevice;
+                    // we have reached the hub object, bail
+                    if (service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
+                        break;
+                }
 
                 hubDevice = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom).ToUsbPnPDevice();
             }
 
             if (hubDevice is null)
                 throw new ArgumentException("Unable to find root hub for the current device.");
+
+            var parameters = new USB_CYCLE_PORT_PARAMS
+            {
+                ConnectionIndex = compositeDevice.Port
+            };
 
             var ret = SetupApiWrapper.CM_Get_Device_Interface_List_SizeW(
                 out var listLength,
@@ -121,8 +129,16 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     IntPtr.Zero
                 );
 
-                if (!success && PInvoke.Kernel32.GetLastError() == Win32ErrorCode.ERROR_GEN_FAILURE)
-                    throw new ArgumentException("Request failed, this operation requires administrative privileges.");
+                var err = PInvoke.Kernel32.GetLastError();
+
+                switch (success)
+                {
+                    case false when err == Win32ErrorCode.ERROR_GEN_FAILURE:
+                        throw new ArgumentException("Request failed, this operation requires administrative privileges.");
+                    /* STATUS_NO_SUCH_DEVICE */
+                    case false when (int)err == 433:
+                        throw new ArgumentException($"Request failed, device on port {compositeDevice.Port} not found.");
+                }
 
                 var result = Marshal.PtrToStructure<USB_CYCLE_PORT_PARAMS>(buffer);
 
