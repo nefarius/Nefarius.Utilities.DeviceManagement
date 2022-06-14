@@ -283,6 +283,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region IEquatable
 
+        /// <inheritdoc />
         public bool Equals(PnPDevice other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -290,21 +291,29 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             return string.Equals(DeviceId, other.DeviceId, StringComparison.InvariantCultureIgnoreCase);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj) || obj is PnPDevice other && Equals(other);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return StringComparer.InvariantCultureIgnoreCase.GetHashCode(DeviceId);
         }
 
+        /// <summary>
+        ///     Compares two instances of <see cref="PnPDevice"/> for equality.
+        /// </summary>
         public static bool operator ==(PnPDevice left, PnPDevice right)
         {
             return Equals(left, right);
         }
 
+        /// <summary>
+        ///     Compares two instances of <see cref="PnPDevice"/> for equality.
+        /// </summary>
         public static bool operator !=(PnPDevice left, PnPDevice right)
         {
             return !Equals(left, right);

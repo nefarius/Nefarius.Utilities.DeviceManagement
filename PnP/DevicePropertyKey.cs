@@ -43,6 +43,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             return new SetupApiWrapper.DevPropKey(CategoryGuid, PropertyIdentifier);
         }
 
+        /// <inheritdoc />
         public bool Equals(DevicePropertyKey other)
         {
             if (ReferenceEquals(null, other)) return false;
@@ -50,11 +51,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             return CategoryGuid.Equals(other.CategoryGuid) && PropertyIdentifier == other.PropertyIdentifier && PropertyType.Equals(other.PropertyType);
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return ReferenceEquals(this, obj) || obj is DevicePropertyKey other && Equals(other);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked
