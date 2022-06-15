@@ -48,15 +48,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
                 if (service is not null)
                 {
-                    // if one parent is a composite device, use their port number instead
-                    if (service.Equals("usbccgp", StringComparison.OrdinalIgnoreCase) || 
-                        service.StartsWith("xusb", StringComparison.OrdinalIgnoreCase))
-                        compositeDevice = hubDevice;
                     // we have reached the hub object, bail
                     if (service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
                         break;
                 }
+                
+                // grab topmost child to get real port number
+                compositeDevice = hubDevice;
 
+                // get next parent
                 hubDevice = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom).ToUsbPnPDevice();
             }
 
