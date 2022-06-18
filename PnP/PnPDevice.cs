@@ -281,6 +281,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             return GetDeviceByInterfaceId(symbolicLink, DeviceLocationFlags.Normal);
         }
 
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return InstanceId;
+        }
+
         #region IEquatable
 
         /// <inheritdoc />
