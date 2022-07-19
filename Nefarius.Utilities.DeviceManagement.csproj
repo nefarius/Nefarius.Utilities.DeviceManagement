@@ -26,8 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PInvoke.Kernel32" Version="0.7.104" />
-    <PackageReference Include="PInvoke.User32" Version="0.7.104" />
+    <PackageReference Include="PInvoke.Kernel32" Version="0.7.124">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="PInvoke.User32" Version="0.7.124">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
