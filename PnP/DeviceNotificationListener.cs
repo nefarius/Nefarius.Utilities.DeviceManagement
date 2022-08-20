@@ -331,7 +331,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         #region Win32
 
         [DllImport(nameof(Kernel32), SetLastError = true)]  
-        public static extern IntPtr GetModuleHandle(IntPtr lpModuleName); 
+        private static extern IntPtr GetModuleHandle(IntPtr lpModuleName); 
 
         [DllImport(nameof(User32), SetLastError = true)]
         private static extern IntPtr RegisterDeviceNotification(
