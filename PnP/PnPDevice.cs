@@ -64,6 +64,17 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         void Remove();
 
         /// <summary>
+        ///     Walks up the <see cref="PnPDevice" />s parents chain to determine if the top most device is root enumerated.
+        /// </summary>
+        /// <remarks>
+        ///     This is achieved by walking up the node tree until the top most parent and check if the last parent below the
+        ///     tree root is a software device. Hardware devices originate from a PCI(e) bus while virtual devices originate from a
+        ///     root enumerated device.
+        /// </remarks>
+        /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
+        bool IsVirtual();
+
+        /// <summary>
         ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
         /// </summary>
         /// <typeparam name="T">The managed type of the fetched property value.</typeparam>
@@ -123,8 +134,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             uint nBytes = 256;
-            
-            var ptrInstanceBuf = Marshal.AllocHGlobal((int) nBytes);
+
+            var ptrInstanceBuf = Marshal.AllocHGlobal((int)nBytes);
 
             try
             {
@@ -189,6 +200,29 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
+        /// <inheritdoc />
+        public bool IsVirtual()
+        {
+            IPnPDevice device = this;
+
+            while (device is not null)
+            {
+                var parentId = device.GetProperty<string>(DevicePropertyDevice.Parent);
+
+                if (parentId.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
+                    break;
+
+                device = GetDeviceByInstanceId(parentId);
+            }
+
+            //
+            // TODO: test how others behave (reWASD, NVIDIA, ...)
+            // 
+            return device is not null &&
+                   (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
+                    || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>
         ///     Return device identified by instance ID.
         /// </summary>
@@ -231,7 +265,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
             try
             {
-                buffer = Marshal.AllocHGlobal((int) sizeRequired);
+                buffer = Marshal.AllocHGlobal((int)sizeRequired);
 
                 var ret = SetupApiWrapper.CM_Get_Device_Interface_Property(
                     symbolicLink,
