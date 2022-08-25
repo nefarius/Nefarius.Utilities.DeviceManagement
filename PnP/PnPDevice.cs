@@ -201,21 +201,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     Return device identified by instance ID.
         /// </summary>
         /// <param name="instanceId">The instance ID of the device.</param>
-        /// <returns>A <see cref="PnPDevice" />.</returns>
-        public static PnPDevice GetDeviceByInstanceId(string instanceId)
-        {
-            return GetDeviceByInstanceId(instanceId, DeviceLocationFlags.Normal);
-        }
-
-        /// <summary>
-        ///     Return device identified by instance ID.
-        /// </summary>
-        /// <param name="instanceId">The instance ID of the device.</param>
         /// <param name="flags">
         ///     <see cref="DeviceLocationFlags" />
         /// </param>
         /// <returns>A <see cref="PnPDevice" />.</returns>
-        public static PnPDevice GetDeviceByInstanceId(string instanceId, DeviceLocationFlags flags)
+        public static PnPDevice GetDeviceByInstanceId(string instanceId, DeviceLocationFlags flags = DeviceLocationFlags.Normal)
         {
             return new PnPDevice(instanceId, flags);
         }
@@ -228,7 +218,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     <see cref="DeviceLocationFlags" />
         /// </param>
         /// <returns>A <see cref="PnPDevice" />.</returns>
-        public static PnPDevice GetDeviceByInterfaceId(string symbolicLink, DeviceLocationFlags flags)
+        public static PnPDevice GetDeviceByInterfaceId(string symbolicLink, DeviceLocationFlags flags = DeviceLocationFlags.Normal)
         {
             var instanceId = GetInstanceIdFromInterfaceId(symbolicLink);
 
@@ -269,16 +259,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             {
                 Marshal.FreeHGlobal(buffer);
             }
-        }
-
-        /// <summary>
-        ///     Return device identified by instance ID/path (symbolic link).
-        /// </summary>
-        /// <param name="symbolicLink">The device interface path/ID/symbolic link name.</param>
-        /// <returns>A <see cref="PnPDevice" />.</returns>
-        public static PnPDevice GetDeviceByInterfaceId(string symbolicLink)
-        {
-            return GetDeviceByInterfaceId(symbolicLink, DeviceLocationFlags.Normal);
         }
 
         /// <inheritdoc />
