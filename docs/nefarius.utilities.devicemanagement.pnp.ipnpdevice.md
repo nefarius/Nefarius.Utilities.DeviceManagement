@@ -38,7 +38,7 @@ public abstract string DeviceId { get; }
 
 ### **Restart()**
 
-Attempts to restart this device.
+Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
 
 ```csharp
 void Restart()
@@ -51,6 +51,19 @@ Attempts to remove this device node.
 ```csharp
 void Remove()
 ```
+
+### **IsVirtual()**
+
+Walks up the [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)s parents chain to determine if the top most device is root enumerated.
+
+```csharp
+bool IsVirtual()
+```
+
+#### Returns
+
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True if this devices originates from an emulator, false otherwise.
 
 ### **GetProperty&lt;T&gt;(DevicePropertyKey)**
 

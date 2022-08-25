@@ -5,10 +5,11 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Describes an instance of a PNP device.
 
 ```csharp
-public class PnPDevice
+public class PnPDevice : IPnPDevice, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.PnPDevice, Nefarius.Utilities.DeviceManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)
+Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)<br>
+Implements [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), [IEquatable&lt;PnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)
 
 ## Properties
 
@@ -54,23 +55,18 @@ Attempts to remove this device node.
 public void Remove()
 ```
 
-### **GetDeviceByInstanceId(String)**
+### **IsVirtual()**
 
-Return device identified by instance ID.
+Walks up the [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)s parents chain to determine if the top most device is root enumerated.
 
 ```csharp
-public static PnPDevice GetDeviceByInstanceId(string instanceId)
+public bool IsVirtual()
 ```
-
-#### Parameters
-
-`instanceId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The instance ID of the device.
 
 #### Returns
 
-[PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)<br>
-A .
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True if this devices originates from an emulator, false otherwise.
 
 ### **GetDeviceByInstanceId(String, DeviceLocationFlags)**
 
@@ -130,23 +126,61 @@ The device interface path/ID/symbolic link name.
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 The Instance ID.
 
-### **GetDeviceByInterfaceId(String)**
+### **ToString()**
 
-Return device identified by instance ID/path (symbolic link).
+
 
 ```csharp
-public static PnPDevice GetDeviceByInterfaceId(string symbolicLink)
+public string ToString()
+```
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### **Equals(PnPDevice)**
+
+
+
+```csharp
+public bool Equals(PnPDevice other)
 ```
 
 #### Parameters
 
-`symbolicLink` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The device interface path/ID/symbolic link name.
+`other` [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)<br>
 
 #### Returns
 
-[PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)<br>
-A .
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+
+### **Equals(Object)**
+
+
+
+```csharp
+public bool Equals(object obj)
+```
+
+#### Parameters
+
+`obj` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
+
+#### Returns
+
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+
+### **GetHashCode()**
+
+
+
+```csharp
+public int GetHashCode()
+```
+
+#### Returns
+
+[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **GetProperty&lt;T&gt;(DevicePropertyKey)**
 

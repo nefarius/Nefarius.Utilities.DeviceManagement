@@ -14,6 +14,10 @@
 
 [Devcon](./nefarius.utilities.devicemanagement.pnp.devcon.md)
 
+[DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)
+
+[DeviceInterfaceIds](./nefarius.utilities.devicemanagement.pnp.deviceinterfaceids.md)
+
 [DeviceLocationFlags](./nefarius.utilities.devicemanagement.pnp.devicelocationflags.md)
 
 [DeviceNotificationListener](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md)
@@ -21,6 +25,8 @@
 [DevicePropertyDevice](./nefarius.utilities.devicemanagement.pnp.devicepropertydevice.md)
 
 [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)
+
+[IDeviceNotificationListener](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md)
 
 [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)
 

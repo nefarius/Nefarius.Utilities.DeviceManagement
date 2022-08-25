@@ -158,13 +158,19 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     The instance ID of the device.
+        /// </summary>
         public string InstanceId { get; }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     The device ID.
+        /// </summary>
         public string DeviceId { get; }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
+        /// </summary>
         public void Restart()
         {
             var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
@@ -187,7 +193,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Attempts to remove this device node.
+        /// </summary>
         public void Remove()
         {
             var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
@@ -200,7 +208,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Walks up the <see cref="PnPDevice" />s parents chain to determine if the top most device is root enumerated.
+        /// </summary>
+        /// <remarks>
+        ///     This is achieved by walking up the node tree until the top most parent and check if the last parent below the
+        ///     tree root is a software device. Hardware devices originate from a PCI(e) bus while virtual devices originate from a
+        ///     root enumerated device.
+        /// </remarks>
+        /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
         public bool IsVirtual()
         {
             IPnPDevice device = this;

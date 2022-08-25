@@ -89,6 +89,35 @@ Optional instance ID (zero-based) specifying the device to process on multiple m
 [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 True if at least one device was found with the provided class, false otherwise.
 
+### **FindByInterfaceGuid(Guid, PnPDevice&, Int32, Boolean)**
+
+Searches for devices matching the provided interface GUID and returns a [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md).
+
+```csharp
+public static bool FindByInterfaceGuid(Guid target, PnPDevice& device, int instance, bool presentOnly)
+```
+
+#### Parameters
+
+`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+The interface GUID to enumerate.
+
+`device` [PnPDevice&](./nefarius.utilities.devicemanagement.pnp.pnpdevice&.md)<br>
+The  wrapper object.
+
+`instance` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+Optional instance ID (zero-based) specifying the device to process on multiple matches.
+
+`presentOnly` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+
+                Only enumerate currently connected devices by default, set to False to also include phantom
+                devices.
+
+#### Returns
+
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True if at least one device was found with the provided class, false otherwise.
+
 ### **Find(Guid, String&, String&, Int32)**
 
 Searches for devices matching the provided interface GUID and returns the device path and instance ID.

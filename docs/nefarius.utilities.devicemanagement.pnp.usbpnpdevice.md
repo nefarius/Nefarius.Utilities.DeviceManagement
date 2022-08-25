@@ -5,10 +5,11 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Describes an instance of a USB PNP device.
 
 ```csharp
-public class UsbPnPDevice : PnPDevice
+public class UsbPnPDevice : PnPDevice, IPnPDevice, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.PnPDevice, Nefarius.Utilities.DeviceManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) → [UsbPnPDevice](./nefarius.utilities.devicemanagement.pnp.usbpnpdevice.md)
+Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) → [UsbPnPDevice](./nefarius.utilities.devicemanagement.pnp.usbpnpdevice.md)<br>
+Implements [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), [IEquatable&lt;PnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)
 
 ## Properties
 

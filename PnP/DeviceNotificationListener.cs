@@ -17,10 +17,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     {
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Gets invoked when a new device has arrived (plugged in).
+        /// </summary>
         public event Action<DeviceEventArgs> DeviceArrived;
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Gets invoked when an existing device has been removed (unplugged).
+        /// </summary>
         public event Action<DeviceEventArgs> DeviceRemoved;
 
         private readonly List<ListenerItem> _listeners = new();
@@ -30,7 +34,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Registration
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Subscribe a custom event handler to device arrival events.
+        /// </summary>
+        /// <param name="handler">The event handler to invoke.</param>
+        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
         public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
         {
             if (_arrivedRegistrations.All(i => i.Handler != handler))
@@ -43,7 +51,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Unsubscribe a previously registered event handler.
+        /// </summary>
+        /// <param name="handler">The event handler to unsubscribe.</param>
         public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
         {
             foreach (var arrivedRegistration in _arrivedRegistrations.ToList())
@@ -55,7 +66,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Subscribe a custom event handler to device removal events.
+        /// </summary>
+        /// <param name="handler">The event handler to invoke.</param>
+        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
         public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
         {
             if (_removedRegistrations.All(i => i.Handler != handler))
@@ -68,7 +83,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Unsubscribe a previously registered event handler.
+        /// </summary>
+        /// <param name="handler">The event handler to unsubscribe.</param>
         public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
         {
             foreach (var removedRegistration in _removedRegistrations.ToList())
@@ -200,7 +218,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Start/End
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Start listening for device arrivals/removals using the provided <see cref="Guid" />. Call this after you've
+        ///     subscribed to <see cref="DeviceArrived" /> and <see cref="DeviceRemoved" /> events.
+        /// </summary>
+        /// <param name="interfaceGuid">The device interface GUID to listen for.</param>
         public void StartListen(Guid interfaceGuid)
         {
             if (_listeners.All(i => i.InterfaceGuid != interfaceGuid))
@@ -244,7 +266,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             MessagePump();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        ///     Stop listening. The events <see cref="DeviceArrived" /> and <see cref="DeviceRemoved" /> will not get invoked
+        ///     anymore after this call. If no <see cref="Guid" /> is specified, all currently registered interfaces will get
+        ///     unsubscribed.
+        /// </summary>
         public void StopListen(Guid? interfaceGuid = null)
         {
             _cancellationTokenSource.Cancel();
