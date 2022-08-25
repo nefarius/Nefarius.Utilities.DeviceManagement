@@ -54,7 +54,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         string DeviceId { get; }
 
         /// <summary>
-        ///     Attempts to restart this device.
+        ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
         /// </summary>
         void Restart();
 
@@ -147,19 +147,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        /// <summary>
-        ///     The instance ID of the device.
-        /// </summary>
+        /// <inheritdoc />
         public string InstanceId { get; }
 
-        /// <summary>
-        ///     The device ID.
-        /// </summary>
+        /// <inheritdoc />
         public string DeviceId { get; }
 
-        /// <summary>
-        ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
-        /// </summary>
+        /// <inheritdoc />
         public void Restart()
         {
             var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
@@ -182,9 +176,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        /// <summary>
-        ///     Attempts to remove this device node.
-        /// </summary>
+        /// <inheritdoc />
         public void Remove()
         {
             var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
