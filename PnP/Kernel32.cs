@@ -1,25 +1,17 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using Windows.Win32;
 
-namespace Nefarius.Utilities.DeviceManagement.PnP
+namespace Nefarius.Utilities.DeviceManagement.PnP;
+
+internal static class Kernel32
 {
-    internal static class Kernel32
+    public static bool MethodExists(string libraryName, string methodName)
     {
-        public static bool MethodExists(string libraryName, string methodName)
-        {
-            var libraryPtr = LoadLibrary(libraryName);
+        var libraryPtr = PInvoke.LoadLibrary(libraryName);
 
-            if (libraryPtr == UIntPtr.Zero) return false;
+        if (libraryPtr.IsInvalid) return false;
 
-            var procPtr = GetProcAddress(libraryPtr, methodName);
+        var procPtr = PInvoke.GetProcAddress(libraryPtr, methodName);
 
-            return procPtr != UIntPtr.Zero;
-        }
-
-        [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern UIntPtr LoadLibrary(string lpFileName);
-
-        [DllImport("Kernel32.dll", SetLastError = true, CharSet = CharSet.Ansi, ExactSpelling = true)]
-        internal static extern UIntPtr GetProcAddress(UIntPtr hModule, string lpProcName);
+        return procPtr != null;
     }
 }

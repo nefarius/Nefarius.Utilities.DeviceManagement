@@ -32,9 +32,11 @@ DispatchMessage
 GUID_DEVINTERFACE_USB_HUB
 GetMessage
 GetModuleHandle
+GetProcAddress
 INSTALLFLAG_FORCE
 INSTALLFLAG_NONINTERACTIVE
 IOCTL_USB_HUB_CYCLE_PORT
+LoadLibrary
 MAX_PATH
 PostMessage
 RegisterClassEx
