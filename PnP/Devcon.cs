@@ -216,68 +216,7 @@ public static class Devcon
     [Obsolete]
     public static bool Find(Guid target, out string path, out string instanceId, int instance = 0)
     {
-        var detailDataBuffer = IntPtr.Zero;
-        var deviceInfoSet = IntPtr.Zero;
-
-        try
-        {
-            SetupApiWrapper.SP_DEVINFO_DATA deviceInterfaceData = new(), da = new();
-            int bufferSize = 0, memberIndex = 0;
-
-            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero,
-                (int)(PInvoke.DIGCF_DEVICEINTERFACE | PInvoke.DIGCF_PRESENT));
-
-            deviceInterfaceData.cbSize = da.cbSize = Marshal.SizeOf(deviceInterfaceData);
-
-            while (SetupApiWrapper.SetupDiEnumDeviceInterfaces(deviceInfoSet, IntPtr.Zero, ref target, memberIndex,
-                       ref deviceInterfaceData))
-            {
-                SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData, IntPtr.Zero,
-                    0,
-                    ref bufferSize, ref da);
-                {
-                    detailDataBuffer = Marshal.AllocHGlobal(bufferSize);
-
-                    Marshal.WriteInt32(detailDataBuffer,
-                        IntPtr.Size == 4 ? 4 + Marshal.SystemDefaultCharSize : 8);
-
-                    if (SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData,
-                            detailDataBuffer,
-                            bufferSize, ref bufferSize, ref da))
-                    {
-                        var pDevicePathName = detailDataBuffer + 4;
-
-                        path = (Marshal.PtrToStringAuto(pDevicePathName) ?? string.Empty).ToUpper();
-
-                        if (memberIndex == instance)
-                        {
-                            var nBytes = 256;
-                            var ptrInstanceBuf = Marshal.AllocHGlobal(nBytes);
-
-                            SetupApiWrapper.CM_Get_Device_ID(da.DevInst, ptrInstanceBuf, (uint)nBytes, 0);
-                            instanceId = (Marshal.PtrToStringAuto(ptrInstanceBuf) ?? string.Empty).ToUpper();
-
-                            Marshal.FreeHGlobal(ptrInstanceBuf);
-                            return true;
-                        }
-                    }
-                    else
-                    {
-                        Marshal.FreeHGlobal(detailDataBuffer);
-                    }
-                }
-
-                memberIndex++;
-            }
-        }
-        finally
-        {
-            if (deviceInfoSet != IntPtr.Zero)
-                SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
-        }
-
-        path = instanceId = string.Empty;
-        return false;
+        return FindByInterfaceGuid(target, out path, out instanceId, instance);
     }
 
     /// <summary>

@@ -270,14 +270,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Cfgmgr32
 
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_Device_ID(
-            uint DevInst,
-            IntPtr Buffer,
-            uint BufferLen,
-            uint Flags
-        );
-
         [DllImport("CfgMgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern ConfigManagerResult CM_Get_DevNode_Property(
             uint devInst,
