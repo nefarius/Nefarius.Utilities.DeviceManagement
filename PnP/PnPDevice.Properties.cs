@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Util;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -65,15 +67,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     out var size
                 );
 
-                if (ret == SetupApiWrapper.ConfigManagerResult.NoSuchValue
+                if (ret == CONFIGRET.CR_NO_SUCH_VALUE
                     || propertyType == SetupApiWrapper.DevPropType.Empty)
                     return default(T);
 
-                if (ret == SetupApiWrapper.ConfigManagerResult.BufferSmall)
-                    throw new Win32Exception("The buffer supplied to a function was too small");
+                if (ret == CONFIGRET.CR_BUFFER_SMALL)
+                    throw new ConfigManagerException("The buffer supplied to a function was too small", ret);
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to get property.", ret);
 
                 if (!NativeToManagedTypeMap.TryGetValue(propertyType, out var managedType))
                     throw new ArgumentException(
@@ -247,8 +249,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     0
                 );
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to set property.", ret);
             }
             finally
             {
@@ -256,7 +258,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        private SetupApiWrapper.ConfigManagerResult GetProperty(
+        private CONFIGRET GetProperty(
             SetupApiWrapper.DevPropKey propertyKey,
             out SetupApiWrapper.DevPropType propertyType,
             out IntPtr valueBuffer,
@@ -276,7 +278,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 0
             );
 
-            if (ret == SetupApiWrapper.ConfigManagerResult.Success) return ret;
+            if (ret == CONFIGRET.CR_SUCCESS) return ret;
             Marshal.FreeHGlobal(valueBuffer);
             valueBuffer = IntPtr.Zero;
             return ret;

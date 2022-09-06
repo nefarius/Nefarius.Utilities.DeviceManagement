@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -48,78 +49,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 this.fmtid = new Guid(a, b, c, d, e, f, g, h, i, j, k);
                 this.pid = pid;
             }
-        }
-
-        internal enum CM_GET_DEVICE_INTERFACE_LIST_FLAG : uint
-        {
-            CM_GET_DEVICE_INTERFACE_LIST_ALL_DEVICES = 0x00000001,
-            CM_GET_DEVICE_INTERFACE_LIST_PRESENT = 0x00000000
-        }
-
-        internal enum ConfigManagerResult : uint
-        {
-            Success = 0x00000000,
-            Default = 0x00000001,
-            OutOfMemory = 0x00000002,
-            InvalidPointer = 0x00000003,
-            InvalidFlag = 0x00000004,
-            InvalidDevnode = 0x00000005,
-            InvalidDevinst = InvalidDevnode,
-            InvalidResDes = 0x00000006,
-            InvalidLogConf = 0x00000007,
-            InvalidArbitrator = 0x00000008,
-            InvalidNodelist = 0x00000009,
-            DevnodeHasReqs = 0x0000000A,
-            DevinstHasReqs = DevnodeHasReqs,
-            InvalidResourceid = 0x0000000B,
-            NoSuchDevnode = 0x0000000D,
-            NoSuchDevinst = NoSuchDevnode,
-            NoMoreLogConf = 0x0000000E,
-            NoMoreResDes = 0x0000000F,
-            AlreadySuchDevnode = 0x00000010,
-            AlreadySuchDevinst = AlreadySuchDevnode,
-            InvalidRangeList = 0x00000011,
-            InvalidRange = 0x00000012,
-            Failure = 0x00000013,
-            NoSuchLogicalDev = 0x00000014,
-            CreateBlocked = 0x00000015,
-            RemoveVetoed = 0x00000017,
-            ApmVetoed = 0x00000018,
-            InvalidLoadType = 0x00000019,
-            BufferSmall = 0x0000001A,
-            NoArbitrator = 0x0000001B,
-            NoRegistryHandle = 0x0000001C,
-            RegistryError = 0x0000001D,
-            InvalidDeviceId = 0x0000001E,
-            InvalidData = 0x0000001F,
-            InvalidApi = 0x00000020,
-            DevloaderNotReady = 0x00000021,
-            NeedRestart = 0x00000022,
-            NoMoreHwProfiles = 0x00000023,
-            DeviceNotThere = 0x00000024,
-            NoSuchValue = 0x00000025,
-            WrongType = 0x00000026,
-            InvalidPriority = 0x00000027,
-            NotDisableable = 0x00000028,
-            FreeResources = 0x00000029,
-            QueryVetoed = 0x0000002A,
-            CantShareIrq = 0x0000002B,
-            NoDependent = 0x0000002C,
-            SameResources = 0x0000002D,
-            NoSuchRegistryKey = 0x0000002E,
-            InvalidMachinename = 0x0000002F,   // NT ONLY
-            RemoteCommFailure = 0x00000030,   // NT ONLY
-            MachineUnavailable = 0x00000031,   // NT ONLY
-            NoCmServices = 0x00000032,   // NT ONLY
-            AccessDenied = 0x00000033,   // NT ONLY
-            CallNotImplemented = 0x00000034,
-            InvalidProperty = 0x00000035,
-            DeviceInterfaceActive = 0x00000036,
-            NoSuchDeviceInterface = 0x00000037,
-            InvalidReferenceString = 0x00000038,
-            InvalidConflictList = 0x00000039,
-            InvalidIndex = 0x0000003A,
-            InvalidStructureSize = 0x0000003B
         }
 
         internal enum DevPropType : uint
@@ -271,7 +200,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         #region Cfgmgr32
 
         [DllImport("CfgMgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_DevNode_Property(
+        internal static extern CONFIGRET CM_Get_DevNode_Property(
             uint devInst,
             ref DevPropKey propertyKey,
             out DevPropType propertyType,
@@ -281,7 +210,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             );
 
         [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Set_DevNode_Property(
+        internal static extern CONFIGRET CM_Set_DevNode_Property(
             uint devInst,
             ref DevPropKey PropertyKey,
             DevPropType PropertyType,

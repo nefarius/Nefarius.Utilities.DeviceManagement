@@ -86,7 +86,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                         hubInstanceId,
                         pListBuffer,
                         listLength,
-                        (uint)SetupApiWrapper.CM_GET_DEVICE_INTERFACE_LIST_FLAG.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
+                        PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
                     );
 
                     if (ret != CONFIGRET.CR_SUCCESS)
