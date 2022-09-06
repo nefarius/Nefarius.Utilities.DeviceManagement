@@ -12,7 +12,7 @@ public class PnPDeviceTests
     [Test]
     public void TestGetInstanceIdFromInterfaceId()
     {
-        // Requires two Xbox controllers, either 360 or One or mixed
+        // Requires one Xbox controller, either 360 or One or compatible
         var xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
 
         // 1st controller
