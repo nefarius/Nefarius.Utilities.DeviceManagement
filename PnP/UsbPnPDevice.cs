@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.Storage.FileSystem;
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Extensions;
 using Nefarius.Utilities.DeviceManagement.Util;
@@ -36,7 +38,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     Power-cycles the hub port this device is attached to, causing it to restart.
         /// </summary>
         /// <remarks>Requires administrative privileges.</remarks>
-        public void CyclePort()
+        public unsafe void CyclePort()
         {
             var hubDevice = this;
             var compositeDevice = this;
@@ -48,12 +50,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 var service = hubDevice.GetProperty<string>(DevicePropertyDevice.Service);
 
                 if (service is not null)
-                {
                     // we have reached the hub object, bail
                     if (service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
                         break;
-                }
-                
+
                 // grab topmost child to get real port number
                 compositeDevice = hubDevice;
 
@@ -103,15 +103,16 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (hubPath is null)
                     throw new ArgumentException("Failed to get device interface path.");
 
-                using var hubHandle = PInvoke.Kernel32.CreateFile(hubPath,
-                    PInvoke.Kernel32.ACCESS_MASK.GenericRight.GENERIC_READ |
-                    PInvoke.Kernel32.ACCESS_MASK.GenericRight.GENERIC_WRITE,
-                    PInvoke.Kernel32.FileShare.FILE_SHARE_READ | PInvoke.Kernel32.FileShare.FILE_SHARE_WRITE,
-                    IntPtr.Zero, PInvoke.Kernel32.CreationDisposition.OPEN_EXISTING,
-                    PInvoke.Kernel32.CreateFileFlags.FILE_ATTRIBUTE_NORMAL
-                    | PInvoke.Kernel32.CreateFileFlags.FILE_FLAG_NO_BUFFERING
-                    | PInvoke.Kernel32.CreateFileFlags.FILE_FLAG_WRITE_THROUGH,
-                    PInvoke.Kernel32.SafeObjectHandle.Null
+                using var hubHandle = PInvoke.CreateFile(
+                    hubPath,
+                    FILE_ACCESS_FLAGS.FILE_GENERIC_READ | FILE_ACCESS_FLAGS.FILE_GENERIC_WRITE,
+                    FILE_SHARE_MODE.FILE_SHARE_READ | FILE_SHARE_MODE.FILE_SHARE_WRITE,
+                    null,
+                    FILE_CREATION_DISPOSITION.OPEN_EXISTING,
+                    FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_NORMAL
+                    | FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_NO_BUFFERING
+                    | FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_WRITE_THROUGH,
+                    null
                 );
 
                 var size = Marshal.SizeOf<USB_CYCLE_PORT_PARAMS>();
@@ -120,26 +121,27 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 Marshal.StructureToPtr(parameters, buffer, false);
 
                 // request hub to power-cycle port, effectively force-restarting the device
-                var success = PInvoke.Kernel32.DeviceIoControl(
+                var success = PInvoke.DeviceIoControl(
                     hubHandle,
                     IOCTL_USB_HUB_CYCLE_PORT,
-                    buffer,
-                    size,
-                    buffer,
-                    size,
-                    out _,
-                    IntPtr.Zero
+                    &buffer,
+                    (uint)size,
+                    &buffer,
+                    (uint)size,
+                    null,
+                    null
                 );
-                
-                var err = PInvoke.Kernel32.GetLastError();
 
-                switch (success)
+                var err = (WIN32_ERROR)Marshal.GetLastWin32Error();
+
+                switch (success.Value > 0)
                 {
-                    case false when err == Win32ErrorCode.ERROR_GEN_FAILURE:
-                        throw new ArgumentException("Request failed, this operation requires administrative privileges.");
-                    /* STATUS_NO_SUCH_DEVICE */
-                    case false when (int)err == 433:
-                        throw new ArgumentException($"Request failed, device on port {compositeDevice.Port} not found.");
+                    case false when err == WIN32_ERROR.ERROR_GEN_FAILURE:
+                        throw new ArgumentException(
+                            "Request failed, this operation requires administrative privileges.");
+                    case false when err == WIN32_ERROR.ERROR_NO_SUCH_DEVICE:
+                        throw new ArgumentException(
+                            $"Request failed, device on port {compositeDevice.Port} not found.");
                 }
 
                 var result = Marshal.PtrToStructure<USB_CYCLE_PORT_PARAMS>(buffer);

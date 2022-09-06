@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,6 +8,7 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Power;
 using Windows.Win32.UI.WindowsAndMessaging;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -364,7 +364,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 POWER_SETTING_REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
             );
             if (notificationHandle == null)
-                throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to register device notifications.");
+                throw new Win32Exception("Failed to register device notifications.");
 
             listenerItem.NotificationHandle = notificationHandle;
 
