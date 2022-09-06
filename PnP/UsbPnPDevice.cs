@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
@@ -7,7 +6,6 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Storage.FileSystem;
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Extensions;
-using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
