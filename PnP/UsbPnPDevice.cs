@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Windows.Win32;
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Extensions;
 using Nefarius.Utilities.DeviceManagement.Util;
@@ -72,7 +73,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 out var listLength,
                 ref GUID_DEVINTERFACE_USB_HUB,
                 hubDevice.InstanceId,
-                SetupApiWrapper.CM_GET_DEVICE_INTERFACE_LIST_FLAG.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
+                PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
             );
 
             if (ret != SetupApiWrapper.ConfigManagerResult.Success)
@@ -129,7 +130,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     out _,
                     IntPtr.Zero
                 );
-
+                
                 var err = PInvoke.Kernel32.GetLastError();
 
                 switch (success)

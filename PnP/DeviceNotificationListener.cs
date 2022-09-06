@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.Graphics.Gdi;
 using Windows.Win32.System.Power;
 using Windows.Win32.UI.WindowsAndMessaging;
-using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -19,7 +18,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
     public class DeviceNotificationListener : IDeviceNotificationListener, IDisposable
     {
+        private readonly List<DeviceEventRegistration> _arrivedRegistrations = new();
         private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+        private readonly List<ListenerItem> _listeners = new();
+        private readonly List<DeviceEventRegistration> _removedRegistrations = new();
 
         /// <summary>
         ///     Gets invoked when a new device has arrived (plugged in).
@@ -31,163 +34,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public event Action<DeviceEventArgs> DeviceRemoved;
 
-        private readonly List<ListenerItem> _listeners = new();
-
-        private readonly List<DeviceEventRegistration> _arrivedRegistrations = new();
-        private readonly List<DeviceEventRegistration> _removedRegistrations = new();
-
-        #region Registration
-
-        /// <summary>
-        ///     Subscribe a custom event handler to device arrival events.
-        /// </summary>
-        /// <param name="handler">The event handler to invoke.</param>
-        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
-        public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
+        public void Dispose()
         {
-            if (_arrivedRegistrations.All(i => i.Handler != handler))
-            {
-                _arrivedRegistrations.Add(new DeviceEventRegistration
-                {
-                    Handler = handler,
-                    InterfaceGuid = interfaceGuid ?? Guid.Empty
-                });
-            }
+            // Dispose of unmanaged resources.
+            Dispose(true);
+            // Suppress finalization.
+            GC.SuppressFinalize(this);
         }
-
-        /// <summary>
-        ///     Unsubscribe a previously registered event handler.
-        /// </summary>
-        /// <param name="handler">The event handler to unsubscribe.</param>
-        public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
-        {
-            foreach (var arrivedRegistration in _arrivedRegistrations.ToList())
-            {
-                if (arrivedRegistration.Handler == handler)
-                {
-                    _arrivedRegistrations.Remove(arrivedRegistration);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Subscribe a custom event handler to device removal events.
-        /// </summary>
-        /// <param name="handler">The event handler to invoke.</param>
-        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
-        public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
-        {
-            if (_removedRegistrations.All(i => i.Handler != handler))
-            {
-                _removedRegistrations.Add(new DeviceEventRegistration
-                {
-                    Handler = handler,
-                    InterfaceGuid = interfaceGuid ?? Guid.Empty
-                });
-            }
-        }
-
-        /// <summary>
-        ///     Unsubscribe a previously registered event handler.
-        /// </summary>
-        /// <param name="handler">The event handler to unsubscribe.</param>
-        public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
-        {
-            foreach (var removedRegistration in _removedRegistrations.ToList())
-            {
-                if (removedRegistration.Handler == handler)
-                {
-                    _removedRegistrations.Remove(removedRegistration);
-                }
-            }
-        }
-
-        #endregion
-
-        #region Processing
-
-        private LRESULT WndProc(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
-        {
-            if (msg == WM_DEVICECHANGE)
-            {
-                DEV_BROADCAST_HDR hdr;
-
-                switch (wParam.Value)
-                {
-                    case DBT_DEVICEARRIVAL:
-                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
-
-                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
-                        {
-                            var deviceInterface =
-                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
-                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
-                            
-                            var arrivedEvent = new DeviceEventArgs
-                            {
-                                InterfaceGuid = interfaceGuid,
-                                SymLink = deviceInterface.dbcc_name
-                            };
-                            
-                            FireDeviceArrived(arrivedEvent);
-                        }
-
-                        break;
-
-                    case DBT_DEVICEREMOVECOMPLETE:
-                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
-
-                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
-                        {
-                            var deviceInterface =
-                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
-                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
-                            
-                            var removedEvent = new DeviceEventArgs
-                            {
-                                InterfaceGuid = interfaceGuid,
-                                SymLink = deviceInterface.dbcc_name
-                            };
-
-                            FireDeviceRemoved(removedEvent);
-                        }
-
-                        break;
-                }
-            }
-
-            return new LRESULT(0);
-        }
-
-        private void FireDeviceArrived(DeviceEventArgs args)
-        {
-            DeviceArrived?.Invoke(args);
-
-            foreach (var arrivedRegistration in _arrivedRegistrations)
-            {
-                if (arrivedRegistration.InterfaceGuid == args.InterfaceGuid ||
-                    arrivedRegistration.InterfaceGuid == Guid.Empty)
-                {
-                    arrivedRegistration.Handler(args);
-                }
-            }
-        }
-
-        private void FireDeviceRemoved(DeviceEventArgs args)
-        {
-            DeviceRemoved?.Invoke(args);
-
-            foreach (var removedRegistration in _removedRegistrations)
-            {
-                if (removedRegistration.InterfaceGuid == args.InterfaceGuid ||
-                    removedRegistration.InterfaceGuid == Guid.Empty)
-                {
-                    removedRegistration.Handler(args);
-                }
-            }
-        }
-
-        #endregion
 
         #region Util
 
@@ -220,6 +73,162 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #endregion
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _arrivedRegistrations.Clear();
+                _removedRegistrations.Clear();
+            }
+        }
+
+        private unsafe class ListenerItem
+        {
+            public Guid InterfaceGuid { get; set; }
+            public Thread Thread { get; set; }
+            public HWND WindowHandle { get; set; }
+            public void* NotificationHandle { get; set; }
+        }
+
+        private class DeviceEventRegistration
+        {
+            public Action<DeviceEventArgs> Handler { get; set; }
+            public Guid InterfaceGuid { get; set; }
+        }
+
+        #region Registration
+
+        /// <summary>
+        ///     Subscribe a custom event handler to device arrival events.
+        /// </summary>
+        /// <param name="handler">The event handler to invoke.</param>
+        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
+        public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
+        {
+            if (_arrivedRegistrations.All(i => i.Handler != handler))
+                _arrivedRegistrations.Add(new DeviceEventRegistration
+                {
+                    Handler = handler,
+                    InterfaceGuid = interfaceGuid ?? Guid.Empty
+                });
+        }
+
+        /// <summary>
+        ///     Unsubscribe a previously registered event handler.
+        /// </summary>
+        /// <param name="handler">The event handler to unsubscribe.</param>
+        public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
+        {
+            foreach (var arrivedRegistration in _arrivedRegistrations.ToList())
+                if (arrivedRegistration.Handler == handler)
+                    _arrivedRegistrations.Remove(arrivedRegistration);
+        }
+
+        /// <summary>
+        ///     Subscribe a custom event handler to device removal events.
+        /// </summary>
+        /// <param name="handler">The event handler to invoke.</param>
+        /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
+        public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
+        {
+            if (_removedRegistrations.All(i => i.Handler != handler))
+                _removedRegistrations.Add(new DeviceEventRegistration
+                {
+                    Handler = handler,
+                    InterfaceGuid = interfaceGuid ?? Guid.Empty
+                });
+        }
+
+        /// <summary>
+        ///     Unsubscribe a previously registered event handler.
+        /// </summary>
+        /// <param name="handler">The event handler to unsubscribe.</param>
+        public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
+        {
+            foreach (var removedRegistration in _removedRegistrations.ToList())
+                if (removedRegistration.Handler == handler)
+                    _removedRegistrations.Remove(removedRegistration);
+        }
+
+        #endregion
+
+        #region Processing
+
+        private LRESULT WndProc(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+        {
+            if (msg == PInvoke.WM_DEVICECHANGE)
+            {
+                DEV_BROADCAST_HDR hdr;
+
+                switch (wParam.Value)
+                {
+                    case PInvoke.DBT_DEVICEARRIVAL:
+                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
+
+                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                        {
+                            var deviceInterface =
+                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
+                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
+
+                            var arrivedEvent = new DeviceEventArgs
+                            {
+                                InterfaceGuid = interfaceGuid,
+                                SymLink = deviceInterface.dbcc_name
+                            };
+
+                            FireDeviceArrived(arrivedEvent);
+                        }
+
+                        break;
+
+                    case PInvoke.DBT_DEVICEREMOVECOMPLETE:
+                        hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
+
+                        if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                        {
+                            var deviceInterface =
+                                (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
+                                    typeof(DEV_BROADCAST_DEVICEINTERFACE));
+
+                            var removedEvent = new DeviceEventArgs
+                            {
+                                InterfaceGuid = interfaceGuid,
+                                SymLink = deviceInterface.dbcc_name
+                            };
+
+                            FireDeviceRemoved(removedEvent);
+                        }
+
+                        break;
+                }
+            }
+
+            return new LRESULT(0);
+        }
+
+        private void FireDeviceArrived(DeviceEventArgs args)
+        {
+            DeviceArrived?.Invoke(args);
+
+            foreach (var arrivedRegistration in _arrivedRegistrations)
+                if (arrivedRegistration.InterfaceGuid == args.InterfaceGuid ||
+                    arrivedRegistration.InterfaceGuid == Guid.Empty)
+                    arrivedRegistration.Handler(args);
+        }
+
+        private void FireDeviceRemoved(DeviceEventArgs args)
+        {
+            DeviceRemoved?.Invoke(args);
+
+            foreach (var removedRegistration in _removedRegistrations)
+                if (removedRegistration.InterfaceGuid == args.InterfaceGuid ||
+                    removedRegistration.InterfaceGuid == Guid.Empty)
+                    removedRegistration.Handler(args);
+        }
+
+        #endregion
+
         #region Start/End
 
         /// <summary>
@@ -248,7 +257,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             var className = GenerateRandomString(); // random string to avoid conflicts
             var windowName = GenerateRandomString();
             using var hInst = PInvoke.GetModuleHandle((string?)null);
-            
+
             var windowClass = new WNDCLASSEXW
             {
                 cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
@@ -256,7 +265,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 cbClsExtra = 0,
                 cbWndExtra = 0,
                 hInstance = (HINSTANCE)hInst.DangerousGetHandle(),
-                lpfnWndProc = (wnd, msg, wParam, lParam) => WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam)
+                lpfnWndProc = (wnd, msg, wParam, lParam) =>
+                    WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam)
             };
 
             fixed (char* pClassName = className)
@@ -270,9 +280,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     0,
                     pClassName,
                     pWindowName,
-                    0, 
-                    0, 0, 0, 0, 
-                    HWND.Null, 
+                    0,
+                    0, 0, 0, 0,
+                    HWND.Null,
                     HMENU.Null,
                     new HINSTANCE(hInst.DangerousGetHandle())
                 );
@@ -291,27 +301,25 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             _cancellationTokenSource.Cancel();
 
             foreach (var listenerItem in _listeners.ToList())
-            {
                 if (interfaceGuid == null || listenerItem.InterfaceGuid == interfaceGuid)
                 {
                     UnregisterUsbDeviceNotification(listenerItem.NotificationHandle);
-                    PInvoke.PostMessage(listenerItem.WindowHandle, WM_QUIT, new WPARAM(0), new LPARAM(0));
+                    PInvoke.PostMessage(listenerItem.WindowHandle, PInvoke.WM_QUIT, new WPARAM(0), new LPARAM(0));
                     listenerItem.Thread.Join(TimeSpan.FromSeconds(3));
                     _listeners.Remove(listenerItem);
                 }
-            }
         }
 
         private LRESULT WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
         {
             switch (msg)
             {
-                case WM_CREATE:
+                case PInvoke.WM_CREATE:
                 {
                     RegisterUsbDeviceNotification(interfaceGuid, new HANDLE(hwnd.Value));
                     break;
                 }
-                case WM_DEVICECHANGE:
+                case PInvoke.WM_DEVICECHANGE:
                 {
                     return WndProc(interfaceGuid, hwnd, msg, wParam, lParam);
                 }
@@ -350,12 +358,17 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             var notificationFilter = Marshal.AllocHGlobal(Marshal.SizeOf(dbcc));
             Marshal.StructureToPtr(dbcc, notificationFilter, true);
 
-            var notificationHandle =
-                PInvoke.RegisterDeviceNotification(windowHandle, &notificationFilter, POWER_SETTING_REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE);
+            var notificationHandle = PInvoke.RegisterDeviceNotification(
+                windowHandle,
+                &notificationFilter,
+                POWER_SETTING_REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
+            );
             if (notificationHandle == null)
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to register device notifications.");
 
             listenerItem.NotificationHandle = notificationHandle;
+
+            Marshal.FreeHGlobal(notificationFilter);
         }
 
         private unsafe void UnregisterUsbDeviceNotification(void* notificationHandle)
@@ -367,20 +380,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         #endregion
 
         #region Win32
-
-        private const UInt32 WM_QUIT = 0x0012;
-        private const UInt32 WM_CREATE = 0x0001;
-        private const UInt32 WM_DEVICECHANGE = 0x0219;
-
-        private const uint DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000;
-
-        private const int
-            DBT_DEVICEARRIVAL =
-                0x8000; // Device event when a device or piece of media has been inserted and becomes available
-
-        private const int
-            DBT_DEVICEREMOVECOMPLETE =
-                0x8004; // Device event when a device or piece of media has been physically removed
 
         [StructLayout(LayoutKind.Sequential)]
         private struct DEV_BROADCAST_HDR
@@ -406,36 +405,5 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         #endregion
-
-        private unsafe class ListenerItem
-        {
-            public Guid InterfaceGuid { get; set; }
-            public Thread Thread { get; set; }
-            public HWND WindowHandle { get; set; }
-            public void* NotificationHandle { get; set; }
-        }
-
-        private class DeviceEventRegistration
-        {
-            public Action<DeviceEventArgs> Handler { get; set; }
-            public Guid InterfaceGuid { get; set; }
-        }
-
-        public void Dispose()
-        {
-            // Dispose of unmanaged resources.
-            Dispose(true);
-            // Suppress finalization.
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _arrivedRegistrations.Clear();
-                _removedRegistrations.Clear();
-            }
-        }
     }
 }
