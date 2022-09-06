@@ -50,24 +50,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        internal enum CM_SETUP_DEVINST_FLAGS : uint
-        {
-            CM_SETUP_DEVNODE_READY = 0x00000000, // Reenable problem devinst
-            CM_SETUP_DEVINST_READY = CM_SETUP_DEVNODE_READY,
-            CM_SETUP_DOWNLOAD = 0x00000001, // Get info about devinst
-            CM_SETUP_WRITE_LOG_CONFS = 0x00000002,
-            CM_SETUP_PROP_CHANGE = 0x00000003
-        }
-
-        internal enum CM_LOCATE_DEVNODE_FLAG : uint
-        {
-            CM_LOCATE_DEVNODE_NORMAL = 0x00000000,
-            CM_LOCATE_DEVNODE_PHANTOM = 0x00000001,
-            CM_LOCATE_DEVNODE_CANCELREMOVE = 0x00000002,
-            CM_LOCATE_DEVNODE_NOVALIDATION = 0x00000004,
-            CM_LOCATE_DEVNODE_BITS = 0x00000007,
-        }
-
         internal enum CM_GET_DEVICE_INTERFACE_LIST_FLAG : uint
         {
             CM_GET_DEVICE_INTERFACE_LIST_ALL_DEVICES = 0x00000001,
@@ -199,33 +181,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             internal Int32    flags;
             internal UIntPtr  reserved;
         }
-
-
-        [Flags]
-        internal enum DiFlags : uint
-        {
-            DIIDFLAG_SHOWSEARCHUI = 1,
-            DIIDFLAG_NOFINISHINSTALLUI = 2,
-            DIIDFLAG_INSTALLNULLDRIVER = 3
-        }
-
-        internal enum PNP_VETO_TYPE : uint
-        {
-            PNP_VetoTypeUnknown,            // Name is unspecified
-            PNP_VetoLegacyDevice,           // Name is an Instance Path
-            PNP_VetoPendingClose,           // Name is an Instance Path
-            PNP_VetoWindowsApp,             // Name is a Module
-            PNP_VetoWindowsService,         // Name is a Service
-            PNP_VetoOutstandingOpen,        // Name is an Instance Path
-            PNP_VetoDevice,                 // Name is an Instance Path
-            PNP_VetoDriver,                 // Name is a Driver Service Name
-            PNP_VetoIllegalDeviceRequest,   // Name is an Instance Path
-            PNP_VetoInsufficientPower,      // Name is unspecified
-            PNP_VetoNonDisableable,         // Name is an Instance Path
-            PNP_VetoLegacyDriver,           // Name is a Service
-            PNP_VetoInsufficientRights      // Name is unspecified
-        }
-
+        
         /// <summary>
         ///     Flags for DiUninstallDriver
         /// </summary>
@@ -326,7 +282,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         internal static extern ConfigManagerResult CM_Locate_DevNode(
             ref uint pdnDevInst,
             string pDeviceID,
-            CM_LOCATE_DEVNODE_FLAG ulFlags
+            uint ulFlags
         );
 
         [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]

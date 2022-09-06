@@ -109,18 +109,18 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         protected PnPDevice(string instanceId, DeviceLocationFlags flags)
         {
             InstanceId = instanceId;
-            var iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_NORMAL;
+            var iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
 
             switch (flags)
             {
                 case DeviceLocationFlags.Normal:
-                    iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_NORMAL;
+                    iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
                     break;
                 case DeviceLocationFlags.Phantom:
-                    iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_PHANTOM;
+                    iFlags = PInvoke.CM_LOCATE_DEVNODE_PHANTOM;
                     break;
                 case DeviceLocationFlags.CancelRemove:
-                    iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_CANCELREMOVE;
+                    iFlags = PInvoke.CM_LOCATE_DEVNODE_CANCELREMOVE;
                     break;
             }
 
