@@ -138,7 +138,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (ret != CONFIGRET.CR_SUCCESS)
                     throw new ConfigManagerException("Failed to locate device node.", ret);
 
-                var nBytes = PInvoke.MAX_PATH;
+                ret = PInvoke.CM_Get_Device_ID_Size(out var charsRequired, _instanceHandle, 0);
+
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Fetching device ID size failed.", ret);
+
+                var nBytes = (charsRequired + 1) * 2;
                 var ptrInstanceBuf = stackalloc char[(int)nBytes];
                 
                 ret = PInvoke.CM_Get_Device_IDW(
