@@ -1,5 +1,5 @@
 ﻿using System;
-using Nefarius.Utilities.DeviceManagement.PnP;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
 
 namespace Nefarius.Utilities.DeviceManagement.Exceptions
 {
@@ -12,7 +12,7 @@ namespace Nefarius.Utilities.DeviceManagement.Exceptions
         {
         }
 
-        internal ConfigManagerException(string message, SetupApiWrapper.ConfigManagerResult result) : this(message)
+        internal ConfigManagerException(string message, CONFIGRET result) : this(message)
         {
         }
     }

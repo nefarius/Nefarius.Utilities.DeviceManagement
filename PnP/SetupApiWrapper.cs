@@ -397,23 +397,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             CM_SETUP_DEVINST_FLAGS ulFlags
         );
 
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_Device_Interface_List_SizeW(
-            [Out] out UInt32 pulLen,
-            [In] ref Guid InterfaceClassGuid,
-            [In] string pDeviceID,
-            [In] CM_GET_DEVICE_INTERFACE_LIST_FLAG ulFlags
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_Device_Interface_ListW(
-            [In] ref Guid InterfaceClassGuid,
-            [In] string pDeviceID,
-            [Out] IntPtr Buffer,
-            [In] UInt32 BufferLen,
-            [In] CM_GET_DEVICE_INTERFACE_LIST_FLAG ulFlags
-        );
-
         #endregion
 
         #region Newdev
