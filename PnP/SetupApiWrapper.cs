@@ -313,16 +313,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             uint ulFlags // reserved
         );
 
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_Device_Interface_Property(
-            string pszDeviceInterface,
-            ref DevPropKey PropertyKey,
-            out DevPropType PropertyType,
-            IntPtr PropertyBuffer,
-            ref uint PropertyBufferSize,
-            uint ulFlags // reserved
-        );
-
         #endregion
 
         #region Newdev

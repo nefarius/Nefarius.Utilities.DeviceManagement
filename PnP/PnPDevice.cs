@@ -145,7 +145,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
                 var nBytes = (charsRequired + 1) * 2;
                 var ptrInstanceBuf = stackalloc char[(int)nBytes];
-                
+
                 ret = PInvoke.CM_Get_Device_IDW(
                     _instanceHandle,
                     ptrInstanceBuf,
@@ -274,35 +274,38 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         /// <param name="symbolicLink">The device interface path/ID/symbolic link name.</param>
         /// <returns>The Instance ID.</returns>
-        public static string GetInstanceIdFromInterfaceId(string symbolicLink)
+        public static unsafe string GetInstanceIdFromInterfaceId(string symbolicLink)
         {
-            var property = DevicePropertyDevice.InstanceId.ToNativeType();
+            var property = DevicePropertyDevice.InstanceId.ToCsWin32Type();
+            uint sizeRequired = 0;
 
-            var buffer = IntPtr.Zero;
-            uint sizeRequired = 2048;
+            var ret = PInvoke.CM_Get_Device_Interface_Property(
+                symbolicLink,
+                property,
+                out _,
+                null,
+                ref sizeRequired,
+                0
+            );
 
-            try
-            {
-                buffer = Marshal.AllocHGlobal((int)sizeRequired);
+            if (ret != CONFIGRET.CR_BUFFER_SMALL)
+                throw new ConfigManagerException("Failed to get instance interface property size.", ret);
 
-                var ret = SetupApiWrapper.CM_Get_Device_Interface_Property(
-                    symbolicLink,
-                    ref property,
-                    out _,
-                    buffer,
-                    ref sizeRequired,
-                    0
-                );
+            var buffer = stackalloc char[(int)sizeRequired];
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            ret = PInvoke.CM_Get_Device_Interface_Property(
+               symbolicLink,
+               property,
+               out _,
+               (byte*)buffer,
+               ref sizeRequired,
+               0
+           );
 
-                return Marshal.PtrToStringUni(buffer);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Failed to get instance interface property.", ret);
+
+            return new string(buffer);
         }
 
         /// <inheritdoc />

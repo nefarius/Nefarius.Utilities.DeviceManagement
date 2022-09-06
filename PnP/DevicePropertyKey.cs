@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.Win32.Devices.Properties;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -41,6 +42,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         internal SetupApiWrapper.DevPropKey ToNativeType()
         {
             return new SetupApiWrapper.DevPropKey(CategoryGuid, PropertyIdentifier);
+        }
+
+        internal DEVPROPKEY ToCsWin32Type()
+        {
+            return new DEVPROPKEY { fmtid = CategoryGuid, pid = PropertyIdentifier };
         }
 
         /// <inheritdoc />

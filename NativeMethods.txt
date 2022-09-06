@@ -3,6 +3,7 @@ CM_Get_Device_ID
 CM_Get_Device_ID_Size
 CM_Get_Device_Interface_List
 CM_Get_Device_Interface_List_Size
+CM_Get_Device_Interface_Property
 CM_LOCATE_DEVNODE_CANCELREMOVE
 CM_LOCATE_DEVNODE_NORMAL
 CM_LOCATE_DEVNODE_PHANTOM
