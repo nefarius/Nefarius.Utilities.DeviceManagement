@@ -15,8 +15,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// </summary>
     public class UsbPnPDevice : PnPDevice
     {
-        private static Guid GUID_DEVINTERFACE_USB_HUB = Guid.Parse("{f18a0e88-c30c-11d0-8815-00a0c906bed8}");
-
         internal UsbPnPDevice(string instanceId, DeviceLocationFlags flags) : base(instanceId, flags)
         {
             var enumerator = GetProperty<string>(DevicePropertyDevice.EnumeratorName);
@@ -67,9 +65,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 ConnectionIndex = compositeDevice.Port
             };
 
+            var usbHub = PInvoke.GUID_DEVINTERFACE_USB_HUB;
+
             var ret = SetupApiWrapper.CM_Get_Device_Interface_List_SizeW(
                 out var listLength,
-                ref GUID_DEVINTERFACE_USB_HUB,
+                ref usbHub,
                 hubDevice.InstanceId,
                 PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
             );
@@ -86,7 +86,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 listBuffer = Marshal.AllocHGlobal(bytesRequired);
 
                 ret = SetupApiWrapper.CM_Get_Device_Interface_ListW(
-                    ref GUID_DEVINTERFACE_USB_HUB,
+                    ref usbHub,
                     hubDevice.InstanceId,
                     listBuffer,
                     listLength,
