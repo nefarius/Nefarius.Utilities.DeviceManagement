@@ -279,13 +279,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         );
 
         [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Locate_DevNode(
-            ref uint pdnDevInst,
-            string pDeviceID,
-            uint ulFlags
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern ConfigManagerResult CM_Locate_DevNode_Ex(
             out uint pdnDevInst,
             IntPtr pDeviceID,

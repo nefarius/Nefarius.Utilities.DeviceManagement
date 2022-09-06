@@ -106,7 +106,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         /// <param name="instanceId">The instance ID to look for.</param>
         /// <param name="flags">The <see cref="DeviceLocationFlags"/> influencing search behavior.</param>
-        protected PnPDevice(string instanceId, DeviceLocationFlags flags)
+        protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
         {
             InstanceId = instanceId;
             var iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
@@ -124,40 +124,34 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     break;
             }
 
-            var ret = SetupApiWrapper.CM_Locate_DevNode(
-                ref _instanceHandle,
-                instanceId,
-                iFlags
-            );
-
-            if (ret == SetupApiWrapper.ConfigManagerResult.NoSuchDevinst)
-                throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
-
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-
-            uint nBytes = 256;
-
-            var ptrInstanceBuf = Marshal.AllocHGlobal((int)nBytes);
-
-            try
+            fixed (char* pInstId = instanceId)
             {
-                ret = SetupApiWrapper.CM_Get_Device_ID(
+                var ret = PInvoke.CM_Locate_DevNode(
+                    out _instanceHandle,
+                    pInstId,
+                    iFlags
+                );
+
+                if (ret == CONFIGRET.CR_NO_SUCH_DEVINST)
+                    throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
+
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to locate device node.", ret);
+
+                var nBytes = PInvoke.MAX_PATH;
+                var ptrInstanceBuf = stackalloc char[(int)nBytes];
+                
+                ret = PInvoke.CM_Get_Device_IDW(
                     _instanceHandle,
                     ptrInstanceBuf,
                     nBytes,
                     0
                 );
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Fetching device ID failed.", ret);
 
-                DeviceId = (Marshal.PtrToStringUni(ptrInstanceBuf) ?? string.Empty).ToUpper();
-            }
-            finally
-            {
-                if (ptrInstanceBuf != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptrInstanceBuf);
+                DeviceId = new string(ptrInstanceBuf);
             }
         }
 
