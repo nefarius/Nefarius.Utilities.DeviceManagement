@@ -1,0 +1,8 @@
+﻿PostMessage
+GetMessage
+TranslateMessage
+DispatchMessage
+GetModuleHandle
+RegisterDeviceNotification
+UnregisterDeviceNotification
+DefWindowProc

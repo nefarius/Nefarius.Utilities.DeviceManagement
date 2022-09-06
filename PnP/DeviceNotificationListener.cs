@@ -4,7 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using PInvoke;
+using Windows.Win32;
+using Windows.Win32.Foundation;
+using Windows.Win32.UI.WindowsAndMessaging;
 using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
@@ -102,13 +104,13 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Processing
 
-        private IntPtr WndProc(Guid interfaceGuid, IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        private IntPtr WndProc(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam, ref bool handled)
         {
-            if (msg == (int)User32.WindowMessage.WM_DEVICECHANGE)
+            if (msg == WM_DEVICECHANGE)
             {
                 DEV_BROADCAST_HDR hdr;
 
-                switch ((int)wParam)
+                switch (wParam.Value)
                 {
                     case DBT_DEVICEARRIVAL:
                         hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
@@ -280,38 +282,36 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (interfaceGuid == null || listenerItem.InterfaceGuid == interfaceGuid)
                 {
                     UnregisterUsbDeviceNotification(listenerItem.NotificationHandle);
-                    User32.PostMessage(listenerItem.WindowHandle, User32.WindowMessage.WM_QUIT, IntPtr.Zero,
-                        IntPtr.Zero);
+                    PInvoke.PostMessage(listenerItem.WindowHandle, WM_QUIT, new WPARAM(0), new LPARAM(0));
                     listenerItem.Thread.Join(TimeSpan.FromSeconds(3));
                     _listeners.Remove(listenerItem);
                 }
             }
         }
 
-        private unsafe IntPtr WndProc2(Guid interfaceGuid, IntPtr hwnd, User32.WindowMessage msg, void* wParam, void* lParam)
+        private IntPtr WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
         {
             switch (msg)
             {
-                case User32.WindowMessage.WM_CREATE:
+                case WM_CREATE:
                 {
                     RegisterUsbDeviceNotification(interfaceGuid, hwnd);
                     break;
                 }
-                case User32.WindowMessage.WM_DEVICECHANGE:
+                case WM_DEVICECHANGE:
                 {
                     var handled = false;
-                    return WndProc(interfaceGuid, hwnd, (int)msg, (IntPtr)wParam, (IntPtr)lParam, ref handled);
+                    return WndProc(interfaceGuid, hwnd, msg, wParam, lParam, ref handled);
                 }
             }
 
-            return User32.DefWindowProc(hwnd, msg, (IntPtr)wParam, (IntPtr)lParam);
+            return PInvoke.DefWindowProc(hwnd, msg, wParam, lParam);
         }
 
         private void MessagePump()
         {
-            var msg = Marshal.AllocHGlobal(Marshal.SizeOf<User32.MSG>());
             int retVal;
-            while ((retVal = User32.GetMessage(msg, IntPtr.Zero, 0, 0)) != 0 &&
+            while ((retVal = PInvoke.GetMessage(out var msg, HWND.Null, 0, 0)) != 0 &&
                    !_cancellationTokenSource.Token.IsCancellationRequested)
                 if (retVal == -1)
                 {
@@ -319,8 +319,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 }
                 else
                 {
-                    User32.TranslateMessage(msg);
-                    User32.DispatchMessage(msg);
+                    PInvoke.TranslateMessage(msg);
+                    PInvoke.DispatchMessage(msg);
                 }
         }
 
@@ -339,7 +339,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             Marshal.StructureToPtr(dbcc, notificationFilter, true);
 
             var notificationHandle =
-                RegisterDeviceNotification(windowHandle, notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
+                PInvoke.RegisterDeviceNotification(windowHandle, notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
             if (notificationHandle == IntPtr.Zero)
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to register device notifications.");
 
@@ -349,25 +349,16 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         private void UnregisterUsbDeviceNotification(IntPtr notificationHandle)
         {
             if (notificationHandle != IntPtr.Zero)
-                UnregisterDeviceNotification(notificationHandle);
+                PInvoke.UnregisterDeviceNotification(notificationHandle);
         }
 
         #endregion
 
         #region Win32
 
-        [DllImport(nameof(Kernel32), SetLastError = true)]  
-        private static extern IntPtr GetModuleHandle(IntPtr lpModuleName); 
-
-        [DllImport(nameof(User32), SetLastError = true)]
-        private static extern IntPtr RegisterDeviceNotification(
-            IntPtr hRecipient,
-            IntPtr NotificationFilter,
-            uint Flags);
-
-        [DllImport(nameof(User32), SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool UnregisterDeviceNotification(IntPtr Handle);
+        private const UInt32 WM_QUIT = 0x0012;
+        private const UInt32 WM_CREATE = 0x0001;
+        private const UInt32 WM_DEVICECHANGE = 0x0219;
 
         private const uint DEVICE_NOTIFY_WINDOW_HANDLE = 0x00000000;
 
@@ -408,7 +399,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             public Guid InterfaceGuid { get; set; }
             public Thread Thread { get; set; }
-            public IntPtr WindowHandle { get; set; }
+            public HWND WindowHandle { get; set; }
             public IntPtr NotificationHandle { get; set; }
         }
 

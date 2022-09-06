@@ -3,7 +3,6 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Nefarius.Utilities.DeviceManagement.Extensions;
 using Nefarius.Utilities.DeviceManagement.Util;
-using PInvoke;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
