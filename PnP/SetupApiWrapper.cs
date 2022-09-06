@@ -309,15 +309,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             uint Flags,
             out bool NeedReboot);
 
-        [DllImport("newdev.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        internal static extern bool UpdateDriverForPlugAndPlayDevices(
-            [In, Optional]  IntPtr hwndParent,
-            [In] string HardwareId,
-            [In] string FullInfPath,
-            [In] uint InstallFlags,
-            [Out] out bool bRebootRequired
-        );
-
         [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         internal static extern bool DiUninstallDriver(
             [In] IntPtr hwndParent,

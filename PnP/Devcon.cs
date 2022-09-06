@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Foundation;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
@@ -50,16 +51,18 @@ public static class Devcon
                 i++
             )
             {
-                if (PInvoke.CM_Get_Device_ID_Size(out var charsRequired, deviceInfoData.DevInst, 0) !=
-                    CONFIGRET.CR_SUCCESS)
-                    continue;
+                var ret = PInvoke.CM_Get_Device_ID_Size(out var charsRequired, deviceInfoData.DevInst, 0);
+
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to get device ID size.", ret);
 
                 var nBytes = (charsRequired + 1) * 2;
                 var ptrInstanceBuf = stackalloc char[(int)nBytes];
 
-                if (PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0) !=
-                    CONFIGRET.CR_SUCCESS)
-                    continue;
+                ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
+
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to get device ID.", ret);
 
                 var instanceId = new string(ptrInstanceBuf).ToUpper();
 
@@ -94,7 +97,7 @@ public static class Devcon
     ///     devices.
     /// </param>
     /// <returns>True if at least one device was found with the provided class, false otherwise.</returns>
-    public static bool FindByInterfaceGuid(Guid target, out string path, out string instanceId, int instance = 0,
+    public static unsafe bool FindByInterfaceGuid(Guid target, out string path, out string instanceId, int instance = 0,
         bool presentOnly = true)
     {
         var detailDataBuffer = IntPtr.Zero;
@@ -118,9 +121,14 @@ public static class Devcon
             while (SetupApiWrapper.SetupDiEnumDeviceInterfaces(deviceInfoSet, IntPtr.Zero, ref target, memberIndex,
                        ref deviceInterfaceData))
             {
-                SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData, IntPtr.Zero,
+                SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(
+                    deviceInfoSet,
+                    ref deviceInterfaceData,
+                    IntPtr.Zero,
                     0,
-                    ref bufferSize, ref da);
+                    ref bufferSize,
+                    ref da
+                );
                 {
                     detailDataBuffer = Marshal.AllocHGlobal(bufferSize);
 
@@ -137,13 +145,17 @@ public static class Devcon
 
                         if (memberIndex == instance)
                         {
-                            var nBytes = 256;
-                            var ptrInstanceBuf = Marshal.AllocHGlobal(nBytes);
+                            var ret = PInvoke.CM_Get_Device_ID_Size(out var charsRequired, da.DevInst, 0);
 
-                            SetupApiWrapper.CM_Get_Device_ID(da.DevInst, ptrInstanceBuf, (uint)nBytes, 0);
-                            instanceId = (Marshal.PtrToStringAuto(ptrInstanceBuf) ?? string.Empty).ToUpper();
+                            if (ret != CONFIGRET.CR_SUCCESS)
+                                throw new ConfigManagerException("Failed to get device ID size.", ret);
 
-                            Marshal.FreeHGlobal(ptrInstanceBuf);
+                            var nBytes = (charsRequired + 1) * 2;
+                            var ptrInstanceBuf = stackalloc char[(int)nBytes];
+
+                            PInvoke.CM_Get_Device_IDW(da.DevInst, ptrInstanceBuf, nBytes, 0);
+                            instanceId = new string(ptrInstanceBuf).ToUpper();
+
                             return true;
                         }
                     }
