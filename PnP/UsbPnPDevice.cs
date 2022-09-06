@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Extensions;
 using Nefarius.Utilities.DeviceManagement.Util;
 
@@ -75,7 +76,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             );
 
             if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(PInvoke.Kernel32.GetLastError(), "Failed to get device interface list size.");
+                throw new ConfigManagerException("Failed to get device interface list size.", ret);
 
             var bytesRequired = (int)listLength * 2;
             var listBuffer = IntPtr.Zero;
@@ -94,7 +95,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 );
 
                 if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(PInvoke.Kernel32.GetLastError(), "Failed to get device interface list.");
+                    throw new ConfigManagerException("Failed to get device interface list.", ret);
 
                 var hubPath = listBuffer.MultiSzPointerToStringArray(bytesRequired).FirstOrDefault();
 

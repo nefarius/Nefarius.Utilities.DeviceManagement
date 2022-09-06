@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Graphics.Gdi;
+using Windows.Win32.System.Power;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Win32Exception = System.ComponentModel.Win32Exception;
 
@@ -104,7 +106,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #region Processing
 
-        private IntPtr WndProc(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam, ref bool handled)
+        private LRESULT WndProc(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
         {
             if (msg == WM_DEVICECHANGE)
             {
@@ -154,7 +156,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 }
             }
 
-            return IntPtr.Zero;
+            return new LRESULT(0);
         }
 
         private void FireDeviceArrived(DeviceEventArgs args)
@@ -244,26 +246,37 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         {
             var listenerItem = (ListenerItem)parameter;
             var className = GenerateRandomString(); // random string to avoid conflicts
-            var wndClass = User32.WNDCLASSEX.Create();
-
-            fixed (char* cln = className)
+            var windowName = GenerateRandomString();
+            using var hInst = PInvoke.GetModuleHandle((string?)null);
+            
+            var windowClass = new WNDCLASSEXW
             {
-                wndClass.lpszClassName = cln;
+                cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
+                style = WNDCLASS_STYLES.CS_HREDRAW | WNDCLASS_STYLES.CS_VREDRAW,
+                cbClsExtra = 0,
+                cbWndExtra = 0,
+                hInstance = (HINSTANCE)hInst.DangerousGetHandle(),
+                lpfnWndProc = (wnd, msg, wParam, lParam) => WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam)
+            };
+
+            fixed (char* pClassName = className)
+            fixed (char* pWindowName = windowName)
+            {
+                windowClass.lpszClassName = pClassName;
+
+                PInvoke.RegisterClassEx(windowClass);
+
+                listenerItem.WindowHandle = PInvoke.CreateWindowEx(
+                    0,
+                    pClassName,
+                    pWindowName,
+                    0, 
+                    0, 0, 0, 0, 
+                    HWND.Null, 
+                    HMENU.Null,
+                    new HINSTANCE(hInst.DangerousGetHandle())
+                );
             }
-            
-            var wndProc = new User32.WndProc((wnd, msg, param, lParam) => WndProc2(listenerItem.InterfaceGuid, wnd, msg, param, lParam));
-            
-            wndClass.style = User32.ClassStyles.CS_HREDRAW | User32.ClassStyles.CS_VREDRAW;
-            wndClass.lpfnWndProc = wndProc;
-            wndClass.cbClsExtra = 0;
-            wndClass.cbWndExtra = 0;
-            wndClass.hInstance = GetModuleHandle(IntPtr.Zero);
-
-            User32.RegisterClassEx(ref wndClass);
-
-            var windowHandle = User32.CreateWindowEx(0, className, GenerateRandomString(), 0, 0, 0, 0, 0,
-                new IntPtr(-3), IntPtr.Zero, wndClass.hInstance, IntPtr.Zero);
-            listenerItem.WindowHandle = windowHandle;
 
             MessagePump();
         }
@@ -273,7 +286,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     anymore after this call. If no <see cref="Guid" /> is specified, all currently registered interfaces will get
         ///     unsubscribed.
         /// </summary>
-        public void StopListen(Guid? interfaceGuid = null)
+        public unsafe void StopListen(Guid? interfaceGuid = null)
         {
             _cancellationTokenSource.Cancel();
 
@@ -289,19 +302,18 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        private IntPtr WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+        private LRESULT WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
         {
             switch (msg)
             {
                 case WM_CREATE:
                 {
-                    RegisterUsbDeviceNotification(interfaceGuid, hwnd);
+                    RegisterUsbDeviceNotification(interfaceGuid, new HANDLE(hwnd.Value));
                     break;
                 }
                 case WM_DEVICECHANGE:
                 {
-                    var handled = false;
-                    return WndProc(interfaceGuid, hwnd, msg, wParam, lParam, ref handled);
+                    return WndProc(interfaceGuid, hwnd, msg, wParam, lParam);
                 }
             }
 
@@ -324,7 +336,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 }
         }
 
-        private void RegisterUsbDeviceNotification(Guid interfaceGuid, IntPtr windowHandle)
+        private unsafe void RegisterUsbDeviceNotification(Guid interfaceGuid, HANDLE windowHandle)
         {
             var listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
 
@@ -339,16 +351,16 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             Marshal.StructureToPtr(dbcc, notificationFilter, true);
 
             var notificationHandle =
-                PInvoke.RegisterDeviceNotification(windowHandle, notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
-            if (notificationHandle == IntPtr.Zero)
+                PInvoke.RegisterDeviceNotification(windowHandle, &notificationFilter, POWER_SETTING_REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE);
+            if (notificationHandle == null)
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Failed to register device notifications.");
 
             listenerItem.NotificationHandle = notificationHandle;
         }
 
-        private void UnregisterUsbDeviceNotification(IntPtr notificationHandle)
+        private unsafe void UnregisterUsbDeviceNotification(void* notificationHandle)
         {
-            if (notificationHandle != IntPtr.Zero)
+            if (notificationHandle != null)
                 PInvoke.UnregisterDeviceNotification(notificationHandle);
         }
 
@@ -395,12 +407,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
         #endregion
 
-        private class ListenerItem
+        private unsafe class ListenerItem
         {
             public Guid InterfaceGuid { get; set; }
             public Thread Thread { get; set; }
             public HWND WindowHandle { get; set; }
-            public IntPtr NotificationHandle { get; set; }
+            public void* NotificationHandle { get; set; }
         }
 
         private class DeviceEventRegistration

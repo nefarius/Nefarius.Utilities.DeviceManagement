@@ -6,3 +6,7 @@ GetModuleHandle
 RegisterDeviceNotification
 UnregisterDeviceNotification
 DefWindowProc
+RegisterClassEx
+CreateWindowEx
+CreateFile
+DeviceIoControl
