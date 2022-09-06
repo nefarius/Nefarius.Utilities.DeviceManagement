@@ -15,8 +15,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// </summary>
     public class UsbPnPDevice : PnPDevice
     {
-        private const int IOCTL_USB_HUB_CYCLE_PORT = 0x220444;
-
         private static Guid GUID_DEVINTERFACE_USB_HUB = Guid.Parse("{f18a0e88-c30c-11d0-8815-00a0c906bed8}");
 
         internal UsbPnPDevice(string instanceId, DeviceLocationFlags flags) : base(instanceId, flags)
@@ -123,7 +121,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 // request hub to power-cycle port, effectively force-restarting the device
                 var success = PInvoke.DeviceIoControl(
                     hubHandle,
-                    IOCTL_USB_HUB_CYCLE_PORT,
+                    PInvoke.IOCTL_USB_HUB_CYCLE_PORT,
                     &buffer,
                     (uint)size,
                     &buffer,
