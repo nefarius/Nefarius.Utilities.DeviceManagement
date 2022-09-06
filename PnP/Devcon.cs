@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -453,12 +454,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <returns>True on success, false otherwise.</returns>
         public static bool RefreshPhantom()
         {
-            if (SetupApiWrapper.CM_Locate_DevNode_Ex(out var devRoot, IntPtr.Zero,
-                    PInvoke.CM_LOCATE_DEVNODE_PHANTOM, IntPtr.Zero) !=
-                SetupApiWrapper.ConfigManagerResult.Success) return false;
-            return SetupApiWrapper.CM_Reenumerate_DevNode_Ex(devRoot, PInvoke.CM_REENUMERATE_SYNCHRONOUS,
-                       IntPtr.Zero) ==
-                   SetupApiWrapper.ConfigManagerResult.Success;
+            if (PInvoke.CM_Locate_DevNode_Ex(out var devRoot, null,
+                    PInvoke.CM_LOCATE_DEVNODE_PHANTOM, 0) !=
+                CONFIGRET.CR_SUCCESS) return false;
+            return PInvoke.CM_Reenumerate_DevNode_Ex(devRoot, PInvoke.CM_REENUMERATE_SYNCHRONOUS, 0) ==
+                   CONFIGRET.CR_SUCCESS;
         }
 
         /// <summary>
