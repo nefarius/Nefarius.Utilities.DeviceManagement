@@ -8,29 +8,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     {
         #region Constant and Structure Definitions
 
-        internal const int DIGCF_PRESENT = 0x0002;
-        internal const int DIGCF_DEVICEINTERFACE = 0x0010;
-
-        internal const int DICD_GENERATE_ID = 0x0001;
-        internal const int SPDRP_HARDWAREID = 0x0001;
-
-        internal const int DIF_REMOVE = 0x0005;
-        internal const int DIF_REGISTERDEVICE = 0x0019;
-
-        internal const int DI_REMOVEDEVICE_GLOBAL = 0x0001;
-        
-        internal const int DI_NEEDRESTART = 0x00000080;
-        internal const int DI_NEEDREBOOT = 0x00000100;
-        
-        internal const uint DIF_PROPERTYCHANGE = 0x12;
-        internal const uint DICS_ENABLE = 1;
-        internal const uint DICS_DISABLE = 2;  // disable device
-        internal const uint DICS_FLAG_GLOBAL = 1; // not profile-specific
-        internal const uint DIGCF_ALLCLASSES = 4;
-        internal const uint ERROR_INVALID_DATA = 13;
-        internal const uint ERROR_NO_MORE_ITEMS = 259;
-        internal const uint ERROR_ELEMENT_NOT_FOUND = 1168;
-        
         [StructLayout(LayoutKind.Sequential)]
         internal struct SP_DEVINFO_DATA
         {
@@ -82,15 +59,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 this.pid = pid;
             }
         }
-
-        internal const uint CM_REENUMERATE_NORMAL = 0x00000000;
-
-        internal const uint CM_REENUMERATE_SYNCHRONOUS = 0x00000001;
-
-        // XP and later versions 
-        internal const uint CM_REENUMERATE_RETRY_INSTALLATION = 0x00000002;
-
-        internal const uint CM_REENUMERATE_ASYNCHRONOUS = 0x00000004;
 
         internal enum CM_QUERY_AND_REMOVE_SUBTREE_FLAGS : uint
         {
@@ -190,9 +158,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             InvalidStructureSize = 0x0000003B
         }
 
-        internal const int DEVPROP_TYPEMOD_ARRAY                 =  0x00001000;  // array of fixed-sized data elements
-        internal const int DEVPROP_TYPEMOD_LIST                  =  0x00002000;  // list of variable-sized data elements
-
         internal enum DevPropType : uint
         {
             TYPEMOD_ARRAY = 0x00001000,  // array of fixed-sized data elements
@@ -261,12 +226,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             DIIDFLAG_NOFINISHINSTALLUI = 2,
             DIIDFLAG_INSTALLNULLDRIVER = 3
         }
-
-        internal const uint DIIRFLAG_FORCE_INF = 0x00000002;
-
-        internal const uint INSTALLFLAG_FORCE             = 0x00000001;  // Force the installation of the specified driver
-        internal const uint INSTALLFLAG_READONLY          = 0x00000002;  // Do a read-only install (no file copy)
-        internal const uint INSTALLFLAG_NONINTERACTIVE    = 0x00000004;
 
         internal enum PNP_VETO_TYPE : uint
         {
@@ -350,11 +309,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         internal static extern bool SetupDiOpenDeviceInfo(IntPtr DeviceInfoSet, string DeviceInstanceId,
             IntPtr hwndParent, int Flags, ref SP_DEVINFO_DATA DeviceInfoData);
         
-        [DllImport("setupapi.dll", SetLastError = true)]
-        internal static extern bool SetupDiChangeState(
-            IntPtr deviceInfoSet,
-            [In] ref SP_DEVINFO_DATA deviceInfoData);
-
         [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
         internal static extern bool SetupDiSetClassInstallParams(IntPtr DeviceInfoSet,
             ref SP_DEVINFO_DATA DeviceInterfaceData, ref SP_REMOVEDEVICE_PARAMS ClassInstallParams,
@@ -365,42 +319,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             IntPtr hDevInfo,
             ref SP_DEVINFO_DATA DeviceInfoData,
             IntPtr DeviceInstallParams
-        );
-        
-        [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool SetupDiGetDeviceProperty(
-            IntPtr deviceInfoSet,
-            [In] ref SP_DEVINFO_DATA DeviceInfoData,
-            [In] ref DevPropKey propertyKey,
-            [Out] out UInt32 propertyType,
-            IntPtr propertyBuffer,
-            UInt32 propertyBufferSize,
-            out UInt32 requiredSize,
-            UInt32 flags);
-        
-        [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool SetupDiGetDeviceRegistryProperty(
-            IntPtr DeviceInfoSet,
-            [In] ref SP_DEVINFO_DATA  DeviceInfoData,
-            UInt32 Property,
-            [Out] out UInt32  PropertyRegDataType,
-            IntPtr PropertyBuffer,
-            UInt32 PropertyBufferSize,
-            [In,Out] ref UInt32 RequiredSize
-        );
-        
-        [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool SetupDiRestartDevices(
-            IntPtr DeviceInfoSet,
-            [In] ref SP_DEVINFO_DATA DeviceInfoData
-        );
-
-        [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern bool SetupDiOpenDeviceInterface(
-            [Out] IntPtr DeviceInfoSet,
-            [In] string DevicePath,
-            [In] uint OpenFlags,
-            [In] [Out] ref SP_DEVICE_INTERFACE_DATA DeviceInterfaceData
         );
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -444,21 +362,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             IntPtr hMachine
         );
 
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_Device_ID_Size(
-            ref uint pulLen,
-            uint dnDevInst,
-            uint ulFlags
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Get_DevNode_Property_Keys(
-            uint devInst,
-            [Out] DevPropKey[] propertyKeyArray,
-            ref uint propertyKeyCount,
-            uint zeroFlags
-        );
-
         [DllImport("CfgMgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern ConfigManagerResult CM_Get_DevNode_Property(
             uint devInst,
@@ -487,15 +390,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             IntPtr PropertyBuffer,
             ref uint PropertyBufferSize,
             uint ulFlags // reserved
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Query_And_Remove_SubTree(
-            uint dnAncestor,
-            ref PNP_VETO_TYPE pVetoType,
-            string pszVetoName,
-            uint ulNameLength,
-            CM_QUERY_AND_REMOVE_SUBTREE_FLAGS ulFlags
         );
 
         [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -533,15 +427,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         #endregion
 
         #region Newdev
-
-        [DllImport("newdev.dll", SetLastError = true)]
-        internal static extern bool DiInstallDevice(
-            IntPtr hParent,
-            IntPtr lpInfoSet,
-            ref SP_DEVINFO_DATA DeviceInfoData,
-            ref SP_DRVINFO_DATA DriverInfoData,
-            DiFlags Flags,
-            ref bool NeedReboot);
 
         [DllImport("newdev.dll", SetLastError = true)]
         internal static extern bool DiInstallDriver(

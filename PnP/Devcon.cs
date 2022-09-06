@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Windows.Win32;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -30,7 +31,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <param name="hardwareId">The hardware ID to search for.</param>
         /// <param name="instanceIds">A list of instances found for the given search criteria.</param>
         /// <returns>True if found, false otherwise.</returns>
-        public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId, out IEnumerable<string> instanceIds)
+        public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
+            out IEnumerable<string> instanceIds)
         {
             instanceIds = new List<string>();
             var found = false;
@@ -52,7 +54,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     SetupApiWrapper.CM_Get_Device_ID(deviceInfoData.DevInst, ptrInstanceBuf, nBytes, 0);
 
                     var instanceId = (Marshal.PtrToStringAuto(ptrInstanceBuf) ?? string.Empty).ToUpper();
-                    
+
                     Marshal.FreeHGlobal(ptrInstanceBuf);
 
                     var device = PnPDevice.GetDeviceByInstanceId(instanceId, DeviceLocationFlags.Phantom);
@@ -94,14 +96,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
             try
             {
-                SetupApiWrapper.SP_DEVINFO_DATA deviceInterfaceData = new SetupApiWrapper.SP_DEVINFO_DATA(),
-                    da = new SetupApiWrapper.SP_DEVINFO_DATA();
+                SetupApiWrapper.SP_DEVINFO_DATA deviceInterfaceData = new(),
+                    da = new();
                 int bufferSize = 0, memberIndex = 0;
 
-                var flags = SetupApiWrapper.DIGCF_DEVICEINTERFACE;
+                var flags = (int)PInvoke.DIGCF_DEVICEINTERFACE;
 
                 if (presentOnly)
-                    flags |= SetupApiWrapper.DIGCF_PRESENT;
+                    flags |= (int)PInvoke.DIGCF_PRESENT;
 
                 deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero, flags);
 
@@ -159,10 +161,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         /// <summary>
-        ///     Searches for devices matching the provided interface GUID and returns a <see cref="PnPDevice"/>.
+        ///     Searches for devices matching the provided interface GUID and returns a <see cref="PnPDevice" />.
         /// </summary>
         /// <param name="target">The interface GUID to enumerate.</param>
-        /// <param name="device">The <see cref="PnPDevice"/> wrapper object.</param>
+        /// <param name="device">The <see cref="PnPDevice" /> wrapper object.</param>
         /// <param name="instance">Optional instance ID (zero-based) specifying the device to process on multiple matches.</param>
         /// <param name="presentOnly">
         ///     Only enumerate currently connected devices by default, set to False to also include phantom
@@ -201,12 +203,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
             try
             {
-                SetupApiWrapper.SP_DEVINFO_DATA deviceInterfaceData = new SetupApiWrapper.SP_DEVINFO_DATA(),
-                    da = new SetupApiWrapper.SP_DEVINFO_DATA();
+                SetupApiWrapper.SP_DEVINFO_DATA deviceInterfaceData = new(), da = new();
                 int bufferSize = 0, memberIndex = 0;
 
                 deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero,
-                    SetupApiWrapper.DIGCF_DEVICEINTERFACE | SetupApiWrapper.DIGCF_PRESENT);
+                    (int)(PInvoke.DIGCF_DEVICEINTERFACE | PInvoke.DIGCF_PRESENT));
 
                 deviceInterfaceData.cbSize = da.cbSize = Marshal.SizeOf(deviceInterfaceData);
 
@@ -269,7 +270,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <returns>True on success, false otherwise.</returns>
         public static bool Install(string fullInfPath, out bool rebootRequired)
         {
-            return SetupApiWrapper.DiInstallDriver(IntPtr.Zero, fullInfPath, SetupApiWrapper.DIIRFLAG_FORCE_INF,
+            return SetupApiWrapper.DiInstallDriver(IntPtr.Zero, fullInfPath, PInvoke.DIIRFLAG_FORCE_INF,
                 out rebootRequired);
         }
 
@@ -300,7 +301,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                         ref classGuid,
                         null,
                         IntPtr.Zero,
-                        SetupApiWrapper.DICD_GENERATE_ID,
+                        (int)PInvoke.DICD_GENERATE_ID,
                         ref deviceInfoData
                     ))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -308,14 +309,14 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (!SetupApiWrapper.SetupDiSetDeviceRegistryProperty(
                         deviceInfoSet,
                         ref deviceInfoData,
-                        SetupApiWrapper.SPDRP_HARDWAREID,
+                        (int)PInvoke.SPDRP_HARDWAREID,
                         node,
                         node.Length * 2
                     ))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
 
                 if (!SetupApiWrapper.SetupDiCallClassInstaller(
-                        SetupApiWrapper.DIF_REGISTERDEVICE,
+                        (int)PInvoke.DIF_REGISTERDEVICE,
                         deviceInfoSet,
                         ref deviceInfoData
                     ))
@@ -362,7 +363,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     ref classGuid,
                     IntPtr.Zero,
                     IntPtr.Zero,
-                    SetupApiWrapper.DIGCF_PRESENT | SetupApiWrapper.DIGCF_DEVICEINTERFACE
+                    (int)PInvoke.DIGCF_PRESENT | (int)PInvoke.DIGCF_DEVICEINTERFACE
                 );
 
                 if (SetupApiWrapper.SetupDiOpenDeviceInfo(
@@ -377,9 +378,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                         { ClassInstallHeader = new SetupApiWrapper.SP_CLASSINSTALL_HEADER() };
 
                     props.ClassInstallHeader.cbSize = Marshal.SizeOf(props.ClassInstallHeader);
-                    props.ClassInstallHeader.InstallFunction = SetupApiWrapper.DIF_REMOVE;
+                    props.ClassInstallHeader.InstallFunction = (int)PInvoke.DIF_REMOVE;
 
-                    props.Scope = SetupApiWrapper.DI_REMOVEDEVICE_GLOBAL;
+                    props.Scope = (int)PInvoke.DI_REMOVEDEVICE_GLOBAL;
                     props.HwProfile = 0x00;
 
                     // Prepare class (un-)installer
@@ -391,7 +392,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                         ))
                     {
                         // Invoke class installer with uninstall action
-                        if (!SetupApiWrapper.SetupDiCallClassInstaller(SetupApiWrapper.DIF_REMOVE, deviceInfoSet,
+                        if (!SetupApiWrapper.SetupDiCallClassInstaller((int)PInvoke.DIF_REMOVE, deviceInfoSet,
                                 ref deviceInfoData))
                             throw new Win32Exception(Marshal.GetLastWin32Error());
 
@@ -411,8 +412,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                         var flags = Marshal.ReadInt32(installParams, Marshal.SizeOf(typeof(uint)));
 
                         // Test for restart/reboot flags being present
-                        rebootRequired = (flags & SetupApiWrapper.DI_NEEDRESTART) != 0 ||
-                                         (flags & SetupApiWrapper.DI_NEEDREBOOT) != 0;
+                        rebootRequired = (flags & PInvoke.DI_NEEDRESTART) != 0 ||
+                                         (flags & PInvoke.DI_NEEDREBOOT) != 0;
 
                         return true;
                     }
@@ -455,7 +456,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             if (SetupApiWrapper.CM_Locate_DevNode_Ex(out var devRoot, IntPtr.Zero,
                     (uint)SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_PHANTOM, IntPtr.Zero) !=
                 SetupApiWrapper.ConfigManagerResult.Success) return false;
-            return SetupApiWrapper.CM_Reenumerate_DevNode_Ex(devRoot, SetupApiWrapper.CM_REENUMERATE_SYNCHRONOUS,
+            return SetupApiWrapper.CM_Reenumerate_DevNode_Ex(devRoot, PInvoke.CM_REENUMERATE_SYNCHRONOUS,
                        IntPtr.Zero) ==
                    SetupApiWrapper.ConfigManagerResult.Success;
         }
@@ -474,7 +475,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             out bool rebootRequired)
         {
             return SetupApiWrapper.UpdateDriverForPlugAndPlayDevices(IntPtr.Zero, hardwareId, fullInfPath,
-                SetupApiWrapper.INSTALLFLAG_FORCE | SetupApiWrapper.INSTALLFLAG_NONINTERACTIVE, out rebootRequired);
+                PInvoke.INSTALLFLAG_FORCE | PInvoke.INSTALLFLAG_NONINTERACTIVE, out rebootRequired);
         }
 
         /// <summary>
@@ -485,10 +486,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <param name="forceDelete">Remove driver store copy, if true.</param>
         public static void DeleteDriver(string oemInfName, string fullInfPath = default, bool forceDelete = false)
         {
-            if (string.IsNullOrEmpty(oemInfName))
-            {
-                throw new ArgumentNullException(nameof(oemInfName));
-            }
+            if (string.IsNullOrEmpty(oemInfName)) throw new ArgumentNullException(nameof(oemInfName));
 
             if (forceDelete
                 && Kernel32.MethodExists("newdev.dll", "DiUninstallDriverW")
@@ -497,17 +495,15 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                     fullInfPath,
                     SetupApiWrapper.DIURFLAG.NO_REMOVE_INF,
                     out _))
-            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
 
             if (!SetupApiWrapper.SetupUninstallOEMInf(
                     oemInfName,
-                    forceDelete ? SetupApiWrapper.SetupUOInfFlags.SUOI_FORCEDELETE : SetupApiWrapper.SetupUOInfFlags.NONE,
+                    forceDelete
+                        ? SetupApiWrapper.SetupUOInfFlags.SUOI_FORCEDELETE
+                        : SetupApiWrapper.SetupUOInfFlags.NONE,
                     IntPtr.Zero))
-            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
         }
     }
 }
