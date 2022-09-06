@@ -1,4 +1,5 @@
 ﻿using Windows.Win32;
+using Windows.Win32.Foundation;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
@@ -12,6 +13,6 @@ internal static class Kernel32
 
         var procPtr = PInvoke.GetProcAddress(libraryPtr, methodName);
 
-        return procPtr != null;
+        return procPtr != FARPROC.Null;
     }
 }
