@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
@@ -24,15 +23,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             internal int InstallFunction;
         }
         
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct SP_PROPCHANGE_PARAMS
-        {
-            internal SP_CLASSINSTALL_HEADER ClassInstallHeader;
-            internal UInt32 StateChange;
-            internal UInt32 Scope;
-            internal UInt32 HwProfile;
-        }
-
         [StructLayout(LayoutKind.Sequential)]
         internal struct SP_REMOVEDEVICE_PARAMS
         {
