@@ -278,21 +278,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             uint Flags
         );
 
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Locate_DevNode_Ex(
-            out uint pdnDevInst,
-            IntPtr pDeviceID,
-            uint ulFlags,
-            IntPtr hMachine
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Reenumerate_DevNode_Ex(
-            uint dnDevInst,
-            uint ulFlags,
-            IntPtr hMachine
-        );
-
         [DllImport("CfgMgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         internal static extern ConfigManagerResult CM_Get_DevNode_Property(
             uint devInst,

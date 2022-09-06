@@ -46,6 +46,7 @@ RegisterDeviceNotification
 SPDRP_HARDWAREID
 TranslateMessage
 UnregisterDeviceNotification
+UpdateDriverForPlugAndPlayDevices
 WIN32_ERROR
 WM_CREATE
 WM_DEVICECHANGE
