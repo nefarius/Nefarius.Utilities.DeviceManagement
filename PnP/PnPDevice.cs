@@ -1,6 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Windows.Win32;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -171,41 +174,41 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <summary>
         ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
         /// </summary>
-        public void Restart()
+        public unsafe void Restart()
         {
-            var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
+            var ret = PInvoke.CM_Query_And_Remove_SubTree(
                 _instanceHandle,
-                IntPtr.Zero, IntPtr.Zero, 0,
-                SetupApiWrapper.CM_QUERY_AND_REMOVE_SUBTREE_FLAGS.CM_REMOVE_NO_RESTART
+                null, null, 0,
+                PInvoke.CM_REMOVE_NO_RESTART
             );
 
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Node removal failed.", ret);
 
-            ret = SetupApiWrapper.CM_Setup_DevNode(
+            ret = PInvoke.CM_Setup_DevNode(
                 _instanceHandle,
-                SetupApiWrapper.CM_SETUP_DEVINST_FLAGS.CM_SETUP_DEVNODE_READY
+                PInvoke.CM_SETUP_DEVNODE_READY
             );
 
-            if (ret != SetupApiWrapper.ConfigManagerResult.NoSuchDevinst
-                && ret != SetupApiWrapper.ConfigManagerResult.Success)
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (ret is CONFIGRET.CR_NO_SUCH_DEVINST or CONFIGRET.CR_SUCCESS) return;
+
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Node addition failed.", ret);
         }
 
         /// <summary>
         ///     Attempts to remove this device node.
         /// </summary>
-        public void Remove()
+        public unsafe void Remove()
         {
-            var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
+            var ret = PInvoke.CM_Query_And_Remove_SubTree(
                 _instanceHandle,
-                IntPtr.Zero, IntPtr.Zero, 0,
-                SetupApiWrapper.CM_QUERY_AND_REMOVE_SUBTREE_FLAGS.CM_REMOVE_NO_RESTART
+                null, null, 0,
+                PInvoke.CM_REMOVE_NO_RESTART
             );
 
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Node removal failed.", ret);
         }
 
         /// <summary>

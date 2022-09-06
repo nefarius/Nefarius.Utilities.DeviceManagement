@@ -35,3 +35,7 @@ INSTALLFLAG_NONINTERACTIVE
 CM_Get_Device_Interface_List_Size
 CM_Get_Device_Interface_List
 MAX_PATH
+CM_Query_And_Remove_SubTree
+CM_Setup_DevNode
+CM_REMOVE_NO_RESTART
+CM_SETUP_DEVNODE_READY

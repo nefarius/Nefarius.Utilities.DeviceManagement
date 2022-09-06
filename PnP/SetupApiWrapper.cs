@@ -50,14 +50,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             }
         }
 
-        internal enum CM_QUERY_AND_REMOVE_SUBTREE_FLAGS : uint
-        {
-            CM_REMOVE_UI_OK = 0x00000000,
-            CM_REMOVE_UI_NOT_OK = 0x00000001,
-            CM_REMOVE_NO_RESTART = 0x00000002,
-            CM_REMOVE_BITS = 0x00000003
-        }
-
         internal enum CM_SETUP_DEVINST_FLAGS : uint
         {
             CM_SETUP_DEVNODE_READY = 0x00000000, // Reenable problem devinst
@@ -380,21 +372,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             IntPtr PropertyBuffer,
             ref uint PropertyBufferSize,
             uint ulFlags // reserved
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Query_And_Remove_SubTree(
-            uint dnAncestor,
-            IntPtr pVetoType,
-            IntPtr pszVetoName,
-            uint ulNameLength,
-            CM_QUERY_AND_REMOVE_SUBTREE_FLAGS ulFlags
-        );
-
-        [DllImport("Cfgmgr32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        internal static extern ConfigManagerResult CM_Setup_DevNode(
-            uint dnDevInst,
-            CM_SETUP_DEVINST_FLAGS ulFlags
         );
 
         #endregion
