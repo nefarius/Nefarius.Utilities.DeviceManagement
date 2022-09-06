@@ -190,9 +190,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             );
 
             if (ret is CONFIGRET.CR_NO_SUCH_DEVINST or CONFIGRET.CR_SUCCESS) return;
-
-            if (ret != CONFIGRET.CR_SUCCESS)
-                throw new ConfigManagerException("Node addition failed.", ret);
+            
+            throw new ConfigManagerException("Node addition failed.", ret);
         }
 
         /// <summary>
