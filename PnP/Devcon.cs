@@ -34,14 +34,33 @@ public static class Devcon
     /// <param name="hardwareId">The hardware ID to search for.</param>
     /// <param name="instanceIds">A list of instances found for the given search criteria.</param>
     /// <returns>True if found, false otherwise.</returns>
-    public static unsafe bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
+    public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
         out IEnumerable<string> instanceIds)
+    {
+        return FindInDeviceClassByHardwareId(target, hardwareId, out instanceIds, false /* backwards compatibility */);
+    }
+
+    /// <summary>
+    ///     Attempts to find a device within a specified device class by a given hardware ID.
+    /// </summary>
+    /// <param name="target">The device class GUID.</param>
+    /// <param name="hardwareId">The hardware ID to search for.</param>
+    /// <param name="instanceIds">A list of instances found for the given search criteria.</param>
+    /// <param name="presentOnly">True to filter currently plugged in devices, false to get all matching devices.</param>
+    /// <returns>True if found, false otherwise.</returns>
+    public static unsafe bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
+        out IEnumerable<string> instanceIds, bool presentOnly)
     {
         instanceIds = new List<string>();
         var found = false;
         var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
         deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
-        var deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero, 0);
+        var deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
+            ref target,
+            IntPtr.Zero,
+            IntPtr.Zero,
+            presentOnly ? (int)PInvoke.DIGCF_PRESENT : 0
+        );
 
         try
         {
