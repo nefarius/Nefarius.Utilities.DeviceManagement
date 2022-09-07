@@ -7,6 +7,7 @@ using System.Threading;
 using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.System.Power;
+using Windows.Win32.System.SystemServices;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 
@@ -165,7 +166,7 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
                 case PInvoke.DBT_DEVICEARRIVAL:
                     hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
 
-                    if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                    if (hdr.dbch_devicetype == DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE)
                     {
                         var deviceInterface =
                             (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
@@ -184,8 +185,8 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
 
                 case PInvoke.DBT_DEVICEREMOVECOMPLETE:
                     hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
-
-                    if (hdr.dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+                    
+                    if (hdr.dbch_devicetype == DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE)
                     {
                         var deviceInterface =
                             (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
@@ -351,7 +352,7 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
         var dbcc = new DEV_BROADCAST_DEVICEINTERFACE
         {
             dbcc_size = (uint)Marshal.SizeOf(typeof(DEV_BROADCAST_DEVICEINTERFACE)),
-            dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE,
+            dbcc_devicetype = DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE,
             dbcc_classguid = interfaceGuid
         };
 
@@ -390,17 +391,15 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
     private struct DEV_BROADCAST_HDR
     {
         public readonly uint dbch_size;
-        public readonly uint dbch_devicetype;
+        public readonly DEV_BROADCAST_HDR_DEVICE_TYPE dbch_devicetype;
         public readonly uint dbch_reserved;
     }
-
-    private const uint DBT_DEVTYP_DEVICEINTERFACE = 0x00000005;
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     private struct DEV_BROADCAST_DEVICEINTERFACE
     {
         public uint dbcc_size;
-        public uint dbcc_devicetype;
+        public DEV_BROADCAST_HDR_DEVICE_TYPE dbcc_devicetype;
         public readonly uint dbcc_reserved;
         public Guid dbcc_classguid;
 
