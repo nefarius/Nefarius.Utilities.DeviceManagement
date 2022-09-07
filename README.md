@@ -70,3 +70,5 @@ foreach (var driverPackage in allDriverPackages.Where(p => p.Contains("mydriver.
 - [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
 - [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
 - [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
+- [C#/Win32 P/Invoke Source Generator](https://github.com/microsoft/CsWin32)
+- [Tooling to generate metadata for Win32 APIs in the Windows SDK.](https://github.com/microsoft/win32metadata)
