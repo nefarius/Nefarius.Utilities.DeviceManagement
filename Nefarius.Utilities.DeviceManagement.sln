@@ -5,7 +5,9 @@ VisualStudioVersion = 17.3.32825.248
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nefarius.Utilities.DeviceManagement", "Nefarius.Utilities.DeviceManagement.csproj", "{410F8177-07FD-4A66-B77B-46F77D97C1A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{32764B11-187C-4B57-B765-6B19E48272C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{32764B11-187C-4B57-B765-6B19E48272C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManagementPropertiesGenerator", "Generator\DeviceManagementPropertiesGenerator.csproj", "{BA3335D6-C9B1-4319-B5CB-DB4EA151F0A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{32764B11-187C-4B57-B765-6B19E48272C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32764B11-187C-4B57-B765-6B19E48272C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32764B11-187C-4B57-B765-6B19E48272C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA3335D6-C9B1-4319-B5CB-DB4EA151F0A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA3335D6-C9B1-4319-B5CB-DB4EA151F0A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA3335D6-C9B1-4319-B5CB-DB4EA151F0A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA3335D6-C9B1-4319-B5CB-DB4EA151F0A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
