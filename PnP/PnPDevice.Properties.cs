@@ -35,7 +35,7 @@ public partial class PnPDevice
             { PInvoke.DEVPROP_TYPE_STRING | PInvoke.DEVPROP_TYPEMOD_LIST, typeof(string[]) },
             // DEVPROP_TYPE_SECURITY_DESCRIPTOR
             // DEVPROP_TYPE_SECURITY_DESCRIPTOR_STRING
-            { PInvoke.DEVPROP_TYPE_DEVPROPKEY, typeof(SetupApiWrapper.DevPropKey) },
+            { PInvoke.DEVPROP_TYPE_DEVPROPKEY, typeof(DEVPROPKEY) },
             { PInvoke.DEVPROP_TYPE_DEVPROPTYPE, typeof(uint) },
             { PInvoke.DEVPROP_TYPE_BYTE | PInvoke.DEVPROP_TYPEMOD_ARRAY, typeof(byte[]) },
             { PInvoke.DEVPROP_TYPE_ERROR, typeof(int) },

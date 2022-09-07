@@ -32,47 +32,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             internal int HwProfile;
         }
         
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct DevPropKey
-        {
-            public Guid fmtid;
-            public uint pid;
-
-            public DevPropKey(Guid fmtid, uint pid)
-            {
-                this.fmtid = fmtid;
-                this.pid = pid;
-            }
-
-            public DevPropKey(uint a, ushort b, ushort c, byte d, byte e, byte f, byte g, byte h, byte i, byte j, byte k, uint pid)
-            {
-                this.fmtid = new Guid(a, b, c, d, e, f, g, h, i, j, k);
-                this.pid = pid;
-            }
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct SP_DRVINFO_DATA
-        {
-            internal readonly uint cbSize;
-            internal readonly uint DriverType;
-            internal readonly IntPtr Reserved;
-            internal readonly string Description;
-            internal readonly string MfgName;
-            internal readonly string ProviderName;
-            internal readonly DateTime DriverDate;
-            internal readonly ulong DriverVersion;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct SP_DEVICE_INTERFACE_DATA
-        {
-            internal Int32    cbSize;
-            internal Guid     interfaceClassGuid;
-            internal Int32    flags;
-            internal UIntPtr  reserved;
-        }
-        
         /// <summary>
         ///     Flags for DiUninstallDriver
         /// </summary>

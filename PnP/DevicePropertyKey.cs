@@ -35,15 +35,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         public Type PropertyType { get; }
 
-        /// <summary>
-        ///     Returns native type for managed type.
-        /// </summary>
-        /// <returns>The native <see cref="SetupApiWrapper.DevPropKey"/>.</returns>
-        internal SetupApiWrapper.DevPropKey ToNativeType()
-        {
-            return new SetupApiWrapper.DevPropKey(CategoryGuid, PropertyIdentifier);
-        }
-
         internal DEVPROPKEY ToCsWin32Type()
         {
             return new DEVPROPKEY { fmtid = CategoryGuid, pid = PropertyIdentifier };
