@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.InteropServices;
+using Windows.Win32;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Windows.Win32.Foundation;
+using Windows.Win32.Storage.FileSystem;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Extensions;
-using Nefarius.Utilities.DeviceManagement.Util;
-using PInvoke;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -12,10 +14,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// </summary>
     public class UsbPnPDevice : PnPDevice
     {
-        private const int IOCTL_USB_HUB_CYCLE_PORT = 0x220444;
-
-        private static Guid GUID_DEVINTERFACE_USB_HUB = Guid.Parse("{f18a0e88-c30c-11d0-8815-00a0c906bed8}");
-
         internal UsbPnPDevice(string instanceId, DeviceLocationFlags flags) : base(instanceId, flags)
         {
             var enumerator = GetProperty<string>(DevicePropertyDevice.EnumeratorName);
@@ -35,7 +33,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     Power-cycles the hub port this device is attached to, causing it to restart.
         /// </summary>
         /// <remarks>Requires administrative privileges.</remarks>
-        public void CyclePort()
+        public unsafe void CyclePort()
         {
             var hubDevice = this;
             var compositeDevice = this;
@@ -47,12 +45,10 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 var service = hubDevice.GetProperty<string>(DevicePropertyDevice.Service);
 
                 if (service is not null)
-                {
                     // we have reached the hub object, bail
                     if (service.StartsWith("USBHUB", StringComparison.OrdinalIgnoreCase))
                         break;
-                }
-                
+
                 // grab topmost child to get real port number
                 compositeDevice = hubDevice;
 
@@ -68,88 +64,80 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 ConnectionIndex = compositeDevice.Port
             };
 
-            var ret = SetupApiWrapper.CM_Get_Device_Interface_List_SizeW(
-                out var listLength,
-                ref GUID_DEVINTERFACE_USB_HUB,
-                hubDevice.InstanceId,
-                SetupApiWrapper.CM_GET_DEVICE_INTERFACE_LIST_FLAG.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
-            );
-
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(PInvoke.Kernel32.GetLastError(), "Failed to get device interface list size.");
-
-            var bytesRequired = (int)listLength * 2;
-            var listBuffer = IntPtr.Zero;
-            var buffer = IntPtr.Zero;
-
-            try
+            fixed (char* hubInstanceId = hubDevice.InstanceId)
             {
-                listBuffer = Marshal.AllocHGlobal(bytesRequired);
-
-                ret = SetupApiWrapper.CM_Get_Device_Interface_ListW(
-                    ref GUID_DEVINTERFACE_USB_HUB,
-                    hubDevice.InstanceId,
-                    listBuffer,
-                    listLength,
-                    SetupApiWrapper.CM_GET_DEVICE_INTERFACE_LIST_FLAG.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
+                var ret = PInvoke.CM_Get_Device_Interface_List_Size(
+                    out var listLength,
+                    PInvoke.GUID_DEVINTERFACE_USB_HUB,
+                    hubInstanceId,
+                    PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
                 );
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(PInvoke.Kernel32.GetLastError(), "Failed to get device interface list.");
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to get device interface list size.", ret);
 
-                var hubPath = listBuffer.MultiSzPointerToStringArray(bytesRequired).FirstOrDefault();
+                var bytesRequired = (int)listLength * 2;
+                Span<char> listBuffer = stackalloc char[bytesRequired];
 
-                if (hubPath is null)
-                    throw new ArgumentException("Failed to get device interface path.");
-
-                using var hubHandle = PInvoke.Kernel32.CreateFile(hubPath,
-                    PInvoke.Kernel32.ACCESS_MASK.GenericRight.GENERIC_READ |
-                    PInvoke.Kernel32.ACCESS_MASK.GenericRight.GENERIC_WRITE,
-                    PInvoke.Kernel32.FileShare.FILE_SHARE_READ | PInvoke.Kernel32.FileShare.FILE_SHARE_WRITE,
-                    IntPtr.Zero, PInvoke.Kernel32.CreationDisposition.OPEN_EXISTING,
-                    PInvoke.Kernel32.CreateFileFlags.FILE_ATTRIBUTE_NORMAL
-                    | PInvoke.Kernel32.CreateFileFlags.FILE_FLAG_NO_BUFFERING
-                    | PInvoke.Kernel32.CreateFileFlags.FILE_FLAG_WRITE_THROUGH,
-                    PInvoke.Kernel32.SafeObjectHandle.Null
-                );
-
-                var size = Marshal.SizeOf<USB_CYCLE_PORT_PARAMS>();
-                buffer = Marshal.AllocHGlobal(size);
-
-                Marshal.StructureToPtr(parameters, buffer, false);
-
-                // request hub to power-cycle port, effectively force-restarting the device
-                var success = PInvoke.Kernel32.DeviceIoControl(
-                    hubHandle,
-                    IOCTL_USB_HUB_CYCLE_PORT,
-                    buffer,
-                    size,
-                    buffer,
-                    size,
-                    out _,
-                    IntPtr.Zero
-                );
-
-                var err = PInvoke.Kernel32.GetLastError();
-
-                switch (success)
+                fixed (char* pListBuffer = listBuffer)
                 {
-                    case false when err == Win32ErrorCode.ERROR_GEN_FAILURE:
-                        throw new ArgumentException("Request failed, this operation requires administrative privileges.");
-                    /* STATUS_NO_SUCH_DEVICE */
-                    case false when (int)err == 433:
-                        throw new ArgumentException($"Request failed, device on port {compositeDevice.Port} not found.");
+                    ret = PInvoke.CM_Get_Device_Interface_List(
+                        PInvoke.GUID_DEVINTERFACE_USB_HUB,
+                        hubInstanceId,
+                        pListBuffer,
+                        listLength,
+                        PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
+                    );
+
+                    if (ret != CONFIGRET.CR_SUCCESS)
+                        throw new ConfigManagerException("Failed to get device interface list.", ret);
+
+                    var hubPath = listBuffer.ToString();
+
+                    if (hubPath is null)
+                        throw new ArgumentException("Failed to get device interface path.");
+
+                    using var hubHandle = PInvoke.CreateFile(
+                        hubPath,
+                        FILE_ACCESS_FLAGS.FILE_GENERIC_READ | FILE_ACCESS_FLAGS.FILE_GENERIC_WRITE,
+                        FILE_SHARE_MODE.FILE_SHARE_READ | FILE_SHARE_MODE.FILE_SHARE_WRITE,
+                        null,
+                        FILE_CREATION_DISPOSITION.OPEN_EXISTING,
+                        FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_NORMAL
+                        | FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_NO_BUFFERING
+                        | FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_WRITE_THROUGH,
+                        null
+                    );
+
+                    var size = Marshal.SizeOf<USB_CYCLE_PORT_PARAMS>();
+
+                    // request hub to power-cycle port, effectively force-restarting the device
+                    var success = PInvoke.DeviceIoControl(
+                        hubHandle,
+                        PInvoke.IOCTL_USB_HUB_CYCLE_PORT,
+                        &parameters,
+                        (uint)size,
+                        &parameters,
+                        (uint)size,
+                        null,
+                        null
+                    );
+
+                    var err = (WIN32_ERROR)Marshal.GetLastWin32Error();
+
+                    switch (success.Value > 0)
+                    {
+                        case false when err == WIN32_ERROR.ERROR_GEN_FAILURE:
+                            throw new ArgumentException(
+                                "Request failed, this operation requires administrative privileges.");
+                        case false when err == WIN32_ERROR.ERROR_NO_SUCH_DEVICE:
+                            throw new ArgumentException(
+                                $"Request failed, device on port {compositeDevice.Port} not found.");
+                    }
+
+                    if (parameters.Status != 0)
+                        throw new ArgumentException("Port cycle request failed.");
                 }
-
-                var result = Marshal.PtrToStructure<USB_CYCLE_PORT_PARAMS>(buffer);
-
-                if (result.Status != 0)
-                    throw new ArgumentException("Port cycle request failed.");
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(listBuffer);
-                Marshal.FreeHGlobal(buffer);
             }
         }
 

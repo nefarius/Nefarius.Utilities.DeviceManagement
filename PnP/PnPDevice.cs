@@ -1,6 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Windows.Win32;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -103,58 +106,57 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         /// <param name="instanceId">The instance ID to look for.</param>
         /// <param name="flags">The <see cref="DeviceLocationFlags"/> influencing search behavior.</param>
-        protected PnPDevice(string instanceId, DeviceLocationFlags flags)
+        protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
         {
             InstanceId = instanceId;
-            var iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_NORMAL;
+            var iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
 
             switch (flags)
             {
                 case DeviceLocationFlags.Normal:
-                    iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_NORMAL;
+                    iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
                     break;
                 case DeviceLocationFlags.Phantom:
-                    iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_PHANTOM;
+                    iFlags = PInvoke.CM_LOCATE_DEVNODE_PHANTOM;
                     break;
                 case DeviceLocationFlags.CancelRemove:
-                    iFlags = SetupApiWrapper.CM_LOCATE_DEVNODE_FLAG.CM_LOCATE_DEVNODE_CANCELREMOVE;
+                    iFlags = PInvoke.CM_LOCATE_DEVNODE_CANCELREMOVE;
                     break;
             }
 
-            var ret = SetupApiWrapper.CM_Locate_DevNode(
-                ref _instanceHandle,
-                instanceId,
-                iFlags
-            );
-
-            if (ret == SetupApiWrapper.ConfigManagerResult.NoSuchDevinst)
-                throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
-
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-
-            uint nBytes = 256;
-
-            var ptrInstanceBuf = Marshal.AllocHGlobal((int)nBytes);
-
-            try
+            fixed (char* pInstId = instanceId)
             {
-                ret = SetupApiWrapper.CM_Get_Device_ID(
+                var ret = PInvoke.CM_Locate_DevNode(
+                    out _instanceHandle,
+                    pInstId,
+                    iFlags
+                );
+
+                if (ret == CONFIGRET.CR_NO_SUCH_DEVINST)
+                    throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
+
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Failed to locate device node.", ret);
+
+                ret = PInvoke.CM_Get_Device_ID_Size(out var charsRequired, _instanceHandle, 0);
+
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Fetching device ID size failed.", ret);
+
+                var nBytes = (charsRequired + 1) * 2;
+                var ptrInstanceBuf = stackalloc char[(int)nBytes];
+
+                ret = PInvoke.CM_Get_Device_IDW(
                     _instanceHandle,
                     ptrInstanceBuf,
                     nBytes,
                     0
                 );
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                if (ret != CONFIGRET.CR_SUCCESS)
+                    throw new ConfigManagerException("Fetching device ID failed.", ret);
 
-                DeviceId = (Marshal.PtrToStringUni(ptrInstanceBuf) ?? string.Empty).ToUpper();
-            }
-            finally
-            {
-                if (ptrInstanceBuf != IntPtr.Zero)
-                    Marshal.FreeHGlobal(ptrInstanceBuf);
+                DeviceId = new string(ptrInstanceBuf);
             }
         }
 
@@ -171,41 +173,40 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <summary>
         ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
         /// </summary>
-        public void Restart()
+        public unsafe void Restart()
         {
-            var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
+            var ret = PInvoke.CM_Query_And_Remove_SubTree(
                 _instanceHandle,
-                IntPtr.Zero, IntPtr.Zero, 0,
-                SetupApiWrapper.CM_QUERY_AND_REMOVE_SUBTREE_FLAGS.CM_REMOVE_NO_RESTART
+                null, null, 0,
+                PInvoke.CM_REMOVE_NO_RESTART
             );
 
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Node removal failed.", ret);
 
-            ret = SetupApiWrapper.CM_Setup_DevNode(
+            ret = PInvoke.CM_Setup_DevNode(
                 _instanceHandle,
-                SetupApiWrapper.CM_SETUP_DEVINST_FLAGS.CM_SETUP_DEVNODE_READY
+                PInvoke.CM_SETUP_DEVNODE_READY
             );
 
-            if (ret != SetupApiWrapper.ConfigManagerResult.NoSuchDevinst
-                && ret != SetupApiWrapper.ConfigManagerResult.Success)
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (ret is CONFIGRET.CR_NO_SUCH_DEVINST or CONFIGRET.CR_SUCCESS) return;
+            
+            throw new ConfigManagerException("Node addition failed.", ret);
         }
 
         /// <summary>
         ///     Attempts to remove this device node.
         /// </summary>
-        public void Remove()
+        public unsafe void Remove()
         {
-            var ret = SetupApiWrapper.CM_Query_And_Remove_SubTree(
+            var ret = PInvoke.CM_Query_And_Remove_SubTree(
                 _instanceHandle,
-                IntPtr.Zero, IntPtr.Zero, 0,
-                SetupApiWrapper.CM_QUERY_AND_REMOVE_SUBTREE_FLAGS.CM_REMOVE_NO_RESTART
+                null, null, 0,
+                PInvoke.CM_REMOVE_NO_RESTART
             );
 
-            if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Node removal failed.", ret);
         }
 
         /// <summary>
@@ -272,35 +273,38 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         /// <param name="symbolicLink">The device interface path/ID/symbolic link name.</param>
         /// <returns>The Instance ID.</returns>
-        public static string GetInstanceIdFromInterfaceId(string symbolicLink)
+        public static unsafe string GetInstanceIdFromInterfaceId(string symbolicLink)
         {
-            var property = DevicePropertyDevice.InstanceId.ToNativeType();
+            var property = DevicePropertyDevice.InstanceId.ToCsWin32Type();
+            uint sizeRequired = 0;
 
-            var buffer = IntPtr.Zero;
-            uint sizeRequired = 2048;
+            var ret = PInvoke.CM_Get_Device_Interface_Property(
+                symbolicLink,
+                property,
+                out _,
+                null,
+                ref sizeRequired,
+                0
+            );
 
-            try
-            {
-                buffer = Marshal.AllocHGlobal((int)sizeRequired);
+            if (ret != CONFIGRET.CR_BUFFER_SMALL)
+                throw new ConfigManagerException("Failed to get instance interface property size.", ret);
 
-                var ret = SetupApiWrapper.CM_Get_Device_Interface_Property(
-                    symbolicLink,
-                    ref property,
-                    out _,
-                    buffer,
-                    ref sizeRequired,
-                    0
-                );
+            var buffer = stackalloc char[(int)sizeRequired];
 
-                if (ret != SetupApiWrapper.ConfigManagerResult.Success)
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+            ret = PInvoke.CM_Get_Device_Interface_Property(
+               symbolicLink,
+               property,
+               out _,
+               (byte*)buffer,
+               ref sizeRequired,
+               0
+           );
 
-                return Marshal.PtrToStringUni(buffer);
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
+            if (ret != CONFIGRET.CR_SUCCESS)
+                throw new ConfigManagerException("Failed to get instance interface property.", ret);
+
+            return new string(buffer);
         }
 
         /// <inheritdoc />
