@@ -95,184 +95,184 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <summary>
         ///     The Device Description.
         /// </summary>
-        public static DevicePropertyKey DeviceDesc = new DevicePropertyDeviceDeviceDesc();
+        public static readonly DevicePropertyKey DeviceDesc = new DevicePropertyDeviceDeviceDesc();
 
         /// <summary>
         ///     The list of hardware IDs.
         /// </summary>
-        public static DevicePropertyKey HardwareIds = new DevicePropertyDeviceHardwareIds();
+        public static readonly DevicePropertyKey HardwareIds = new DevicePropertyDeviceHardwareIds();
 
         /// <summary>
         ///     The list of compatible IDs.
         /// </summary>
-        public static DevicePropertyKey CompatibleIds = new DevicePropertyDeviceCompatibleIds();
+        public static readonly DevicePropertyKey CompatibleIds = new DevicePropertyDeviceCompatibleIds();
 
         /// <summary>
         ///     The service name.
         /// </summary>
-        public static DevicePropertyKey Service = new DevicePropertyDeviceService();
+        public static readonly DevicePropertyKey Service = new DevicePropertyDeviceService();
         
         /// <summary>
         ///     The device class name.
         /// </summary>
-        public static DevicePropertyKey Class = new DevicePropertyDeviceClass();
+        public static readonly DevicePropertyKey Class = new DevicePropertyDeviceClass();
 
         /// <summary>
         ///     The device class guid.
         /// </summary>
-        public static DevicePropertyKey ClassGuid = new DevicePropertyDeviceClassGuid();
+        public static readonly DevicePropertyKey ClassGuid = new DevicePropertyDeviceClassGuid();
 
         /// <summary>
         ///     The driver name.
         /// </summary>
-        public static DevicePropertyKey Driver = new DevicePropertyDeviceDriver();
+        public static readonly DevicePropertyKey Driver = new DevicePropertyDeviceDriver();
 
         /// <summary>
         ///     Possible configuration flags.
         /// </summary>
-        public static DevicePropertyKey ConfigFlags = new DevicePropertyDeviceConfigFlags();
+        public static readonly DevicePropertyKey ConfigFlags = new DevicePropertyDeviceConfigFlags();
 
         /// <summary>
         ///     The manufacturer string.
         /// </summary>
-        public static DevicePropertyKey Manufacturer = new DevicePropertyDeviceManufacturer();
+        public static readonly DevicePropertyKey Manufacturer = new DevicePropertyDeviceManufacturer();
 
         /// <summary>
         ///     The friendly display name.
         /// </summary>
-        public static DevicePropertyKey FriendlyName = new DevicePropertyDeviceFriendlyName();
+        public static readonly DevicePropertyKey FriendlyName = new DevicePropertyDeviceFriendlyName();
 
         /// <summary>
         ///     The location information.
         /// </summary>
-        public static DevicePropertyKey LocationInfo = new DevicePropertyDeviceLocationInfo();
+        public static readonly DevicePropertyKey LocationInfo = new DevicePropertyDeviceLocationInfo();
 
         /// <summary>
         ///     The Physical Device Object name.
         /// </summary>
-        public static DevicePropertyKey PDOName = new DevicePropertyDevicePDOName();
+        public static readonly DevicePropertyKey PDOName = new DevicePropertyDevicePDOName();
 
         /// <summary>
         ///     The device capabilities.
         /// </summary>
-        public static DevicePropertyKey Capabilities = new DevicePropertyDeviceCapabilities();
+        public static readonly DevicePropertyKey Capabilities = new DevicePropertyDeviceCapabilities();
 
         /// <summary>
         ///     The UI number.
         /// </summary>
-        public static DevicePropertyKey UINumber = new DevicePropertyDeviceUINumber();
+        public static readonly DevicePropertyKey UINumber = new DevicePropertyDeviceUINumber();
 
         /// <summary>
         ///     The upper filters list.
         /// </summary>
-        public static DevicePropertyKey UpperFilters = new DevicePropertyDeviceUpperFilters();
+        public static readonly DevicePropertyKey UpperFilters = new DevicePropertyDeviceUpperFilters();
 
         /// <summary>
         ///     The lower filters list.
         /// </summary>
-        public static DevicePropertyKey LowerFilters = new DevicePropertyDeviceLowerFilters();
+        public static readonly DevicePropertyKey LowerFilters = new DevicePropertyDeviceLowerFilters();
 
         /// <summary>
         ///     The bus type GUILD.
         /// </summary>
-        public static DevicePropertyKey BusTypeGuid = new DevicePropertyDeviceBusTypeGuid();
+        public static readonly DevicePropertyKey BusTypeGuid = new DevicePropertyDeviceBusTypeGuid();
 
         /// <summary>
         ///     The legacy bus type.
         /// </summary>
-        public static DevicePropertyKey LegacyBusType = new DevicePropertyDeviceLegacyBusType();
+        public static readonly DevicePropertyKey LegacyBusType = new DevicePropertyDeviceLegacyBusType();
 
         /// <summary>
         ///     The bus number.
         /// </summary>
-        public static DevicePropertyKey BusNumber = new DevicePropertyDeviceBusNumber();
+        public static readonly DevicePropertyKey BusNumber = new DevicePropertyDeviceBusNumber();
         
         /// <summary>
         ///     The enumerator name.
         /// </summary>
-        public static DevicePropertyKey EnumeratorName = new DevicePropertyDeviceEnumeratorName();
+        public static readonly DevicePropertyKey EnumeratorName = new DevicePropertyDeviceEnumeratorName();
         
         /// <summary>
         ///     The instance ID.
         /// </summary>
-        public static DevicePropertyKey InstanceId = new DevicePropertyDeviceInstanceId();
+        public static readonly DevicePropertyKey InstanceId = new DevicePropertyDeviceInstanceId();
         
         /// <summary>
         ///     The parent instance ID.
         /// </summary>
-        public static DevicePropertyKey Parent = new DevicePropertyDeviceParent();
+        public static readonly DevicePropertyKey Parent = new DevicePropertyDeviceParent();
         
         /// <summary>
         ///     The list of child instances, if any.
         /// </summary>
-        public static DevicePropertyKey Children = new DevicePropertyDeviceChildren();
+        public static readonly DevicePropertyKey Children = new DevicePropertyDeviceChildren();
 
         /// <summary>
         ///     The list of siblings, if any.
         /// </summary>
-        public static DevicePropertyKey Siblings = new DevicePropertyDeviceSiblings();
+        public static readonly DevicePropertyKey Siblings = new DevicePropertyDeviceSiblings();
 
         /// <summary>
         ///     The driver release date.
         /// </summary>
-        public static DevicePropertyKey DriverDate = new DevicePropertyDeviceDriverDate();
+        public static readonly DevicePropertyKey DriverDate = new DevicePropertyDeviceDriverDate();
 
         /// <summary>
         ///     The driver version.
         /// </summary>
-        public static DevicePropertyKey DriverVersion = new DevicePropertyDeviceDriverVersion();
+        public static readonly DevicePropertyKey DriverVersion = new DevicePropertyDeviceDriverVersion();
 
         /// <summary>
         ///     The driver description.
         /// </summary>
-        public static DevicePropertyKey DriverDesc = new DevicePropertyDeviceDriverDesc();
+        public static readonly DevicePropertyKey DriverDesc = new DevicePropertyDeviceDriverDesc();
 
         /// <summary>
         ///     The driver INF path.
         /// </summary>
-        public static DevicePropertyKey DriverInfPath = new DevicePropertyDeviceDriverInfPath();
+        public static readonly DevicePropertyKey DriverInfPath = new DevicePropertyDeviceDriverInfPath();
 
         /// <summary>
         ///     The driver INF section.
         /// </summary>
-        public static DevicePropertyKey DriverInfSection = new DevicePropertyDeviceDriverInfSection();
+        public static readonly DevicePropertyKey DriverInfSection = new DevicePropertyDeviceDriverInfSection();
 
         /// <summary>
         ///     The matching device ID.
         /// </summary>
-        public static DevicePropertyKey MatchingDeviceId = new DevicePropertyDeviceMatchingDeviceId();
+        public static readonly DevicePropertyKey MatchingDeviceId = new DevicePropertyDeviceMatchingDeviceId();
 
         /// <summary>
         ///     The driver provider name.
         /// </summary>
-        public static DevicePropertyKey DriverProvider = new DevicePropertyDeviceDriverProvider();
+        public static readonly DevicePropertyKey DriverProvider = new DevicePropertyDeviceDriverProvider();
 
         /// <summary>
         ///     The address (bus index, port number) the enumerator assigned to the device.
         /// </summary>
-        public static DevicePropertyKey Address = new DevicePropertyDeviceAddress();
+        public static readonly DevicePropertyKey Address = new DevicePropertyDeviceAddress();
 
         /// <summary>
         ///     The driver install date.
         /// </summary>
-        public static DevicePropertyKey InstallDate = new DevicePropertyDeviceInstallDate();
+        public static readonly DevicePropertyKey InstallDate = new DevicePropertyDeviceInstallDate();
 
         /// <summary>
         ///     The driver first install date.
         /// </summary>
-        public static DevicePropertyKey FirstInstallDate = new DevicePropertyDeviceFirstInstallDate();
+        public static readonly DevicePropertyKey FirstInstallDate = new DevicePropertyDeviceFirstInstallDate();
 
 
         /// <summary>
         ///     The driver last arrival date.
         /// </summary>
-        public static DevicePropertyKey LastArrivalDate = new DevicePropertyDeviceLastArrivalDate();
+        public static readonly DevicePropertyKey LastArrivalDate = new DevicePropertyDeviceLastArrivalDate();
 
 
         /// <summary>
         ///     The driver last removal date
         /// </summary>
-        public static DevicePropertyKey LastRemovalDate = new DevicePropertyDeviceLastRemovalDate();
+        public static readonly DevicePropertyKey LastRemovalDate = new DevicePropertyDeviceLastRemovalDate();
 
 
         private DevicePropertyDevice(uint propertyIdentifier, Type propertyType) : this(
