@@ -85,7 +85,12 @@ public static class Devcon
 
                 var instanceId = new string(ptrInstanceBuf).ToUpper();
 
-                var device = PnPDevice.GetDeviceByInstanceId(instanceId, DeviceLocationFlags.Phantom);
+                var device = PnPDevice.GetDeviceByInstanceId(
+                    instanceId,
+                    presentOnly
+                        ? DeviceLocationFlags.Normal
+                        : DeviceLocationFlags.Phantom
+                );
 
                 var hardwareIds = device.GetProperty<string[]>(DevicePropertyDevice.HardwareIds)
                     .Select(id => id.ToUpper()).ToList();
