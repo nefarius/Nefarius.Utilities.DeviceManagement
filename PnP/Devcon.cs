@@ -484,15 +484,15 @@ public static class Devcon
             && !SetupApiWrapper.DiUninstallDriver(
                 IntPtr.Zero,
                 fullInfPath,
-                SetupApiWrapper.DIURFLAG.NO_REMOVE_INF,
+                PInvoke.DIURFLAG_NO_REMOVE_INF,
                 out _))
             throw new Win32Exception(Marshal.GetLastWin32Error());
 
         if (!SetupApiWrapper.SetupUninstallOEMInf(
                 oemInfName,
                 forceDelete
-                    ? SetupApiWrapper.SetupUOInfFlags.SUOI_FORCEDELETE
-                    : SetupApiWrapper.SetupUOInfFlags.NONE,
+                    ? PInvoke.SUOI_FORCEDELETE
+                    : 0,
                 IntPtr.Zero))
             throw new Win32Exception(Marshal.GetLastWin32Error());
     }

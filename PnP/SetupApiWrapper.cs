@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Windows.Win32.Devices.DeviceAndDriverInstallation;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -32,23 +31,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             internal int HwProfile;
         }
         
-        /// <summary>
-        ///     Flags for DiUninstallDriver
-        /// </summary>
-        [Flags]
-        internal enum DIURFLAG
-        {
-            NO_REMOVE_INF = 0x00000001, // Do not remove inf from the system
-            UNCONFIGURE_INF = 0x00000002 // Unconfigure inf, if possible
-        }
-
-        [Flags]
-        internal enum SetupUOInfFlags : uint
-        {
-            NONE = 0x0000,
-            SUOI_FORCEDELETE = 0x0001
-        }
-
         #endregion
 
         #region Interop Definitions
@@ -113,7 +95,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetupUninstallOEMInf(
             [MarshalAs(UnmanagedType.LPWStr)] string infName,
-            SetupUOInfFlags flags,
+            uint flags,
             IntPtr reserved);
 
         #endregion
@@ -131,7 +113,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         internal static extern bool DiUninstallDriver(
             [In] IntPtr hwndParent,
             [In] string infPath,
-            [In] DIURFLAG flags,
+            [In] uint flags,
             [Out] out bool needReboot
         );
 
