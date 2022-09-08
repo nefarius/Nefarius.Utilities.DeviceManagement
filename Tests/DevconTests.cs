@@ -41,13 +41,13 @@ namespace Tests
             Assert.True(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out var device01));
 
             // check Service property against expected values
-            Assert.That(device01.GetProperty<string>(DevicePropertyDevice.EnumeratorName), Is.EqualTo("USB").Or.EqualTo("HID"));
+            Assert.That(device01.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName), Is.EqualTo("USB").Or.EqualTo("HID"));
 
             // 2nd controller
             Assert.True(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out var device02, instance:1));
 
             // check Service property against expected values
-            Assert.That(device02.GetProperty<string>(DevicePropertyDevice.EnumeratorName), Is.EqualTo("USB").Or.EqualTo("HID"));
+            Assert.That(device02.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName), Is.EqualTo("USB").Or.EqualTo("HID"));
         }
     }
 }

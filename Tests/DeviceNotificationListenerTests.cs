@@ -36,7 +36,7 @@ public class DeviceNotificationListenerTests
 
             Assert.IsNotNull(device);
 
-            Assert.That(device.GetProperty<string>(DevicePropertyDevice.EnumeratorName), Is.EqualTo("HID").IgnoreCase);
+            Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName), Is.EqualTo("HID").IgnoreCase);
 
             wait.Set();
         };
@@ -54,7 +54,7 @@ public class DeviceNotificationListenerTests
 
             Assert.IsNotNull(device);
 
-            Assert.That(device.GetProperty<string>(DevicePropertyDevice.EnumeratorName), Is.EqualTo("HID").IgnoreCase);
+            Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName), Is.EqualTo("HID").IgnoreCase);
 
             wait.Set();
         };

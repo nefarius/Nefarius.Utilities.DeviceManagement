@@ -16,12 +16,12 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     {
         internal UsbPnPDevice(string instanceId, DeviceLocationFlags flags) : base(instanceId, flags)
         {
-            var enumerator = GetProperty<string>(DevicePropertyDevice.EnumeratorName);
+            var enumerator = GetProperty<string>(DevicePropertyKey.Device_EnumeratorName);
 
             if (!Equals(enumerator, "USB"))
                 throw new ArgumentException("This device is not a USB device.");
 
-            Port = GetProperty<UInt32>(DevicePropertyDevice.Address);
+            Port = GetProperty<UInt32>(DevicePropertyKey.Device_Address);
         }
 
         /// <summary>
@@ -41,8 +41,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
             // find root hub
             while (hubDevice is not null)
             {
-                var parentId = hubDevice.GetProperty<string>(DevicePropertyDevice.Parent);
-                var service = hubDevice.GetProperty<string>(DevicePropertyDevice.Service);
+                var parentId = hubDevice.GetProperty<string>(DevicePropertyKey.Device_Parent);
+                var service = hubDevice.GetProperty<string>(DevicePropertyKey.Device_Service);
 
                 if (service is not null)
                     // we have reached the hub object, bail

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Nefarius.Utilities.DeviceManagement.Exceptions;
-using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
 {
@@ -224,7 +222,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 
             while (device is not null)
             {
-                var parentId = device.GetProperty<string>(DevicePropertyDevice.Parent);
+                var parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
 
                 if (parentId.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
                     break;
@@ -275,7 +273,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <returns>The Instance ID.</returns>
         public static unsafe string GetInstanceIdFromInterfaceId(string symbolicLink)
         {
-            var property = DevicePropertyDevice.InstanceId.ToCsWin32Type();
+            var property = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
             uint sizeRequired = 0;
 
             var ret = PInvoke.CM_Get_Device_Interface_Property(
