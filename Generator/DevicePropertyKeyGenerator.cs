@@ -126,6 +126,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 var managedType = nameToManagedTypeMap[propertyName];
 
                 sb.AppendLine($@"
+        /// <summary>
+        ///     {propertyName}
+        /// </summary>
         public static readonly DevicePropertyKey {fieldName} = new DevicePropertyKey(PInvoke.{propertyName}, typeof({managedType.Name}));");
             }
 
