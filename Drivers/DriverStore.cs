@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using Windows.Win32.Devices.Properties;
 
 namespace Nefarius.Utilities.DeviceManagement.Drivers
 {
@@ -136,13 +137,6 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
     internal enum DriverStoreObjectType : uint
     {
         DriverDatabase = 1
-    }
-
-    internal struct DevPropKey
-    {
-        public Guid fmtid;
-
-        public uint pid;
     }
 
     internal enum DevPropType : uint
@@ -387,7 +381,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
             IntPtr driverStoreHandle,
             DriverStoreObjectType objectType,
             string objectName,
-            ref DevPropKey propertyKey,
+            ref DEVPROPKEY propertyKey,
             DevPropType propertyType,
             ref uint propertyBuffer,
             int propertySize,
