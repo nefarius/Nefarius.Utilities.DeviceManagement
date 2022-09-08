@@ -92,7 +92,7 @@ public static class Devcon
                         : DeviceLocationFlags.Phantom
                 );
 
-                var hardwareIds = device.GetProperty<string[]>(DevicePropertyDevice.HardwareIds)
+                var hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds)
                     .Select(id => id.ToUpper()).ToList();
 
                 if (!hardwareIds.Contains(hardwareId.ToUpper())) continue;
