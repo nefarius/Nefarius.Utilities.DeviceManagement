@@ -17,7 +17,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 ///     Utility class to listen for system-wide device arrivals and removals based on a provided device interface GUID.
 /// </summary>
 /// <remarks>Original source: https://gist.github.com/emoacht/73eff195317e387f4cda</remarks>
-public class DeviceNotificationListener : IDeviceNotificationListener, IDisposable
+public sealed class DeviceNotificationListener : IDeviceNotificationListener, IDisposable
 {
     private readonly List<DeviceEventRegistration> _arrivedRegistrations = new();
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -35,6 +35,7 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
     /// </summary>
     public event Action<DeviceEventArgs> DeviceRemoved;
 
+    /// <inheritdoc />
     public void Dispose()
     {
         // Dispose of unmanaged resources.
@@ -74,7 +75,7 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
 
     #endregion
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (disposing)
         {
@@ -257,7 +258,7 @@ public class DeviceNotificationListener : IDeviceNotificationListener, IDisposab
         var listenerItem = (ListenerItem)parameter;
         var className = GenerateRandomString(); // random string to avoid conflicts
         var windowName = GenerateRandomString();
-        using var hInst = PInvoke.GetModuleHandle((string?)null);
+        using var hInst = PInvoke.GetModuleHandle((string)null);
 
         var windowClass = new WNDCLASSEXW
         {

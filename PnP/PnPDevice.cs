@@ -104,6 +104,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         /// <param name="instanceId">The instance ID to look for.</param>
         /// <param name="flags">The <see cref="DeviceLocationFlags"/> influencing search behavior.</param>
+        /// <exception cref="ConfigManagerException"></exception>
         protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
         {
             InstanceId = instanceId;
@@ -159,18 +160,19 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         /// <summary>
-        ///     The instance ID of the device.
+        ///     The instance ID of the device. Uniquely identifies devices of equal make and model on the same machine.
         /// </summary>
         public string InstanceId { get; }
 
         /// <summary>
-        ///     The device ID.
+        ///     The device ID. Typically built from the hardware ID of the same make and model of hardware.
         /// </summary>
         public string DeviceId { get; }
 
         /// <summary>
         ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be force-closed.
         /// </summary>
+        /// <exception cref="ConfigManagerException"></exception>
         public unsafe void Restart()
         {
             var ret = PInvoke.CM_Query_And_Remove_SubTree(
@@ -195,6 +197,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// <summary>
         ///     Attempts to remove this device node.
         /// </summary>
+        /// <exception cref="ConfigManagerException"></exception>
         public unsafe void Remove()
         {
             var ret = PInvoke.CM_Query_And_Remove_SubTree(
@@ -271,6 +274,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         /// </summary>
         /// <param name="symbolicLink">The device interface path/ID/symbolic link name.</param>
         /// <returns>The Instance ID.</returns>
+        /// <exception cref="ConfigManagerException"></exception>
         public static unsafe string GetInstanceIdFromInterfaceId(string symbolicLink)
         {
             var property = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
