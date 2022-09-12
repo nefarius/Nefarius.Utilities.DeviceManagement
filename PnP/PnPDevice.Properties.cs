@@ -277,6 +277,14 @@ public partial class PnPDevice
             ref valueBufferSize,
             0
         );
+
+        if (ret == CONFIGRET.CR_NO_SUCH_VALUE)
+        {
+            propertyType = 0;
+            valueBuffer = IntPtr.Zero;
+            return ret;
+        }
+
         if (ret != CONFIGRET.CR_BUFFER_SMALL)
             throw new ConfigManagerException("Failed to get property size.", ret);
 
