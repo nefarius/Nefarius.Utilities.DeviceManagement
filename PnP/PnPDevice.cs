@@ -230,7 +230,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                 if (parentId.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
                     break;
 
-                device = GetDeviceByInstanceId(parentId);
+                device = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom);
             }
 
             //
