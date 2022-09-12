@@ -16,7 +16,7 @@
     <LangVersion>latest</LangVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.</Description>
-    <PackageReadmeFile>$(SolutionDir)README-NuGet.md</PackageReadmeFile>
+    <PackageReadmeFile>README-NuGet.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,6 +33,7 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    <None Include="$(SolutionDir)README-NuGet.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
 
   <ItemGroup>
