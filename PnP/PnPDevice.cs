@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Nefarius.Utilities.DeviceManagement.Exceptions;
@@ -72,8 +73,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     tree root is a software device. Hardware devices originate from a PCI(e) bus while virtual devices originate from a
         ///     root enumerated device.
         /// </remarks>
+        /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
         /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
-        bool IsVirtual();
+        bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default);
 
         /// <summary>
         ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
@@ -218,13 +220,17 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         ///     tree root is a software device. Hardware devices originate from a PCI(e) bus while virtual devices originate from a
         ///     root enumerated device.
         /// </remarks>
+        /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
         /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
-        public bool IsVirtual()
+        public bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default)
         {
             IPnPDevice device = this;
 
             while (device is not null)
             {
+                if (excludeIfMatches != null && excludeIfMatches(device))
+                    return false;
+
                 var parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
 
                 if (parentId.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
@@ -240,7 +246,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                    (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                     || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
         }
-
+        
         /// <summary>
         ///     Return device identified by instance ID.
         /// </summary>
