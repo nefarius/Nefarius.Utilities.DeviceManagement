@@ -30,3 +30,5 @@ deploy:
   on:
     branch: master
     appveyor_repo_tag: true
+after_deploy:
+- ps : Get-ChildItem .\bin\*.snupkg | % { dotnet nuget push $_.FullName -s https://api.nuget.org/v3/index.json -k $env:NUGET_DEPLOY_SECRET }
