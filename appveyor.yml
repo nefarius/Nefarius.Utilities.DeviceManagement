@@ -2,6 +2,9 @@ version: 3.2.{build}
 image: Visual Studio 2022
 configuration:
 - Release
+environment:
+  nuget_deploy_secret:
+    secure: A4UFP6yxsVn4vOe18tnIMBeGAztu15wuhU1ek1NHInliyCGwhZJHtsv4Yect1pnv
 install:
 - cmd: git submodule -q update --init
 dotnet_csproj:
