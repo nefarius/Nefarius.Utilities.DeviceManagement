@@ -103,9 +103,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                         FILE_SHARE_MODE.FILE_SHARE_READ | FILE_SHARE_MODE.FILE_SHARE_WRITE,
                         null,
                         FILE_CREATION_DISPOSITION.OPEN_EXISTING,
-                        FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_NORMAL
-                        | FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_NO_BUFFERING
-                        | FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_WRITE_THROUGH,
+                        FILE_FLAGS_AND_ATTRIBUTES.FILE_ATTRIBUTE_NORMAL,
                         null
                     );
 
@@ -135,8 +133,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
                                 $"Request failed, device on port {compositeDevice.Port} not found.");
                     }
 
-                    if (parameters.Status != 0)
-                        throw new ArgumentException("Port cycle request failed.");
+                    if (parameters.Status != 0 || hubHandle.IsInvalid)
+                        throw new Win32Exception("Port cycle request failed.", (int)err);
                 }
             }
         }
