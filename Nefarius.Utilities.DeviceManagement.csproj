@@ -17,6 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.</Description>
     <PackageReadmeFile>README-NuGet.md</PackageReadmeFile>
+    <IncludeSymbols>true</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
