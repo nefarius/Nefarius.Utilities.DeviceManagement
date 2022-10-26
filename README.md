@@ -63,6 +63,21 @@ foreach (var driverPackage in allDriverPackages.Where(p => p.Contains("mydriver.
 }
 ```
 
+### Get Instance ID from a symbolic link (device path)
+
+```csharp
+// e.g. the path "\\?\HID#VID_045E&PID_028E&IG_00#3&31f0e99d&0&0000#{4d1e55b2-f16f-11cf-88cb-001111000030}"
+// gets translated to instanceId "HID\VID_045E&PID_028E&IG_00\3&31f0e99d&0&0000"
+var instanceId = PnPDevice.GetInstanceIdFromInterfaceId(path);
+```
+
+### Get PnPDevice object from symbolic link
+
+```csharp
+// example path: "\\?\HID#VID_046D&PID_C33F&MI_01&COL02#B&31580538&0&0001#{4D1E55B2-F16F-11CF-88CB-001111000030}"
+PnPDevice device = PnPDevice.GetDeviceByInterfaceId(path);
+```
+
 ## Sources & 3rd party credits
 
 - [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
