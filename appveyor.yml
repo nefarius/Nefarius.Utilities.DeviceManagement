@@ -1,4 +1,4 @@
-version: 3.4.{build}
+version: 3.4.{build}-pre
 image: Visual Studio 2022
 configuration:
 - Release
