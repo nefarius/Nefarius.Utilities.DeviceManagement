@@ -5,8 +5,10 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+
 using Windows.Win32;
 using Windows.Win32.Devices.Properties;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -52,23 +54,23 @@ namespace DeviceManagementPropertiesGenerator
 
         public void Execute(GeneratorExecutionContext context)
         {
-            var devpkeyHeader =
+            string devpkeyHeader =
                 "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/devpkey.h";
 
-            var wc = new WebClient();
+            WebClient wc = new WebClient();
 
-            var header = wc.DownloadString(devpkeyHeader);
+            string header = wc.DownloadString(devpkeyHeader);
 
-            var parseRegex = new Regex(@"^DEFINE_DEVPROPKEY\((\w*), .*\/\/ (\w*)$", RegexOptions.Multiline);
+            Regex parseRegex = new Regex(@"^DEFINE_DEVPROPKEY\((\w*), .*\/\/ (\w*)$", RegexOptions.Multiline);
 
-            var matches = parseRegex.Matches(header);
+            MatchCollection matches = parseRegex.Matches(header);
 
-            var nameToManagedTypeMap = new Dictionary<string, Type>();
+            Dictionary<string, Type> nameToManagedTypeMap = new Dictionary<string, Type>();
 
             foreach (Match match in matches)
             {
-                var propName = match.Groups[1].Value;
-                var typeName = match.Groups[2].Value;
+                string propName = match.Groups[1].Value;
+                string typeName = match.Groups[2].Value;
 
                 // handle special cases
                 switch (typeName)
@@ -83,29 +85,34 @@ namespace DeviceManagementPropertiesGenerator
                         break;
                     default:
                         // exists as a comment but not as an actual constant
-                        if (Equals(typeName, "DEVPROP_TYPE_BOOL")) typeName = "DEVPROP_TYPE_BOOLEAN";
+                        if (Equals(typeName, "DEVPROP_TYPE_BOOL"))
+                        {
+                            typeName = "DEVPROP_TYPE_BOOLEAN";
+                        }
 
-                        var nativeType =
+                        FieldInfo nativeType =
                             typeof(PInvoke).GetField(typeName, BindingFlags.Static | BindingFlags.NonPublic);
-                        var nativeTypeValue = (uint)nativeType.GetValue(null);
+                        uint nativeTypeValue = (uint)nativeType.GetValue(null);
 
                         // unsupported type hit
                         if (!NativeToManagedTypeMap.ContainsKey(nativeTypeValue))
+                        {
                             continue;
+                        }
 
-                        var managedType = NativeToManagedTypeMap[nativeTypeValue];
+                        Type managedType = NativeToManagedTypeMap[nativeTypeValue];
 
                         nameToManagedTypeMap.Add(propName, managedType);
                         break;
                 }
             }
 
-            var allProperties = typeof(PInvoke)
+            List<FieldInfo> allProperties = typeof(PInvoke)
                 .GetFields(BindingFlags.Static | BindingFlags.NonPublic)
                 .Where(info => info.FieldType == typeof(DEVPROPKEY))
                 .ToList();
 
-            var sb = new StringBuilder(@"using System;
+            StringBuilder sb = new StringBuilder(@"using System;
 using Windows.Win32;
 using Windows.Win32.Devices.Properties;
 
@@ -113,17 +120,19 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 {
     public partial class DevicePropertyKey
     {");
-            foreach (var property in allProperties)
+            foreach (FieldInfo property in allProperties)
             {
                 // strip prefix
-                var fieldName = property.Name.Replace("DEVPKEY_", string.Empty);
-                var propertyName = property.Name;
+                string fieldName = property.Name.Replace("DEVPKEY_", string.Empty);
+                string propertyName = property.Name;
 
                 // skip if we don't know the managed type
                 if (!nameToManagedTypeMap.ContainsKey(propertyName))
+                {
                     continue;
+                }
 
-                var managedType = nameToManagedTypeMap[propertyName];
+                Type managedType = nameToManagedTypeMap[propertyName];
 
                 sb.AppendLine($@"
         /// <summary>
