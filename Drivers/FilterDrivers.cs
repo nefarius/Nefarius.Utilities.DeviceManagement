@@ -128,6 +128,11 @@ public static class FilterDrivers
             ? new List<string>(filters)
             : new List<string>();
 
+        if (entries.Contains(serviceName, StringComparer.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
         entries.Add(serviceName);
         key.SetValue("UpperFilters", entries.ToArray(), RegistryValueKind.MultiString);
     }
@@ -150,6 +155,11 @@ public static class FilterDrivers
         List<string> entries = key.GetValue("LowerFilters") is string[] filters
             ? new List<string>(filters)
             : new List<string>();
+
+        if (entries.Contains(serviceName, StringComparer.OrdinalIgnoreCase))
+        {
+            return;
+        }
 
         entries.Add(serviceName);
         key.SetValue("LowerFilters", entries.ToArray(), RegistryValueKind.MultiString);
