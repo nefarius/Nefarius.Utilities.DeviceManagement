@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Windows.Win32.Devices.Properties;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
@@ -7,6 +8,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     ///     Describes a unified device property.
     /// </summary>
     /// <remarks>https://docs.microsoft.com/en-us/windows-hardware/drivers/install/unified-device-property-model--windows-vista-and-later-</remarks>
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public partial class DevicePropertyKey : IEquatable<DevicePropertyKey>
     {
         internal DevicePropertyKey(

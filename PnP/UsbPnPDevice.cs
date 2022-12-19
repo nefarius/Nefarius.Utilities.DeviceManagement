@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
@@ -12,6 +13,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
     /// <summary>
     ///     Describes an instance of a USB PNP device.
     /// </summary>
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class UsbPnPDevice : PnPDevice
     {
         internal UsbPnPDevice(string instanceId, DeviceLocationFlags flags) : base(instanceId, flags)
@@ -140,6 +142,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         internal struct USB_CYCLE_PORT_PARAMS
         {
             internal UInt32 ConnectionIndex;

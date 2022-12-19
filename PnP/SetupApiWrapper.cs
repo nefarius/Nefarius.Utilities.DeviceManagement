@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP
@@ -8,6 +9,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         #region Constant and Structure Definitions
 
         [StructLayout(LayoutKind.Sequential)]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         internal struct SP_DEVINFO_DATA
         {
             internal int cbSize;
@@ -17,6 +20,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
 
         [StructLayout(LayoutKind.Sequential)]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         internal struct SP_CLASSINSTALL_HEADER
         {
             internal int cbSize;
@@ -24,6 +28,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
         }
         
         [StructLayout(LayoutKind.Sequential)]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         internal struct SP_REMOVEDEVICE_PARAMS
         {
             internal SP_CLASSINSTALL_HEADER ClassInstallHeader;

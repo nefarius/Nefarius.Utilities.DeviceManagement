@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -389,6 +390,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     #region Win32
 
     [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Local")]
     private struct DEV_BROADCAST_HDR
     {
         public readonly uint dbch_size;
@@ -397,6 +400,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Local")]
     private struct DEV_BROADCAST_DEVICEINTERFACE
     {
         public uint dbcc_size;

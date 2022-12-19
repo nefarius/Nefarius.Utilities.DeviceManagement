@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Windows.Win32;
@@ -14,6 +15,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 ///     Managed wrapper for SetupAPI.
 /// </summary>
 /// <remarks>https://docs.microsoft.com/en-us/windows-hardware/drivers/install/setupapi</remarks>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static class Devcon
 {
     /// <summary>

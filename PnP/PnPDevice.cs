@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Nefarius.Utilities.DeviceManagement.Exceptions;

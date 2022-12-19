@@ -25,6 +25,7 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -40,6 +41,8 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
         Exclusive = 2
     }
 
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum ProcessorArchitecture : ushort
     {
         PROCESSOR_ARCHITECTURE_INTEL = 0,
@@ -169,6 +172,7 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
     }
 
     [Flags]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal enum DriverPackageOpenFlag : uint
     {
         VersionOnly = 1,
@@ -275,6 +279,8 @@ namespace Nefarius.Utilities.DeviceManagement.Drivers
             string TargetSystemDrive);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Size = 0x2B8, Pack = 0x4)]
+        [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public struct DriverStoreOfflineEnumDriverPackageInfo
         {
             public int InboxInf;
