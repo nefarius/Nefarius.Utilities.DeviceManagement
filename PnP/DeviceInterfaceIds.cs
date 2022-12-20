@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
@@ -6,6 +7,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 /// <summary>
 ///     Provides common device interface <see cref="Guid" />s.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class DeviceInterfaceIds
 {
     /// <summary>

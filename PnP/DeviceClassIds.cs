@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
 ///     Provides common device class <see cref="Guid" />s.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class DeviceClassIds
 {
     /// <summary>
