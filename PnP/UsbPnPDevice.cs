@@ -71,7 +71,7 @@ public class UsbPnPDevice : PnPDevice
 
         if (hubDevice is null)
         {
-            throw new ArgumentException("Unable to find root hub for the current device.");
+            throw new UsbPnPDeviceRestartException("Unable to find root hub for the current device.");
         }
 
         USB_CYCLE_PORT_PARAMS parameters = new() { ConnectionIndex = compositeDevice.Port };
@@ -112,7 +112,7 @@ public class UsbPnPDevice : PnPDevice
 
                 if (hubPath is null)
                 {
-                    throw new ArgumentException("Failed to get device interface path.");
+                    throw new UsbPnPDeviceRestartException("Failed to get device interface path.");
                 }
 
                 using SafeFileHandle hubHandle = PInvoke.CreateFile(
@@ -144,10 +144,10 @@ public class UsbPnPDevice : PnPDevice
                 switch (success.Value > 0)
                 {
                     case false when err == WIN32_ERROR.ERROR_GEN_FAILURE:
-                        throw new ArgumentException(
+                        throw new UsbPnPDeviceRestartException(
                             "Request failed, this operation requires administrative privileges.");
                     case false when err == WIN32_ERROR.ERROR_NO_SUCH_DEVICE:
-                        throw new ArgumentException(
+                        throw new UsbPnPDeviceRestartException(
                             $"Request failed, device on port {compositeDevice.Port} not found.");
                 }
 

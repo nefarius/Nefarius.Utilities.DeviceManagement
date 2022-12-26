@@ -27,3 +27,13 @@ public class UsbPnPDeviceConversionException : UsbPnPDeviceException
     {
     }
 }
+
+/// <summary>
+///     Thrown if a port-cycle operation of a <see cref="UsbPnPDevice" /> failed.
+/// </summary>
+public class UsbPnPDeviceRestartException : UsbPnPDeviceException
+{
+    internal UsbPnPDeviceRestartException(string message) : base(message)
+    {
+    }
+}
