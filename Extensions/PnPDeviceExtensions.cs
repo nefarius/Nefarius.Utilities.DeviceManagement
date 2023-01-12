@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 using Microsoft.Win32;
 
@@ -42,7 +43,7 @@ public static class PnPDeviceExtensions
 
         return new DriverMeta
         {
-            DriverDate = DateTime.Parse(key.GetValue("DriverDate") as string),
+            DriverDate = DateTime.ParseExact(key.GetValue("DriverDate") as string, "M-d-yyyy", CultureInfo.InvariantCulture),
             DriverDescription = key.GetValue("DriverDesc") as string,
             DriverVersion = Version.Parse((key.GetValue("DriverVersion") as string)!),
             InfPath = key.GetValue("InfPath") as string,
