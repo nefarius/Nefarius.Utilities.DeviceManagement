@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
+
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Foundation;
+
 using Nefarius.Utilities.DeviceManagement.Exceptions;
+
 using Win32Exception = System.ComponentModel.Win32Exception;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
@@ -55,10 +58,10 @@ public static class Devcon
         out IEnumerable<string> instanceIds, bool presentOnly)
     {
         instanceIds = new List<string>();
-        var found = false;
-        var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
+        bool found = false;
+        SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
         deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
-        var deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
+        IntPtr deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
             ref target,
             IntPtr.Zero,
             IntPtr.Zero,
@@ -73,32 +76,39 @@ public static class Devcon
                 i++
             )
             {
-                var ret = PInvoke.CM_Get_Device_ID_Size(out var charsRequired, deviceInfoData.DevInst, 0);
+                CONFIGRET ret = PInvoke.CM_Get_Device_ID_Size(out uint charsRequired, deviceInfoData.DevInst, 0);
 
                 if (ret != CONFIGRET.CR_SUCCESS)
+                {
                     throw new ConfigManagerException("Failed to get device ID size.", ret);
+                }
 
-                var nBytes = (charsRequired + 1) * 2;
-                var ptrInstanceBuf = stackalloc char[(int)nBytes];
+                uint nBytes = (charsRequired + 1) * 2;
+                char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
                 ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
 
                 if (ret != CONFIGRET.CR_SUCCESS)
+                {
                     throw new ConfigManagerException("Failed to get device ID.", ret);
+                }
 
-                var instanceId = new string(ptrInstanceBuf).ToUpper();
+                string instanceId = new string(ptrInstanceBuf).ToUpper();
 
-                var device = PnPDevice.GetDeviceByInstanceId(
+                PnPDevice device = PnPDevice.GetDeviceByInstanceId(
                     instanceId,
                     presentOnly
                         ? DeviceLocationFlags.Normal
                         : DeviceLocationFlags.Phantom
                 );
 
-                var hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds)
+                List<string> hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds)
                     .Select(id => id.ToUpper()).ToList();
 
-                if (!hardwareIds.Contains(hardwareId.ToUpper())) continue;
+                if (!hardwareIds.Contains(hardwareId.ToUpper()))
+                {
+                    continue;
+                }
 
                 ((List<string>)instanceIds).Add(instanceId);
                 found = true;
@@ -106,7 +116,10 @@ public static class Devcon
         }
         finally
         {
-            if (deviceInfoSet != IntPtr.Zero) SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            if (deviceInfoSet != IntPtr.Zero)
+            {
+                SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            }
         }
 
         return found;
@@ -127,8 +140,8 @@ public static class Devcon
     public static unsafe bool FindByInterfaceGuid(Guid target, out string path, out string instanceId, int instance = 0,
         bool presentOnly = true)
     {
-        var detailDataBuffer = IntPtr.Zero;
-        var deviceInfoSet = IntPtr.Zero;
+        IntPtr detailDataBuffer = IntPtr.Zero;
+        IntPtr deviceInfoSet = IntPtr.Zero;
 
         try
         {
@@ -136,10 +149,12 @@ public static class Devcon
                 da = new();
             int bufferSize = 0, memberIndex = 0;
 
-            var flags = (int)PInvoke.DIGCF_DEVICEINTERFACE;
+            int flags = (int)PInvoke.DIGCF_DEVICEINTERFACE;
 
             if (presentOnly)
+            {
                 flags |= (int)PInvoke.DIGCF_PRESENT;
+            }
 
             deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero, flags);
 
@@ -166,19 +181,21 @@ public static class Devcon
                             detailDataBuffer,
                             bufferSize, ref bufferSize, ref da))
                     {
-                        var pDevicePathName = detailDataBuffer + 4;
+                        IntPtr pDevicePathName = detailDataBuffer + 4;
 
                         path = (Marshal.PtrToStringAuto(pDevicePathName) ?? string.Empty).ToUpper();
 
                         if (memberIndex == instance)
                         {
-                            var ret = PInvoke.CM_Get_Device_ID_Size(out var charsRequired, da.DevInst, 0);
+                            CONFIGRET ret = PInvoke.CM_Get_Device_ID_Size(out uint charsRequired, da.DevInst, 0);
 
                             if (ret != CONFIGRET.CR_SUCCESS)
+                            {
                                 throw new ConfigManagerException("Failed to get device ID size.", ret);
+                            }
 
-                            var nBytes = (charsRequired + 1) * 2;
-                            var ptrInstanceBuf = stackalloc char[(int)nBytes];
+                            uint nBytes = (charsRequired + 1) * 2;
+                            char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
                             PInvoke.CM_Get_Device_IDW(da.DevInst, ptrInstanceBuf, nBytes, 0);
                             instanceId = new string(ptrInstanceBuf).ToUpper();
@@ -198,7 +215,9 @@ public static class Devcon
         finally
         {
             if (deviceInfoSet != IntPtr.Zero)
+            {
                 SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            }
         }
 
         path = instanceId = string.Empty;
@@ -219,7 +238,7 @@ public static class Devcon
     public static bool FindByInterfaceGuid(Guid target, out PnPDevice device, int instance = 0,
         bool presentOnly = true)
     {
-        var ret = FindByInterfaceGuid(target, out _, out var instanceId, instance, presentOnly);
+        bool ret = FindByInterfaceGuid(target, out _, out string instanceId, instance, presentOnly);
 
         device = PnPDevice.GetDeviceByInstanceId(
             instanceId,
@@ -240,7 +259,7 @@ public static class Devcon
     /// <param name="instance">Optional instance ID (zero-based) specifying the device to process on multiple matches.</param>
     /// <returns>True if at least one device was found with the provided class, false otherwise.</returns>
     /// <remarks>This is here for backwards compatibility.</remarks>
-    [Obsolete]
+    [Obsolete("Please use FindByInterfaceGuid instead.")]
     public static bool Find(Guid target, out string path, out string instanceId, int instance = 0)
     {
         return FindByInterfaceGuid(target, out path, out instanceId, instance);
@@ -267,15 +286,17 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Create(string className, Guid classGuid, string node)
     {
-        var deviceInfoSet = (IntPtr)(-1);
-        var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
+        IntPtr deviceInfoSet = (IntPtr)(-1);
+        SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
 
         try
         {
             deviceInfoSet = SetupApiWrapper.SetupDiCreateDeviceInfoList(ref classGuid, IntPtr.Zero);
 
             if (deviceInfoSet == (IntPtr)(-1))
+            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
 
             deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
 
@@ -288,7 +309,9 @@ public static class Devcon
                     (int)PInvoke.DICD_GENERATE_ID,
                     ref deviceInfoData
                 ))
+            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
 
             if (!SetupApiWrapper.SetupDiSetDeviceRegistryProperty(
                     deviceInfoSet,
@@ -297,19 +320,25 @@ public static class Devcon
                     node,
                     node.Length * 2
                 ))
+            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
 
             if (!SetupApiWrapper.SetupDiCallClassInstaller(
                     (int)PInvoke.DIF_REGISTERDEVICE,
                     deviceInfoSet,
                     ref deviceInfoData
                 ))
+            {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
         }
         finally
         {
             if (deviceInfoSet != (IntPtr)(-1))
+            {
                 SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            }
         }
 
         return true;
@@ -335,12 +364,12 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Remove(Guid classGuid, string instanceId, out bool rebootRequired)
     {
-        var deviceInfoSet = IntPtr.Zero;
-        var installParams = Marshal.AllocHGlobal(584); // Max struct size on x64 platform
+        IntPtr deviceInfoSet = IntPtr.Zero;
+        IntPtr installParams = Marshal.AllocHGlobal(584); // Max struct size on x64 platform
 
         try
         {
-            var deviceInfoData = new SetupApiWrapper.SP_DEVINFO_DATA();
+            SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
             deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
 
             deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
@@ -358,8 +387,10 @@ public static class Devcon
                     ref deviceInfoData
                 ))
             {
-                var props = new SetupApiWrapper.SP_REMOVEDEVICE_PARAMS
-                    { ClassInstallHeader = new SetupApiWrapper.SP_CLASSINSTALL_HEADER() };
+                SetupApiWrapper.SP_REMOVEDEVICE_PARAMS props = new()
+                {
+                    ClassInstallHeader = new SetupApiWrapper.SP_CLASSINSTALL_HEADER()
+                };
 
                 props.ClassInstallHeader.cbSize = Marshal.SizeOf(props.ClassInstallHeader);
                 props.ClassInstallHeader.InstallFunction = (int)PInvoke.DIF_REMOVE;
@@ -378,7 +409,9 @@ public static class Devcon
                     // Invoke class installer with uninstall action
                     if (!SetupApiWrapper.SetupDiCallClassInstaller((int)PInvoke.DIF_REMOVE, deviceInfoSet,
                             ref deviceInfoData))
+                    {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
 
                     // Fill cbSize field
                     Marshal.WriteInt32(
@@ -390,10 +423,12 @@ public static class Devcon
                     // Fill SP_DEVINSTALL_PARAMS struct
                     if (!SetupApiWrapper.SetupDiGetDeviceInstallParams(deviceInfoSet, ref deviceInfoData,
                             installParams))
+                    {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
+                    }
 
                     // Grab Flags field of SP_DEVINSTALL_PARAMS (offset of 32 bits)
-                    var flags = Marshal.ReadInt32(installParams, Marshal.SizeOf(typeof(uint)));
+                    int flags = Marshal.ReadInt32(installParams, Marshal.SizeOf(typeof(uint)));
 
                     // Test for restart/reboot flags being present
                     rebootRequired = (flags & PInvoke.DI_NEEDRESTART) != 0 ||
@@ -414,7 +449,10 @@ public static class Devcon
         finally
         {
             if (deviceInfoSet != IntPtr.Zero)
+            {
                 SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            }
+
             Marshal.FreeHGlobal(installParams);
         }
     }
@@ -425,8 +463,10 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Refresh()
     {
-        if (PInvoke.CM_Locate_DevNode_Ex(out var devRoot, null, 0, 0) != CONFIGRET.CR_SUCCESS)
+        if (PInvoke.CM_Locate_DevNode_Ex(out uint devRoot, null, 0, 0) != CONFIGRET.CR_SUCCESS)
+        {
             return false;
+        }
 
         return PInvoke.CM_Reenumerate_DevNode_Ex(devRoot, 0, 0) == CONFIGRET.CR_SUCCESS;
     }
@@ -437,9 +477,13 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool RefreshPhantom()
     {
-        if (PInvoke.CM_Locate_DevNode_Ex(out var devRoot, null,
+        if (PInvoke.CM_Locate_DevNode_Ex(out uint devRoot, null,
                 PInvoke.CM_LOCATE_DEVNODE_PHANTOM, 0) !=
-            CONFIGRET.CR_SUCCESS) return false;
+            CONFIGRET.CR_SUCCESS)
+        {
+            return false;
+        }
+
         return PInvoke.CM_Reenumerate_DevNode_Ex(devRoot, PInvoke.CM_REENUMERATE_SYNCHRONOUS, 0) ==
                CONFIGRET.CR_SUCCESS;
     }
@@ -459,7 +503,7 @@ public static class Devcon
     {
         BOOL reboot = false;
 
-        var ret = PInvoke.UpdateDriverForPlugAndPlayDevices(
+        BOOL ret = PInvoke.UpdateDriverForPlugAndPlayDevices(
             HWND.Null,
             hardwareId,
             fullInfPath,
@@ -480,7 +524,10 @@ public static class Devcon
     /// <param name="forceDelete">Remove driver store copy, if true.</param>
     public static void DeleteDriver(string oemInfName, string fullInfPath = default, bool forceDelete = false)
     {
-        if (string.IsNullOrEmpty(oemInfName)) throw new ArgumentNullException(nameof(oemInfName));
+        if (string.IsNullOrEmpty(oemInfName))
+        {
+            throw new ArgumentNullException(nameof(oemInfName));
+        }
 
         if (forceDelete
             && Kernel32.MethodExists("newdev.dll", "DiUninstallDriverW")
@@ -489,7 +536,9 @@ public static class Devcon
                 fullInfPath,
                 PInvoke.DIURFLAG_NO_REMOVE_INF,
                 out _))
+        {
             throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
 
         if (!SetupApiWrapper.SetupUninstallOEMInf(
                 oemInfName,
@@ -497,6 +546,8 @@ public static class Devcon
                     ? PInvoke.SUOI_FORCEDELETE
                     : 0,
                 IntPtr.Zero))
+        {
             throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
     }
 }
