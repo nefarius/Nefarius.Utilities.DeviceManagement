@@ -13,6 +13,11 @@ public static class DeviceClassIds
     ///     USB devices.
     /// </summary>
     public static Guid Usb => Guid.Parse("{36FC9E60-C465-11CF-8056-444553540000}");
+    
+    /// <summary>
+    ///     Bluetooth devices.
+    /// </summary>
+    public static Guid Bluetooth => Guid.Parse("{e0cbf06c-cd8b-4647-bb8a-263b43f0f974}");
 
     /// <summary>
     ///     Xbox 360 Peripherals.
