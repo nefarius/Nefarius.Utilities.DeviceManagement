@@ -104,6 +104,7 @@ public interface IPnPDevice
 /// <summary>
 ///     Describes an instance of a PNP device.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 {
     private readonly uint _instanceHandle;
@@ -190,7 +191,8 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
     ///     force-closed.
     /// </summary>
-    [Obsolete("This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects.")]
+    [Obsolete(
+        "This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects.")]
     public unsafe void Restart()
     {
         CONFIGRET ret = PInvoke.CM_Query_And_Remove_SubTree(
@@ -272,6 +274,34 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         return device is not null &&
                (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
+    }
+    
+    /// <summary>
+    ///     Disables this device instance node.
+    /// </summary>
+    /// <exception cref="ConfigManagerException"></exception>
+    public void Disable()
+    {
+        CONFIGRET ret = PInvoke.CM_Disable_DevNode(_instanceHandle, PInvoke.CM_DISABLE_UI_NOT_OK);
+
+        if (ret != CONFIGRET.CR_SUCCESS)
+        {
+            throw new ConfigManagerException("Disabling node failed.", ret);
+        }
+    }
+
+    /// <summary>
+    ///     Enables this device instance node.
+    /// </summary>
+    /// <exception cref="ConfigManagerException"></exception>
+    public void Enable()
+    {
+        CONFIGRET ret = PInvoke.CM_Enable_DevNode(_instanceHandle, 0);
+
+        if (ret != CONFIGRET.CR_SUCCESS)
+        {
+            throw new ConfigManagerException("Enabling node failed.", ret);
+        }
     }
 
     /// <inheritdoc />
