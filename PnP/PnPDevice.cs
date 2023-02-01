@@ -190,7 +190,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
     ///     force-closed.
     /// </summary>
-    /// <exception cref="ConfigManagerException"></exception>
+    [Obsolete("This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects.")]
     public unsafe void Restart()
     {
         CONFIGRET ret = PInvoke.CM_Query_And_Remove_SubTree(
