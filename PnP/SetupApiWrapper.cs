@@ -13,7 +13,9 @@ internal static class SetupApiWrapper
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal struct SP_DEVINFO_DATA
     {
+#pragma warning disable IDE1006
         internal int cbSize;
+#pragma warning restore IDE1006
         internal readonly Guid ClassGuid;
         internal readonly uint DevInst;
         internal readonly IntPtr Reserved;
@@ -23,7 +25,9 @@ internal static class SetupApiWrapper
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal struct SP_CLASSINSTALL_HEADER
     {
+#pragma warning disable IDE1006
         internal int cbSize;
+#pragma warning restore IDE1006
         internal int InstallFunction;
     }
 
