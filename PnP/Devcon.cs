@@ -140,7 +140,6 @@ public static class Devcon
     public static unsafe bool FindByInterfaceGuid(Guid target, out string path, out string instanceId, int instance = 0,
         bool presentOnly = true)
     {
-        IntPtr detailDataBuffer = IntPtr.Zero;
         IntPtr deviceInfoSet = IntPtr.Zero;
 
         try
@@ -172,7 +171,7 @@ public static class Devcon
                     ref da
                 );
                 {
-                    detailDataBuffer = Marshal.AllocHGlobal(bufferSize);
+                    IntPtr detailDataBuffer = Marshal.AllocHGlobal(bufferSize);
 
                     Marshal.WriteInt32(detailDataBuffer,
                         IntPtr.Size == 4 ? 4 + Marshal.SystemDefaultCharSize : 8);
