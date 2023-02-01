@@ -87,3 +87,5 @@ PnPDevice device = PnPDevice.GetDeviceByInterfaceId(path);
 - [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
 - [C#/Win32 P/Invoke Source Generator](https://github.com/microsoft/CsWin32)
 - [Tooling to generate metadata for Win32 APIs in the Windows SDK.](https://github.com/microsoft/win32metadata)
+- [Disable or Enable Device with Hardware ID](https://gist.github.com/3735943886/f47c355738e3dd7975fe0aa1abd67445)
+- [Manage Windows devices in .NET, can enumerate, start, stop, disable, enable, and remove devices](https://gist.github.com/jborean93/01ba060ac9043a7b997d396de7aa009e)
