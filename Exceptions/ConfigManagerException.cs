@@ -8,6 +8,7 @@ namespace Nefarius.Utilities.DeviceManagement.Exceptions;
 ///     A Configuration Manager API has failed.
 /// </summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
 public class ConfigManagerException : Exception
 {
     internal ConfigManagerException(string message) : base(message)
