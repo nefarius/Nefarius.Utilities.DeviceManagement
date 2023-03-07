@@ -1,0 +1,32 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Copyright information -->
+    <Authors>Benjamin Höglinger-Stelzer</Authors>
+    <Copyright>Copyright © Benjamin Höglinger-Stelzer 2022-2023</Copyright>
+
+    <!-- Package Icon -->
+    <PackageIcon>NSS-128x128.png</PackageIcon>
+    <PackageIconUrl />
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Common solution settings -->
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <LangVersion>latest</LangVersion>
+
+    <!-- Docs and symbols generation -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="assets\NSS-128x128.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>
