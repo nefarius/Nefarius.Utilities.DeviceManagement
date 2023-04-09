@@ -10,6 +10,11 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 public static class DeviceClassIds
 {
     /// <summary>
+    ///     System devices.
+    /// </summary>
+    public static Guid System => Guid.Parse("{4d36e97d-e325-11ce-bfc1-08002be10318}");
+    
+    /// <summary>
     ///     USB devices.
     /// </summary>
     public static Guid Usb => Guid.Parse("{36FC9E60-C465-11CF-8056-444553540000}");
