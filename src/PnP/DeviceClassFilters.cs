@@ -34,10 +34,11 @@ public sealed class DeviceClassFilters
     /// <param name="classGuid">The device class GUID to modify.</param>
     /// <param name="service">The driver service name to add.</param>
     /// <remarks>
-    ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will
-    ///     not get added again.
+    ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will not
+    ///     get added again. Throws a <see cref="DriverServiceNotFoundException" /> if the provided service doesn't exist.
     /// </remarks>
     /// <exception cref="Win32Exception" />
+    /// <exception cref="DriverServiceNotFoundException" />
     public static void AddUpper(Guid classGuid, string service)
     {
         AddFiltersEntry(classGuid, UpperFilters, service);
@@ -86,10 +87,11 @@ public sealed class DeviceClassFilters
     /// <param name="classGuid">The device class GUID to modify.</param>
     /// <param name="service">The driver service name to add.</param>
     /// <remarks>
-    ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will
-    ///     not get added again.
+    ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will not
+    ///     get added again. Throws a <see cref="DriverServiceNotFoundException" /> if the provided service doesn't exist.
     /// </remarks>
     /// <exception cref="Win32Exception" />
+    /// <exception cref="DriverServiceNotFoundException" />
     public static void AddLower(Guid classGuid, string service)
     {
         AddFiltersEntry(classGuid, LowerFilters, service);
