@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -89,10 +90,8 @@ public class DevicePropertyKeyGenerator : ISourceGenerator
                     {
                         typeName = "DEVPROP_TYPE_BOOLEAN";
                     }
-
-                    FieldInfo nativeType =
-                        typeof(PInvoke).GetField(typeName, BindingFlags.Static | BindingFlags.NonPublic);
-                    DEVPROPTYPE nativeTypeValue = (DEVPROPTYPE)nativeType.GetValue(null);
+                    
+                    DEVPROPTYPE nativeTypeValue = (DEVPROPTYPE)Enum.Parse(typeof(DEVPROPTYPE), typeName);
 
                     // unsupported type hit
                     if (!NativeToManagedTypeMap.ContainsKey(nativeTypeValue))
@@ -146,6 +145,6 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 }
 ");
 
-        context.AddSource("DevicePropertyKeysGenerated", SourceText.From(sb.ToString(), Encoding.UTF8));
+        context.AddSource("DevicePropertyKeysGenerated.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
     }
 }
