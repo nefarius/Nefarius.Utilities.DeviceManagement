@@ -2,6 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
+using Windows.Win32;
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
@@ -38,12 +40,9 @@ public static class DeviceInterfaceIds
         get
         {
             // GUID_DEVINTERFACE_HID exists but this is considered best practice
-            HidD_GetHidGuid(out Guid guid);
+            PInvoke.HidD_GetHidGuid(out Guid guid);
 
             return guid;
         }
     }
-
-    [DllImport("hid.dll", EntryPoint = "HidD_GetHidGuid", SetLastError = true)]
-    private static extern void HidD_GetHidGuid(out Guid guid);
 }
