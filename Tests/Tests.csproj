@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Nefarius.Utilities.DeviceManagement.csproj" />
+    <ProjectReference Include="..\src\Nefarius.Utilities.DeviceManagement.csproj" />
   </ItemGroup>
 
 </Project>

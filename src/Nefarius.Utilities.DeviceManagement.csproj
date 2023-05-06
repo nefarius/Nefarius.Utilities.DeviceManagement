@@ -10,8 +10,6 @@
     <Description>Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.</Description>
   </PropertyGroup>
 
-  <Import Project="CommonProjectProperties.targets" />
-
   <ItemGroup>
     <Compile Remove="Generator\**" />
     <Compile Remove="Tests\**" />
