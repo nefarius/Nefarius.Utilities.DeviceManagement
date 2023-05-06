@@ -80,6 +80,7 @@ LoadLibrary
 MAX_PATH
 PostMessage
 REG_SAM_FLAGS
+RegQueryValueExW
 RegisterClassEx
 RegisterDeviceNotification
 SetupDiOpenClassRegKey
