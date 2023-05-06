@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public sealed class DeviceClassFilters
 {
+    private const string UpperFilters = "UpperFilters";
+    private const string LowerFilters = "LowerFilters";
     internal DeviceClassFilters() { }
 
     /// <summary>
@@ -27,10 +30,14 @@ public sealed class DeviceClassFilters
     /// </summary>
     /// <param name="classGuid">The device class GUID to modify.</param>
     /// <param name="service">The driver service name to add.</param>
-    /// <remarks>If the provided service entry already exists, it will not get added again.</remarks>
+    /// <remarks>
+    ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will
+    ///     not get added again.
+    /// </remarks>
+    /// <exception cref="Win32Exception"/>
     public static void AddUpper(Guid classGuid, string service)
     {
-        AddFiltersEntry(classGuid, "UpperFilters", service);
+        AddFiltersEntry(classGuid, UpperFilters, service);
     }
 
     /// <summary>
@@ -42,9 +49,32 @@ public sealed class DeviceClassFilters
     ///     If the provided service entry doesn't exist or the entire filter value is not present, this method does
     ///     nothing.
     /// </remarks>
+    /// <exception cref="Win32Exception"/>
     public static void RemoveUpper(Guid classGuid, string service)
     {
-        RemoveFiltersEntry(classGuid, "UpperFilters", service);
+        RemoveFiltersEntry(classGuid, UpperFilters, service);
+    }
+
+    /// <summary>
+    ///     Returns the list of device class upper filter services configured, or null of the value doesn't exist at all.
+    /// </summary>
+    /// <param name="classGuid">The device class GUID to query.</param>
+    /// <returns>A list of service names or null.</returns>
+    /// <exception cref="Win32Exception"/>
+    public static IEnumerable<string>? GetUpper(Guid classGuid)
+    {
+        return GetFiltersEntry(classGuid, UpperFilters);
+    }
+
+    /// <summary>
+    ///     Deletes the entire upper filters value for the provided device class.
+    /// </summary>
+    /// <param name="classGuid">The device class GUID to delete the value for.</param>
+    /// <remarks>If the value doesn't exist, this method does nothing.</remarks>
+    /// <exception cref="Win32Exception"/>
+    public static void DeleteUpper(Guid classGuid)
+    {
+        DeleteFiltersEntry(classGuid, UpperFilters);
     }
 
     /// <summary>
@@ -52,10 +82,14 @@ public sealed class DeviceClassFilters
     /// </summary>
     /// <param name="classGuid">The device class GUID to modify.</param>
     /// <param name="service">The driver service name to add.</param>
-    /// <remarks>If the provided service entry already exists, it will not get added again.</remarks>
+    /// <remarks>
+    ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will
+    ///     not get added again.
+    /// </remarks>
+    /// <exception cref="Win32Exception"/>
     public static void AddLower(Guid classGuid, string service)
     {
-        AddFiltersEntry(classGuid, "LowerFilters", service);
+        AddFiltersEntry(classGuid, LowerFilters, service);
     }
 
     /// <summary>
@@ -67,9 +101,32 @@ public sealed class DeviceClassFilters
     ///     If the provided service entry doesn't exist or the entire filter value is not present, this method does
     ///     nothing.
     /// </remarks>
+    /// <exception cref="Win32Exception"/>
     public static void RemoveLower(Guid classGuid, string service)
     {
-        RemoveFiltersEntry(classGuid, "LowerFilters", service);
+        RemoveFiltersEntry(classGuid, LowerFilters, service);
+    }
+
+    /// <summary>
+    ///     Returns the list of device class lower filter services configured, or null of the value doesn't exist at all.
+    /// </summary>
+    /// <param name="classGuid">The device class GUID to query.</param>
+    /// <returns>A list of service names or null.</returns>
+    /// <exception cref="Win32Exception"/>
+    public static IEnumerable<string>? GetLower(Guid classGuid)
+    {
+        return GetFiltersEntry(classGuid, LowerFilters);
+    }
+
+    /// <summary>
+    ///     Deletes the entire lower filters value for the provided device class.
+    /// </summary>
+    /// <param name="classGuid">The device class GUID to delete the value for.</param>
+    /// <remarks>If the value doesn't exist, this method does nothing.</remarks>
+    /// <exception cref="Win32Exception"/>
+    public static void DeleteLower(Guid classGuid)
+    {
+        DeleteFiltersEntry(classGuid, LowerFilters);
     }
 
     private static unsafe void AddFiltersEntry(Guid classGuid, string filter, string service)
@@ -232,6 +289,75 @@ public sealed class DeviceClassFilters
 
         // nothing to do for us then
         if (status == WIN32_ERROR.ERROR_FILE_NOT_FOUND)
+        {
+            return;
+        }
+
+        throw new Win32Exception("Unexpected failure", (int)status);
+    }
+
+    private static unsafe IEnumerable<string>? GetFiltersEntry(Guid classGuid, string filter)
+    {
+        using SafeRegistryHandle key = PInvoke.SetupDiOpenClassRegKey(classGuid, (uint)REG_SAM_FLAGS.KEY_READ);
+
+        if (key.IsInvalid)
+        {
+            throw new Win32Exception("Failed to open class registry key");
+        }
+
+        REG_VALUE_TYPE type;
+        uint sizeRequired = 0;
+
+        WIN32_ERROR status = PInvoke.RegQueryValueEx(
+            key,
+            filter,
+            &type,
+            null,
+            &sizeRequired
+        );
+
+        switch (status)
+        {
+            // value exists
+            case WIN32_ERROR.ERROR_SUCCESS:
+                {
+                    byte* buffer = stackalloc byte[(int)sizeRequired];
+
+                    status = PInvoke.RegQueryValueEx(
+                        key,
+                        filter,
+                        &type,
+                        buffer,
+                        &sizeRequired
+                    );
+
+                    if (status != WIN32_ERROR.ERROR_SUCCESS)
+                    {
+                        throw new Win32Exception("Failed to query value");
+                    }
+
+                    return ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired);
+                }
+            case WIN32_ERROR.ERROR_FILE_NOT_FOUND:
+                return null;
+            default:
+                throw new Win32Exception("Unexpected failure", (int)status);
+        }
+    }
+
+    private static void DeleteFiltersEntry(Guid classGuid, string filter)
+    {
+        using SafeRegistryHandle key = PInvoke.SetupDiOpenClassRegKey(classGuid, (uint)REG_SAM_FLAGS.KEY_ALL_ACCESS);
+
+        if (key.IsInvalid)
+        {
+            throw new Win32Exception("Failed to open class registry key");
+        }
+
+        var status = PInvoke.RegDeleteValue(key, filter);
+
+        // success 
+        if (status is WIN32_ERROR.ERROR_SUCCESS or WIN32_ERROR.ERROR_FILE_NOT_FOUND)
         {
             return;
         }

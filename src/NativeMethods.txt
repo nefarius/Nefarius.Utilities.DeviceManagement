@@ -55,6 +55,7 @@ MAX_PATH
 PostMessage
 REGISTER_NOTIFICATION_FLAGS
 REG_SAM_FLAGS
+RegDeleteValueW
 RegQueryValueExW
 RegSetValueExW
 RegisterClassEx
