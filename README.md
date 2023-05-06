@@ -6,6 +6,13 @@
 
 Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.
 
+## Features
+
+- Listen for device plugin and unplug events **without depending on WinForms or WPF**
+- Enumerate devices (present and absent)
+- Convert various notations (Symlink to Instance ID etc.)
+- Enumerate and remove elements form the Driver Store
+
 ## Documentation
 
 [Link to API docs](docs/index.md).
