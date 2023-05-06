@@ -275,7 +275,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
     }
-    
+
     /// <summary>
     ///     Disables this device instance node.
     /// </summary>

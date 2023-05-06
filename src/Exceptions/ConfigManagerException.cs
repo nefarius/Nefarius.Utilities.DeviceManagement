@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 
 namespace Nefarius.Utilities.DeviceManagement.Exceptions;

@@ -79,8 +79,10 @@ IOCTL_USB_HUB_CYCLE_PORT
 LoadLibrary
 MAX_PATH
 PostMessage
+REG_SAM_FLAGS
 RegisterClassEx
 RegisterDeviceNotification
+SetupDiOpenClassRegKey
 SPDRP_HARDWAREID
 SUOI_FORCEDELETE
 TranslateMessage

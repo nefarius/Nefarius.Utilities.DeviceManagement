@@ -24,10 +24,10 @@ public static class PnPDeviceExtensions
     }
 
     /// <summary>
-    ///     Fetches meta data about the currently active driver of the <see cref="PnPDevice"/>.
+    ///     Fetches meta data about the currently active driver of the <see cref="PnPDevice" />.
     /// </summary>
     /// <param name="device">The <see cref="PnPDevice" /> to fetch driver info for.</param>
-    /// <returns>The <see cref="DriverMeta"/> instance.</returns>
+    /// <returns>The <see cref="DriverMeta" /> instance.</returns>
     /// <exception cref="InvalidOperationException">Thrown if registry access failed.</exception>
     public static DriverMeta GetCurrentDriver(this PnPDevice device)
     {
@@ -43,7 +43,8 @@ public static class PnPDeviceExtensions
 
         return new DriverMeta
         {
-            DriverDate = DateTime.ParseExact(key.GetValue("DriverDate") as string, "M-d-yyyy", CultureInfo.InvariantCulture),
+            DriverDate =
+                DateTime.ParseExact(key.GetValue("DriverDate") as string, "M-d-yyyy", CultureInfo.InvariantCulture),
             DriverDescription = key.GetValue("DriverDesc") as string,
             DriverVersion = Version.Parse((key.GetValue("DriverVersion") as string)!),
             InfPath = key.GetValue("InfPath") as string,
