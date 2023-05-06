@@ -90,7 +90,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         public Guid InterfaceGuid { get; set; }
         public Thread Thread { get; set; }
         public HWND WindowHandle { get; set; }
-        public void* NotificationHandle { get; set; }
+        public HDEVNOTIFY NotificationHandle { get; set; }
     }
 
     private class DeviceEventRegistration
@@ -112,7 +112,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             _arrivedRegistrations.Add(new DeviceEventRegistration
             {
-                Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
+                Handler = handler,
+                InterfaceGuid = interfaceGuid ?? Guid.Empty
             });
         }
     }
@@ -143,7 +144,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             _removedRegistrations.Add(new DeviceEventRegistration
             {
-                Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
+                Handler = handler,
+                InterfaceGuid = interfaceGuid ?? Guid.Empty
             });
         }
     }
@@ -186,7 +188,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
                         DeviceEventArgs arrivedEvent = new DeviceEventArgs
                         {
-                            InterfaceGuid = interfaceGuid, SymLink = deviceInterface.dbcc_name
+                            InterfaceGuid = interfaceGuid,
+                            SymLink = deviceInterface.dbcc_name
                         };
 
                         FireDeviceArrived(arrivedEvent);
@@ -205,7 +208,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
                         DeviceEventArgs removedEvent = new DeviceEventArgs
                         {
-                            InterfaceGuid = interfaceGuid, SymLink = deviceInterface.dbcc_name
+                            InterfaceGuid = interfaceGuid,
+                            SymLink = deviceInterface.dbcc_name
                         };
 
                         FireDeviceRemoved(removedEvent);
@@ -279,7 +283,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
             style = WNDCLASS_STYLES.CS_HREDRAW | WNDCLASS_STYLES.CS_VREDRAW,
             cbClsExtra = 0,
             cbWndExtra = 0,
-            hInstance = (HINSTANCE)hInst.DangerousGetHandle(),
+            hInstance = (HMODULE)hInst.DangerousGetHandle(),
             lpfnWndProc = (wnd, msg, wParam, lParam) =>
                 WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam)
         };
@@ -299,7 +303,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 0, 0, 0, 0,
                 HWND.Null,
                 HMENU.Null,
-                new HINSTANCE(hInst.DangerousGetHandle())
+                new HMODULE(hInst.DangerousGetHandle())
             );
         }
 
@@ -379,15 +383,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             Marshal.StructureToPtr(dbcc, notificationFilter, true);
 
-            void* notificationHandle = PInvoke.RegisterDeviceNotification(
+            HDEVNOTIFY notificationHandle = PInvoke.RegisterDeviceNotification(
                 windowHandle,
                 notificationFilter.ToPointer(),
-                POWER_SETTING_REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
+                REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
             );
-            if (notificationHandle == null)
-            {
-                throw new Win32Exception("Failed to register device notifications.");
-            }
 
             listenerItem.NotificationHandle = notificationHandle;
         }
@@ -397,12 +397,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private unsafe void UnregisterUsbDeviceNotification(void* notificationHandle)
+    private void UnregisterUsbDeviceNotification(HDEVNOTIFY notificationHandle)
     {
-        if (notificationHandle != null)
-        {
-            PInvoke.UnregisterDeviceNotification(notificationHandle);
-        }
+        PInvoke.UnregisterDeviceNotification(notificationHandle);
     }
 
     #endregion

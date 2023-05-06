@@ -117,7 +117,7 @@ public class UsbPnPDevice : PnPDevice
 
                 using SafeFileHandle hubHandle = PInvoke.CreateFile(
                     hubPath,
-                    FILE_ACCESS_FLAGS.FILE_GENERIC_READ | FILE_ACCESS_FLAGS.FILE_GENERIC_WRITE,
+                    (uint)(FILE_ACCESS_RIGHTS.FILE_GENERIC_READ | FILE_ACCESS_RIGHTS.FILE_GENERIC_WRITE),
                     FILE_SHARE_MODE.FILE_SHARE_READ | FILE_SHARE_MODE.FILE_SHARE_WRITE,
                     null,
                     FILE_CREATION_DISPOSITION.OPEN_EXISTING,

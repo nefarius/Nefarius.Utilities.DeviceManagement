@@ -41,6 +41,7 @@ DI_REMOVEDEVICE_GLOBAL
 DefWindowProc
 DeviceIoControl
 DispatchMessage
+FILE_ACCESS_RIGHTS
 GUID_DEVINTERFACE_USB_HUB
 GetMessage
 GetModuleHandle
@@ -52,13 +53,14 @@ IOCTL_USB_HUB_CYCLE_PORT
 LoadLibrary
 MAX_PATH
 PostMessage
+REGISTER_NOTIFICATION_FLAGS
 REG_SAM_FLAGS
 RegQueryValueExW
 RegisterClassEx
 RegisterDeviceNotification
-SetupDiOpenClassRegKey
 SPDRP_HARDWAREID
 SUOI_FORCEDELETE
+SetupDiOpenClassRegKey
 TranslateMessage
 UnregisterDeviceNotification
 UpdateDriverForPlugAndPlayDevices

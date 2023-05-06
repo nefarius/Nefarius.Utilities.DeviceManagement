@@ -67,7 +67,7 @@ public partial class PnPDevice
         {
             CONFIGRET ret = GetProperty(
                 propertyKey.ToCsWin32Type(),
-                out uint propertyType,
+                out DEVPROPTYPE propertyType,
                 out buffer,
                 out uint size
             );
@@ -88,7 +88,7 @@ public partial class PnPDevice
                 throw new ConfigManagerException("Failed to get property.", ret);
             }
 
-            if (!NativeToManagedTypeMap.TryGetValue((DEVPROPTYPE)propertyType, out Type managedType))
+            if (!NativeToManagedTypeMap.TryGetValue(propertyType, out Type managedType))
             {
                 throw new ArgumentException(
                     "Unknown property type.",
@@ -194,7 +194,7 @@ public partial class PnPDevice
 
         DEVPROPKEY nativePropKey = propertyKey.ToCsWin32Type();
 
-        uint nativePropType = (uint)NativeToManagedTypeMap.FirstOrDefault(t => t.Value == managedType).Key;
+        DEVPROPTYPE nativePropType = NativeToManagedTypeMap.FirstOrDefault(t => t.Value == managedType).Key;
 
         uint propBufSize = 0;
 
@@ -296,7 +296,7 @@ public partial class PnPDevice
 
     private unsafe CONFIGRET GetProperty(
         DEVPROPKEY propertyKey,
-        out uint propertyType,
+        out DEVPROPTYPE propertyType,
         out IntPtr valueBuffer,
         out uint valueBufferSize
     )
