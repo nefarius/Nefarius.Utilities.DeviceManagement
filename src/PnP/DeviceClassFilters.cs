@@ -3,9 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.Security;
+using Windows.Win32.Storage.FileSystem;
 using Windows.Win32.System.Registry;
 
 using Microsoft.Win32.SafeHandles;
@@ -34,7 +37,7 @@ public sealed class DeviceClassFilters
     ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will
     ///     not get added again.
     /// </remarks>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static void AddUpper(Guid classGuid, string service)
     {
         AddFiltersEntry(classGuid, UpperFilters, service);
@@ -49,7 +52,7 @@ public sealed class DeviceClassFilters
     ///     If the provided service entry doesn't exist or the entire filter value is not present, this method does
     ///     nothing.
     /// </remarks>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static void RemoveUpper(Guid classGuid, string service)
     {
         RemoveFiltersEntry(classGuid, UpperFilters, service);
@@ -60,7 +63,7 @@ public sealed class DeviceClassFilters
     /// </summary>
     /// <param name="classGuid">The device class GUID to query.</param>
     /// <returns>A list of service names or null.</returns>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static IEnumerable<string>? GetUpper(Guid classGuid)
     {
         return GetFiltersEntry(classGuid, UpperFilters);
@@ -71,7 +74,7 @@ public sealed class DeviceClassFilters
     /// </summary>
     /// <param name="classGuid">The device class GUID to delete the value for.</param>
     /// <remarks>If the value doesn't exist, this method does nothing.</remarks>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static void DeleteUpper(Guid classGuid)
     {
         DeleteFiltersEntry(classGuid, UpperFilters);
@@ -86,7 +89,7 @@ public sealed class DeviceClassFilters
     ///     If the filters value doesn't exist, it will get created. If the provided service entry already exists, it will
     ///     not get added again.
     /// </remarks>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static void AddLower(Guid classGuid, string service)
     {
         AddFiltersEntry(classGuid, LowerFilters, service);
@@ -101,7 +104,7 @@ public sealed class DeviceClassFilters
     ///     If the provided service entry doesn't exist or the entire filter value is not present, this method does
     ///     nothing.
     /// </remarks>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static void RemoveLower(Guid classGuid, string service)
     {
         RemoveFiltersEntry(classGuid, LowerFilters, service);
@@ -112,7 +115,7 @@ public sealed class DeviceClassFilters
     /// </summary>
     /// <param name="classGuid">The device class GUID to query.</param>
     /// <returns>A list of service names or null.</returns>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static IEnumerable<string>? GetLower(Guid classGuid)
     {
         return GetFiltersEntry(classGuid, LowerFilters);
@@ -123,7 +126,7 @@ public sealed class DeviceClassFilters
     /// </summary>
     /// <param name="classGuid">The device class GUID to delete the value for.</param>
     /// <remarks>If the value doesn't exist, this method does nothing.</remarks>
-    /// <exception cref="Win32Exception"/>
+    /// <exception cref="Win32Exception" />
     public static void DeleteLower(Guid classGuid)
     {
         DeleteFiltersEntry(classGuid, LowerFilters);
@@ -131,6 +134,37 @@ public sealed class DeviceClassFilters
 
     private static unsafe void AddFiltersEntry(Guid classGuid, string filter, string service)
     {
+        const uint serviceFlags = (uint)FILE_ACCESS_RIGHTS.STANDARD_RIGHTS_REQUIRED | PInvoke.SC_MANAGER_CONNECT |
+                                  PInvoke.SC_MANAGER_ENUMERATE_SERVICE;
+
+        SC_HANDLE serviceManager = PInvoke.OpenSCManager(null, "ServicesActive", serviceFlags);
+
+        if (serviceManager.Value == 0)
+        {
+            throw new Win32Exception("Failed to open service controller");
+        }
+
+        SC_HANDLE serviceHandle =
+            PInvoke.OpenService(serviceManager, service, serviceFlags);
+
+        if (serviceHandle.Value == 0)
+        {
+            WIN32_ERROR error = (WIN32_ERROR)Marshal.GetLastWin32Error();
+
+            PInvoke.CloseServiceHandle(serviceManager);
+
+            if (error == WIN32_ERROR.ERROR_SERVICE_DOES_NOT_EXIST)
+            {
+                throw new DriverServiceNotFoundException($"{service} is not a valid service on this machine",
+                    (int)error);
+            }
+
+            throw new Win32Exception("Failed to open service handle");
+        }
+
+        PInvoke.CloseServiceHandle(serviceManager);
+        PInvoke.CloseServiceHandle(serviceHandle);
+
         using SafeRegistryHandle key = PInvoke.SetupDiOpenClassRegKey(classGuid, (uint)REG_SAM_FLAGS.KEY_ALL_ACCESS);
 
         if (key.IsInvalid)
@@ -354,7 +388,7 @@ public sealed class DeviceClassFilters
             throw new Win32Exception("Failed to open class registry key");
         }
 
-        var status = PInvoke.RegDeleteValue(key, filter);
+        WIN32_ERROR status = PInvoke.RegDeleteValue(key, filter);
 
         // success 
         if (status is WIN32_ERROR.ERROR_SUCCESS or WIN32_ERROR.ERROR_FILE_NOT_FOUND)
