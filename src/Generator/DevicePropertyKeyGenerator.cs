@@ -17,34 +17,34 @@ namespace DeviceManagementPropertiesGenerator;
 [Generator]
 public class DevicePropertyKeyGenerator : ISourceGenerator
 {
-    private static readonly IDictionary<uint, Type> NativeToManagedTypeMap =
-        new Dictionary<uint, Type>
+    private static readonly IDictionary<DEVPROPTYPE, Type> NativeToManagedTypeMap =
+        new Dictionary<DEVPROPTYPE, Type>
         {
-            { PInvoke.DEVPROP_TYPE_SBYTE, typeof(sbyte) },
-            { PInvoke.DEVPROP_TYPE_BYTE, typeof(byte) },
-            { PInvoke.DEVPROP_TYPE_INT16, typeof(short) },
-            { PInvoke.DEVPROP_TYPE_UINT16, typeof(ushort) },
-            { PInvoke.DEVPROP_TYPE_INT32, typeof(int) },
-            { PInvoke.DEVPROP_TYPE_UINT32, typeof(uint) },
-            { PInvoke.DEVPROP_TYPE_INT64, typeof(long) },
-            { PInvoke.DEVPROP_TYPE_UINT64, typeof(ulong) },
-            { PInvoke.DEVPROP_TYPE_FLOAT, typeof(float) },
-            { PInvoke.DEVPROP_TYPE_DOUBLE, typeof(double) },
-            { PInvoke.DEVPROP_TYPE_DECIMAL, typeof(decimal) },
-            { PInvoke.DEVPROP_TYPE_GUID, typeof(Guid) },
+            { DEVPROPTYPE.DEVPROP_TYPE_SBYTE, typeof(sbyte) },
+            { DEVPROPTYPE.DEVPROP_TYPE_BYTE, typeof(byte) },
+            { DEVPROPTYPE.DEVPROP_TYPE_INT16, typeof(short) },
+            { DEVPROPTYPE.DEVPROP_TYPE_UINT16, typeof(ushort) },
+            { DEVPROPTYPE.DEVPROP_TYPE_INT32, typeof(int) },
+            { DEVPROPTYPE.DEVPROP_TYPE_UINT32, typeof(uint) },
+            { DEVPROPTYPE.DEVPROP_TYPE_INT64, typeof(long) },
+            { DEVPROPTYPE.DEVPROP_TYPE_UINT64, typeof(ulong) },
+            { DEVPROPTYPE.DEVPROP_TYPE_FLOAT, typeof(float) },
+            { DEVPROPTYPE.DEVPROP_TYPE_DOUBLE, typeof(double) },
+            { DEVPROPTYPE.DEVPROP_TYPE_DECIMAL, typeof(decimal) },
+            { DEVPROPTYPE.DEVPROP_TYPE_GUID, typeof(Guid) },
             // DEVPROP_TYPE_CURRENCY
-            { PInvoke.DEVPROP_TYPE_DATE, typeof(DateTime) },
-            { PInvoke.DEVPROP_TYPE_FILETIME, typeof(DateTimeOffset) },
-            { PInvoke.DEVPROP_TYPE_BOOLEAN, typeof(bool) },
-            { PInvoke.DEVPROP_TYPE_STRING, typeof(string) },
-            { PInvoke.DEVPROP_TYPE_STRING | PInvoke.DEVPROP_TYPEMOD_LIST, typeof(string[]) },
+            { DEVPROPTYPE.DEVPROP_TYPE_DATE, typeof(DateTime) },
+            { DEVPROPTYPE.DEVPROP_TYPE_FILETIME, typeof(DateTimeOffset) },
+            { DEVPROPTYPE.DEVPROP_TYPE_BOOLEAN, typeof(bool) },
+            { DEVPROPTYPE.DEVPROP_TYPE_STRING, typeof(string) },
+            { DEVPROPTYPE.DEVPROP_TYPE_STRING_LIST, typeof(string[]) },
             // DEVPROP_TYPE_SECURITY_DESCRIPTOR
             // DEVPROP_TYPE_SECURITY_DESCRIPTOR_STRING
-            { PInvoke.DEVPROP_TYPE_DEVPROPKEY, typeof(DEVPROPKEY) },
-            { PInvoke.DEVPROP_TYPE_DEVPROPTYPE, typeof(uint) },
-            { PInvoke.DEVPROP_TYPE_BYTE | PInvoke.DEVPROP_TYPEMOD_ARRAY, typeof(byte[]) },
-            { PInvoke.DEVPROP_TYPE_ERROR, typeof(int) },
-            { PInvoke.DEVPROP_TYPE_NTSTATUS, typeof(int) }
+            { DEVPROPTYPE.DEVPROP_TYPE_DEVPROPKEY, typeof(DEVPROPKEY) },
+            { DEVPROPTYPE.DEVPROP_TYPE_DEVPROPTYPE, typeof(uint) },
+            { DEVPROPTYPE.DEVPROP_TYPE_BINARY, typeof(byte[]) },
+            { DEVPROPTYPE.DEVPROP_TYPE_ERROR, typeof(int) },
+            { DEVPROPTYPE.DEVPROP_TYPE_NTSTATUS, typeof(int) }
             // DEVPROP_TYPE_STRING_INDIRECT
         };
 
@@ -92,7 +92,7 @@ public class DevicePropertyKeyGenerator : ISourceGenerator
 
                     FieldInfo nativeType =
                         typeof(PInvoke).GetField(typeName, BindingFlags.Static | BindingFlags.NonPublic);
-                    uint nativeTypeValue = (uint)nativeType.GetValue(null);
+                    DEVPROPTYPE nativeTypeValue = (DEVPROPTYPE)nativeType.GetValue(null);
 
                     // unsupported type hit
                     if (!NativeToManagedTypeMap.ContainsKey(nativeTypeValue))

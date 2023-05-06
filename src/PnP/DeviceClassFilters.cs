@@ -7,6 +7,7 @@ using Windows.Win32.System.Registry;
 using Microsoft.Win32.SafeHandles;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
@@ -25,12 +26,11 @@ public sealed class DeviceClassFilters
 
         const string filter = "LowerFilters";
         REG_VALUE_TYPE type;
-        uint sizeRequired = 0, reserved = 0;
+        uint sizeRequired = 0;
 
         var status = PInvoke.RegQueryValueEx(
             key,
             filter,
-            ref reserved,
             &type,
             null,
             &sizeRequired
@@ -44,7 +44,6 @@ public sealed class DeviceClassFilters
             status = PInvoke.RegQueryValueEx(
                 key,
                 filter,
-                ref reserved,
                 &type,
                 buffer,
                 &sizeRequired
@@ -54,8 +53,8 @@ public sealed class DeviceClassFilters
             {
                 throw new Win32Exception("Failed to query value");
             }
-            
-            
+
+            var elements = ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired);
         }
     }
 

@@ -8,8 +8,6 @@ using System.Threading;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.System.Power;
-using Windows.Win32.System.SystemServices;
 using Windows.Win32.UI.WindowsAndMessaging;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;

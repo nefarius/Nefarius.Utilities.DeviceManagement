@@ -1,0 +1,20 @@
+﻿using Nefarius.Utilities.DeviceManagement.PnP;
+
+namespace Tests;
+
+public class DeviceClassFilterTests
+{
+    [SetUp]
+    public void Setup()
+    {
+    }
+
+    /// <summary>
+    ///     Tests detection of device arrival and removal
+    /// </summary>
+    [Test]
+    public void TestAddUpperFilter()
+    {
+        DeviceClassFilters.AddUpper(DeviceClassIds.Usb, "test");
+    }
+}

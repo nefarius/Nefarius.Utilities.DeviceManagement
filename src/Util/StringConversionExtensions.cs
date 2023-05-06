@@ -72,22 +72,4 @@ internal static class StringConversionExtensions
         // Trims away potential redundant NULL-characters and splits at NULL-terminator
         return Encoding.Unicode.GetString(rawBuffer).TrimEnd(char.MinValue).Split(char.MinValue);
     }
-    
-    /// <summary>
-    ///     Converts a double-null-terminated multi-byte character memory block into a string array.
-    /// </summary>
-    /// <param name="buffer">The memory buffer.</param>
-    /// <param name="length">The size in bytes of the memory buffer.</param>
-    /// <returns>The extracted string array.</returns>
-    public static unsafe IEnumerable<string> MultiSzPointerToStringArray(char* buffer, int length)
-    {
-        // Temporary byte array
-        byte[] rawBuffer = new byte[length];
-
-        // Grab data from buffer
-        Marshal.Copy((IntPtr)buffer, rawBuffer, 0, length);
-
-        // Trims away potential redundant NULL-characters and splits at NULL-terminator
-        return Encoding.Unicode.GetString(rawBuffer).TrimEnd(char.MinValue).Split(char.MinValue);
-    }
 }
