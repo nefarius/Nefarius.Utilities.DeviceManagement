@@ -16,5 +16,7 @@ public class DeviceClassFilterTests
     public void TestAddUpperFilter()
     {
         DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, "HidHide");
+        
+        DeviceClassFilters.RemoveUpper(DeviceClassIds.XnaComposite, "HidHide");
     }
 }
