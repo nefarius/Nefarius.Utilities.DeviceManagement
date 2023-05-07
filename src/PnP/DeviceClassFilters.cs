@@ -372,7 +372,8 @@ public sealed class DeviceClassFilters
                         throw new Win32Exception("Failed to query value");
                     }
 
-                    return ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired);
+                    return ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired)
+                        .Where(e => !string.IsNullOrWhiteSpace(e));
                 }
             case WIN32_ERROR.ERROR_FILE_NOT_FOUND:
                 return null;

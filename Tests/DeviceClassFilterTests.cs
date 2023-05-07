@@ -21,6 +21,11 @@ public class DeviceClassFilterTests
     ///     This service must not exist!
     /// </summary>
     private const string Service02 = "HidVibe";
+    
+    /// <summary>
+    ///     Requires USBPcap to be installed to work!
+    /// </summary>
+    private const string Service03 = "USBPcap";
 
     /// <summary>
     ///     Tests for <see cref="DeviceClassFilters"/>.
@@ -46,5 +51,30 @@ public class DeviceClassFilterTests
 
         // add invalid service, has to throw exception
         Assert.Throws(typeof(DriverServiceNotFoundException), () => DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, Service02));
+
+        // add new service
+        DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, Service03);
+        // expect to get 2 services now
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite)!.Count(), Is.EqualTo(2));
+        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service01);
+        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service03);
+
+        // remove first service
+        DeviceClassFilters.RemoveUpper(DeviceClassIds.XnaComposite, Service01);
+        // expect to get one service now, excluding the removed one
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite)!.Count(), Is.EqualTo(1));
+        CollectionAssert.DoesNotContain(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service01);
+        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service03);
+
+        // remove remaining service
+        DeviceClassFilters.RemoveUpper(DeviceClassIds.XnaComposite, Service03);
+        // expect not null, but empty
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Is.Not.Null);
+        CollectionAssert.IsEmpty(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite));
+
+        // remove entirely
+        DeviceClassFilters.DeleteUpper(DeviceClassIds.XnaComposite);
+        // expect it being gone
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Is.Null);
     }
 }
