@@ -3,7 +3,9 @@ using Nefarius.Utilities.DeviceManagement.PnP;
 
 namespace Tests;
 
+#pragma warning disable CS1591
 public class DeviceClassFilterTests
+#pragma warning restore CS1591
 {
     [SetUp]
     public void Setup()
@@ -21,7 +23,7 @@ public class DeviceClassFilterTests
     private const string Service02 = "HidVibe";
 
     /// <summary>
-    ///     Tests detection of device arrival and removal
+    ///     Tests for <see cref="DeviceClassFilters"/>.
     /// </summary>
     [Test]
     public void TestAddUpperFilter()
