@@ -53,7 +53,7 @@ public Type PropertyType { get; }
 
 ### **CreateCustomDeviceProperty(Guid, UInt32, Type)**
 
-
+Creates a custom device property.
 
 ```csharp
 public static DevicePropertyKey CreateCustomDeviceProperty(Guid categoryGuid, uint propertyIdentifier, Type propertyType)
@@ -62,11 +62,15 @@ public static DevicePropertyKey CreateCustomDeviceProperty(Guid categoryGuid, ui
 #### Parameters
 
 `categoryGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+The category GUID.
 
 `propertyIdentifier` [UInt32](https://docs.microsoft.com/en-us/dotnet/api/system.uint32)<br>
+The property identifier.
 
 `propertyType` [Type](https://docs.microsoft.com/en-us/dotnet/api/system.type)<br>
+The managed type to translate from/to.
 
 #### Returns
 
 [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)<br>
+A new instance of .

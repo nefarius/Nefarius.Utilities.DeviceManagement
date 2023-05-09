@@ -29,3 +29,26 @@ The  to base this USB device on.
 
 [UsbPnPDevice](./nefarius.utilities.devicemanagement.pnp.usbpnpdevice.md)<br>
 The new .
+
+### **GetCurrentDriver(PnPDevice)**
+
+Fetches meta data about the currently active driver of the [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md).
+
+```csharp
+public static DriverMeta GetCurrentDriver(PnPDevice device)
+```
+
+#### Parameters
+
+`device` [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)<br>
+The  to fetch driver info for.
+
+#### Returns
+
+[DriverMeta](./nefarius.utilities.devicemanagement.drivers.drivermeta.md)<br>
+The  instance.
+
+#### Exceptions
+
+[InvalidOperationException](https://docs.microsoft.com/en-us/dotnet/api/system.invalidoperationexception)<br>
+Thrown if registry access failed.
