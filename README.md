@@ -17,6 +17,12 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on W
 
 [Link to API docs](docs/index.md).
 
+### Generating documentation
+
+- `dotnet build -c:Release`
+- `dotnet tool install -g XMLDoc2Markdown`
+- `xmldoc2md .\bin\netstandard2.0\Nefarius.Utilities.DeviceManagement.dll .\docs\`
+
 ## Examples
 
 Some usage examples of the core library features are presented below.
