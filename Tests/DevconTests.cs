@@ -31,6 +31,9 @@ public class DevconTests
         Assert.False(Devcon.FindInDeviceClassByHardwareId(Guid.Empty, hardwareId));
     }
 
+    /// <summary>
+    ///     Requires two Xbox controllers, either 360 or One or mixed, connected for this test to work.
+    /// </summary>
     [Test]
     public void TestFindByInterfaceGuid()
     {

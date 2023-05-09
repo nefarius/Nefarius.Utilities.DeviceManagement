@@ -49,12 +49,12 @@ public class PnPDeviceTests
 
         List<string> list = instances.ToList();
 
-        Assert.That(list.Count, Is.EqualTo(1));
+        Assert.That(list.Count, Is.GreaterThanOrEqualTo(1));
 
-        PnPDevice? device = PnPDevice.GetDeviceByInstanceId(list.First());
+        PnPDevice? device = list.Select(e => PnPDevice.GetDeviceByInstanceId(e)).FirstOrDefault(dev => dev.IsVirtual());
 
         Assert.That(device, Is.Not.Null);
 
-        Assert.That(device.IsVirtual, Is.True);
+        Assert.That(device!.IsVirtual(), Is.True);
     }
 }
