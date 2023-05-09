@@ -1,4 +1,5 @@
 using Nefarius.Utilities.DeviceManagement.PnP;
+#pragma warning disable CS1591
 
 namespace Tests;
 

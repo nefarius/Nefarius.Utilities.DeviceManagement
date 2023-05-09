@@ -1,6 +1,7 @@
 ﻿using Nefarius.Utilities.DeviceManagement.PnP;
 
 namespace Tests;
+#pragma warning disable CS1591
 
 public class DeviceNotificationListenerTests
 {
