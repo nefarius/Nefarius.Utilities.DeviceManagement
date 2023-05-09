@@ -27,7 +27,7 @@ public uint Port { get; }
 
 ### **InstanceId**
 
-The instance ID of the device.
+The instance ID of the device. Uniquely identifies devices of equal make and model on the same machine.
 
 ```csharp
 public string InstanceId { get; }
@@ -39,7 +39,7 @@ public string InstanceId { get; }
 
 ### **DeviceId**
 
-The device ID.
+The device ID. Typically built from the hardware ID of the same make and model of hardware.
 
 ```csharp
 public string DeviceId { get; }
@@ -58,3 +58,7 @@ Power-cycles the hub port this device is attached to, causing it to restart.
 ```csharp
 public void CyclePort()
 ```
+
+**Remarks:**
+
+Requires administrative privileges.

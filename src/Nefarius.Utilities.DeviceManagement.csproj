@@ -1,37 +1,37 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>1.0.0</Version>
-    <RepositoryUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</PackageProjectUrl>
-    <Description>Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>1.0.0</Version>
+        <RepositoryUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</PackageProjectUrl>
+        <Description>Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.</Description>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Generator\**" />
-    <Compile Remove="Tests\**" />
-    <EmbeddedResource Remove="Generator\**" />
-    <EmbeddedResource Remove="Tests\**" />
-    <None Remove="Generator\**" />
-    <None Remove="Tests\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Generator\**" />
+        <Compile Remove="Tests\**" />
+        <EmbeddedResource Remove="Generator\**" />
+        <EmbeddedResource Remove="Tests\**" />
+        <None Remove="Generator\**" />
+        <None Remove="Tests\**" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.164-beta">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.229-beta">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="Generator\DeviceManagementPropertiesGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="Generator\DeviceManagementPropertiesGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    </ItemGroup>
 
 </Project>

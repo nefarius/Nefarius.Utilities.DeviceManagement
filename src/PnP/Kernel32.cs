@@ -7,11 +7,14 @@ internal static class Kernel32
 {
     public static bool MethodExists(string libraryName, string methodName)
     {
-        var libraryPtr = PInvoke.LoadLibrary(libraryName);
+        FreeLibrarySafeHandle libraryPtr = PInvoke.LoadLibrary(libraryName);
 
-        if (libraryPtr.IsInvalid) return false;
+        if (libraryPtr.IsInvalid)
+        {
+            return false;
+        }
 
-        var procPtr = PInvoke.GetProcAddress(libraryPtr, methodName);
+        FARPROC procPtr = PInvoke.GetProcAddress(libraryPtr, methodName);
 
         return procPtr != FARPROC.Null;
     }

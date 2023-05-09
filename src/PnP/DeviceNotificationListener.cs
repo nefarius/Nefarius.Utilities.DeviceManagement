@@ -5,11 +5,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.System.Power;
-using Windows.Win32.System.SystemServices;
 using Windows.Win32.UI.WindowsAndMessaging;
+
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
@@ -50,15 +50,15 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     private static string GenerateRandomString()
     {
         // Creating object of random class
-        var rand = new Random();
+        Random rand = new Random();
 
         // Choosing the size of string
         // Using Next() string
-        var stringlen = rand.Next(4, 10);
+        int stringlen = rand.Next(4, 10);
         int randValue;
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         char letter;
-        for (var i = 0; i < stringlen; i++)
+        for (int i = 0; i < stringlen; i++)
         {
             // Generating a random number.
             randValue = rand.Next(0, 26);
@@ -90,7 +90,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         public Guid InterfaceGuid { get; set; }
         public Thread Thread { get; set; }
         public HWND WindowHandle { get; set; }
-        public void* NotificationHandle { get; set; }
+        public HDEVNOTIFY NotificationHandle { get; set; }
     }
 
     private class DeviceEventRegistration
@@ -109,11 +109,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
     {
         if (_arrivedRegistrations.All(i => i.Handler != handler))
+        {
             _arrivedRegistrations.Add(new DeviceEventRegistration
             {
                 Handler = handler,
                 InterfaceGuid = interfaceGuid ?? Guid.Empty
             });
+        }
     }
 
     /// <summary>
@@ -122,9 +124,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="handler">The event handler to unsubscribe.</param>
     public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
     {
-        foreach (var arrivedRegistration in _arrivedRegistrations.ToList())
+        foreach (DeviceEventRegistration arrivedRegistration in _arrivedRegistrations.ToList())
+        {
             if (arrivedRegistration.Handler == handler)
+            {
                 _arrivedRegistrations.Remove(arrivedRegistration);
+            }
+        }
     }
 
     /// <summary>
@@ -135,11 +141,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
     {
         if (_removedRegistrations.All(i => i.Handler != handler))
+        {
             _removedRegistrations.Add(new DeviceEventRegistration
             {
                 Handler = handler,
                 InterfaceGuid = interfaceGuid ?? Guid.Empty
             });
+        }
     }
 
     /// <summary>
@@ -148,9 +156,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="handler">The event handler to unsubscribe.</param>
     public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
     {
-        foreach (var removedRegistration in _removedRegistrations.ToList())
+        foreach (DeviceEventRegistration removedRegistration in _removedRegistrations.ToList())
+        {
             if (removedRegistration.Handler == handler)
+            {
                 _removedRegistrations.Remove(removedRegistration);
+            }
+        }
     }
 
     #endregion
@@ -170,11 +182,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
                     if (hdr.dbch_devicetype == DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE)
                     {
-                        var deviceInterface =
+                        DEV_BROADCAST_DEVICEINTERFACE deviceInterface =
                             (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                 typeof(DEV_BROADCAST_DEVICEINTERFACE));
 
-                        var arrivedEvent = new DeviceEventArgs
+                        DeviceEventArgs arrivedEvent = new DeviceEventArgs
                         {
                             InterfaceGuid = interfaceGuid,
                             SymLink = deviceInterface.dbcc_name
@@ -187,14 +199,14 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
                 case PInvoke.DBT_DEVICEREMOVECOMPLETE:
                     hdr = (DEV_BROADCAST_HDR)Marshal.PtrToStructure(lParam, typeof(DEV_BROADCAST_HDR));
-                    
+
                     if (hdr.dbch_devicetype == DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE)
                     {
-                        var deviceInterface =
+                        DEV_BROADCAST_DEVICEINTERFACE deviceInterface =
                             (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                 typeof(DEV_BROADCAST_DEVICEINTERFACE));
 
-                        var removedEvent = new DeviceEventArgs
+                        DeviceEventArgs removedEvent = new DeviceEventArgs
                         {
                             InterfaceGuid = interfaceGuid,
                             SymLink = deviceInterface.dbcc_name
@@ -214,20 +226,28 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         DeviceArrived?.Invoke(args);
 
-        foreach (var arrivedRegistration in _arrivedRegistrations)
+        foreach (DeviceEventRegistration arrivedRegistration in _arrivedRegistrations)
+        {
             if (arrivedRegistration.InterfaceGuid == args.InterfaceGuid ||
                 arrivedRegistration.InterfaceGuid == Guid.Empty)
+            {
                 arrivedRegistration.Handler(args);
+            }
+        }
     }
 
     private void FireDeviceRemoved(DeviceEventArgs args)
     {
         DeviceRemoved?.Invoke(args);
 
-        foreach (var removedRegistration in _removedRegistrations)
+        foreach (DeviceEventRegistration removedRegistration in _removedRegistrations)
+        {
             if (removedRegistration.InterfaceGuid == args.InterfaceGuid ||
                 removedRegistration.InterfaceGuid == Guid.Empty)
+            {
                 removedRegistration.Handler(args);
+            }
+        }
     }
 
     #endregion
@@ -243,12 +263,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         if (_listeners.All(i => i.InterfaceGuid != interfaceGuid))
         {
-            var listenerThread = new Thread(Start);
-            var listenerItem = new ListenerItem
-            {
-                InterfaceGuid = interfaceGuid,
-                Thread = listenerThread
-            };
+            Thread listenerThread = new Thread(Start);
+            ListenerItem listenerItem = new ListenerItem { InterfaceGuid = interfaceGuid, Thread = listenerThread };
             _listeners.Add(listenerItem);
             listenerThread.Start(listenerItem);
         }
@@ -256,18 +272,18 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
     private unsafe void Start(object parameter)
     {
-        var listenerItem = (ListenerItem)parameter;
-        var className = GenerateRandomString(); // random string to avoid conflicts
-        var windowName = GenerateRandomString();
-        using var hInst = PInvoke.GetModuleHandle((string)null);
+        ListenerItem listenerItem = (ListenerItem)parameter;
+        string className = GenerateRandomString(); // random string to avoid conflicts
+        string windowName = GenerateRandomString();
+        using FreeLibrarySafeHandle hInst = PInvoke.GetModuleHandle((string)null);
 
-        var windowClass = new WNDCLASSEXW
+        WNDCLASSEXW windowClass = new WNDCLASSEXW
         {
             cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
             style = WNDCLASS_STYLES.CS_HREDRAW | WNDCLASS_STYLES.CS_VREDRAW,
             cbClsExtra = 0,
             cbWndExtra = 0,
-            hInstance = (HINSTANCE)hInst.DangerousGetHandle(),
+            hInstance = (HMODULE)hInst.DangerousGetHandle(),
             lpfnWndProc = (wnd, msg, wParam, lParam) =>
                 WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam)
         };
@@ -287,7 +303,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 0, 0, 0, 0,
                 HWND.Null,
                 HMENU.Null,
-                new HINSTANCE(hInst.DangerousGetHandle())
+                new HMODULE(hInst.DangerousGetHandle())
             );
         }
 
@@ -303,7 +319,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         _cancellationTokenSource.Cancel();
 
-        foreach (var listenerItem in _listeners.ToList())
+        foreach (ListenerItem listenerItem in _listeners.ToList())
+        {
             if (interfaceGuid == null || listenerItem.InterfaceGuid == interfaceGuid)
             {
                 UnregisterUsbDeviceNotification(listenerItem.NotificationHandle);
@@ -311,6 +328,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 listenerItem.Thread.Join(TimeSpan.FromSeconds(3));
                 _listeners.Remove(listenerItem);
             }
+        }
     }
 
     private LRESULT WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
@@ -318,14 +336,14 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         switch (msg)
         {
             case PInvoke.WM_CREATE:
-            {
-                RegisterUsbDeviceNotification(interfaceGuid, new HANDLE(hwnd.Value));
-                break;
-            }
+                {
+                    RegisterUsbDeviceNotification(interfaceGuid, new HANDLE(hwnd.Value));
+                    break;
+                }
             case PInvoke.WM_DEVICECHANGE:
-            {
-                return WndProc(interfaceGuid, hwnd, msg, wParam, lParam);
-            }
+                {
+                    return WndProc(interfaceGuid, hwnd, msg, wParam, lParam);
+                }
         }
 
         return PInvoke.DefWindowProc(hwnd, msg, wParam, lParam);
@@ -334,8 +352,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     private void MessagePump()
     {
         int retVal;
-        while ((retVal = PInvoke.GetMessage(out var msg, HWND.Null, 0, 0)) != 0 &&
+        while ((retVal = PInvoke.GetMessage(out MSG msg, HWND.Null, 0, 0)) != 0 &&
                !_cancellationTokenSource.Token.IsCancellationRequested)
+        {
             if (retVal == -1)
             {
                 break;
@@ -345,31 +364,30 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 PInvoke.TranslateMessage(msg);
                 PInvoke.DispatchMessage(msg);
             }
+        }
     }
 
     private unsafe void RegisterUsbDeviceNotification(Guid interfaceGuid, HANDLE windowHandle)
     {
-        var listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
+        ListenerItem listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
 
-        var dbcc = new DEV_BROADCAST_DEVICEINTERFACE
+        DEV_BROADCAST_DEVICEINTERFACE dbcc = new DEV_BROADCAST_DEVICEINTERFACE
         {
             dbcc_size = (uint)Marshal.SizeOf(typeof(DEV_BROADCAST_DEVICEINTERFACE)),
             dbcc_devicetype = DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE,
             dbcc_classguid = interfaceGuid
         };
 
-        var notificationFilter = Marshal.AllocHGlobal(Marshal.SizeOf(dbcc));
+        IntPtr notificationFilter = Marshal.AllocHGlobal(Marshal.SizeOf(dbcc));
         try
         {
             Marshal.StructureToPtr(dbcc, notificationFilter, true);
 
-            var notificationHandle = PInvoke.RegisterDeviceNotification(
+            HDEVNOTIFY notificationHandle = PInvoke.RegisterDeviceNotification(
                 windowHandle,
                 notificationFilter.ToPointer(),
-                POWER_SETTING_REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
+                REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
             );
-            if (notificationHandle == null)
-                throw new Win32Exception("Failed to register device notifications.");
 
             listenerItem.NotificationHandle = notificationHandle;
         }
@@ -379,10 +397,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private unsafe void UnregisterUsbDeviceNotification(void* notificationHandle)
+    private void UnregisterUsbDeviceNotification(HDEVNOTIFY notificationHandle)
     {
-        if (notificationHandle != null)
-            PInvoke.UnregisterDeviceNotification(notificationHandle);
+        PInvoke.UnregisterDeviceNotification(notificationHandle);
     }
 
     #endregion

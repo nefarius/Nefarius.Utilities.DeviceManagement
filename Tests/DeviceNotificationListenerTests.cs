@@ -1,6 +1,7 @@
 ﻿using Nefarius.Utilities.DeviceManagement.PnP;
 
 namespace Tests;
+#pragma warning disable CS1591
 
 public class DeviceNotificationListenerTests
 {
@@ -15,16 +16,17 @@ public class DeviceNotificationListenerTests
     [Test]
     public void TestDeviceNotificationListener()
     {
-        var waitTime = TimeSpan.FromSeconds(10);
+        TimeSpan waitTime = TimeSpan.FromSeconds(10);
 
         // Requires any HID device
-        var xusbInterfaceGuid = new Guid((int)0x4D1E55B2L, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
+        Guid xusbInterfaceGuid =
+            new Guid((int)0x4D1E55B2L, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
 
-        using var listener = new DeviceNotificationListener();
+        using DeviceNotificationListener listener = new DeviceNotificationListener();
 
         listener.StartListen(xusbInterfaceGuid);
 
-        var wait = new AutoResetEvent(false);
+        AutoResetEvent wait = new AutoResetEvent(false);
 
         // Arrival
         listener.DeviceArrived += args =>
@@ -32,11 +34,12 @@ public class DeviceNotificationListenerTests
             // compare interface GUID
             Assert.That(args.InterfaceGuid, Is.EqualTo(xusbInterfaceGuid));
 
-            var device = PnPDevice.GetDeviceByInterfaceId(args.SymLink);
+            PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(args.SymLink);
 
             Assert.IsNotNull(device);
 
-            Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName), Is.EqualTo("HID").IgnoreCase);
+            Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
+                Is.EqualTo("HID").IgnoreCase);
 
             wait.Set();
         };
@@ -50,18 +53,19 @@ public class DeviceNotificationListenerTests
             // compare interface GUID
             Assert.That(args.InterfaceGuid, Is.EqualTo(xusbInterfaceGuid));
 
-            var device = PnPDevice.GetDeviceByInterfaceId(args.SymLink, DeviceLocationFlags.Phantom);
+            PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(args.SymLink, DeviceLocationFlags.Phantom);
 
             Assert.IsNotNull(device);
 
-            Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName), Is.EqualTo("HID").IgnoreCase);
+            Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
+                Is.EqualTo("HID").IgnoreCase);
 
             wait.Set();
         };
 
         // unplug it now
         Assert.IsTrue(wait.WaitOne(waitTime));
-        
+
         listener.StopListen();
     }
 }

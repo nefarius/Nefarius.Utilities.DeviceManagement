@@ -10,6 +10,10 @@ public static class Devcon
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Devcon](./nefarius.utilities.devicemanagement.pnp.devcon.md)
 
+**Remarks:**
+
+https://docs.microsoft.com/en-us/windows-hardware/drivers/install/setupapi
+
 ## Methods
 
 ### **FindInDeviceClassByHardwareId(Guid, String)**
@@ -51,6 +55,33 @@ The hardware ID to search for.
 
 `instanceIds` [IEnumerable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1&)<br>
 A list of instances found for the given search criteria.
+
+#### Returns
+
+[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True if found, false otherwise.
+
+### **FindInDeviceClassByHardwareId(Guid, String, IEnumerable`1&, Boolean)**
+
+Attempts to find a device within a specified device class by a given hardware ID.
+
+```csharp
+public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId, IEnumerable`1& instanceIds, bool presentOnly)
+```
+
+#### Parameters
+
+`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+The device class GUID.
+
+`hardwareId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The hardware ID to search for.
+
+`instanceIds` [IEnumerable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1&)<br>
+A list of instances found for the given search criteria.
+
+`presentOnly` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True to filter currently plugged in devices, false to get all matching devices.
 
 #### Returns
 
@@ -144,6 +175,10 @@ Optional instance ID (zero-based) specifying the device to process on multiple m
 
 [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 True if at least one device was found with the provided class, false otherwise.
+
+**Remarks:**
+
+This is here for backwards compatibility.
 
 ### **Install(String, Boolean&)**
 

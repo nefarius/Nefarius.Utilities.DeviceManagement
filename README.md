@@ -10,12 +10,19 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on W
 
 - Listen for device plugin and unplug events **without depending on WinForms or WPF**
 - Enumerate devices (present and absent)
+- Get and set various [unified device properties](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/unified-device-property-model--windows-vista-and-later-) 
 - Convert various notations (Symlink to Instance ID etc.)
 - Enumerate and remove elements form the Driver Store
 
 ## Documentation
 
 [Link to API docs](docs/index.md).
+
+### Generating documentation
+
+- `dotnet build -c:Release`
+- `dotnet tool install -g XMLDoc2Markdown`
+- `xmldoc2md .\bin\netstandard2.0\Nefarius.Utilities.DeviceManagement.dll .\docs\`
 
 ## Examples
 
@@ -43,7 +50,8 @@ while (Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbDevice, out var path,
 
 ### Listen for new and removed USB devices
 
-One or more instances of the `DeviceNotificationListener` can be used to listen for plugin and unplug events of various devices. This class has no dependency on WinForms or WPF and works in Console Applications and Windows Services alike.
+One or more instances of the `DeviceNotificationListener` can be used to listen for plugin and unplug events of various
+devices. This class has no dependency on WinForms or WPF and works in Console Applications and Windows Services alike.
 
 ```csharp
 var listener = new DeviceNotificationListener();

@@ -29,415 +29,423 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+
 using Windows.Win32.Devices.Properties;
 
-namespace Nefarius.Utilities.DeviceManagement.Drivers
+namespace Nefarius.Utilities.DeviceManagement.Drivers;
+
+[Flags]
+internal enum DriverStoreOpenFlag : uint
 {
-    [Flags]
-    internal enum DriverStoreOpenFlag : uint
-    {
-        None = 0,
-        Create = 1,
-        Exclusive = 2
-    }
+    None = 0,
+    Create = 1,
+    Exclusive = 2
+}
 
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    internal enum ProcessorArchitecture : ushort
-    {
-        PROCESSOR_ARCHITECTURE_INTEL = 0,
-        PROCESSOR_ARCHITECTURE_MIPS = 1,
-        PROCESSOR_ARCHITECTURE_ALPHA = 2,
-        PROCESSOR_ARCHITECTURE_PPC = 3,
-        PROCESSOR_ARCHITECTURE_SHX = 4,
-        PROCESSOR_ARCHITECTURE_ARM = 5,
-        PROCESSOR_ARCHITECTURE_IA64 = 6,
-        PROCESSOR_ARCHITECTURE_ALPHA64 = 7,
-        PROCESSOR_ARCHITECTURE_MSIL = 8,
-        PROCESSOR_ARCHITECTURE_AMD64 = 9,
-        PROCESSOR_ARCHITECTURE_IA32_ON_WIN64 = 10,
-        PROCESSOR_ARCHITECTURE_NEUTRAL = 11,
-        PROCESSOR_ARCHITECTURE_ARM64 = 12,
-        PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64 = 13,
-        PROCESSOR_ARCHITECTURE_IA32_ON_ARM64 = 14,
-    }
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal enum ProcessorArchitecture : ushort
+{
+    PROCESSOR_ARCHITECTURE_INTEL = 0,
+    PROCESSOR_ARCHITECTURE_MIPS = 1,
+    PROCESSOR_ARCHITECTURE_ALPHA = 2,
+    PROCESSOR_ARCHITECTURE_PPC = 3,
+    PROCESSOR_ARCHITECTURE_SHX = 4,
+    PROCESSOR_ARCHITECTURE_ARM = 5,
+    PROCESSOR_ARCHITECTURE_IA64 = 6,
+    PROCESSOR_ARCHITECTURE_ALPHA64 = 7,
+    PROCESSOR_ARCHITECTURE_MSIL = 8,
+    PROCESSOR_ARCHITECTURE_AMD64 = 9,
+    PROCESSOR_ARCHITECTURE_IA32_ON_WIN64 = 10,
+    PROCESSOR_ARCHITECTURE_NEUTRAL = 11,
+    PROCESSOR_ARCHITECTURE_ARM64 = 12,
+    PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64 = 13,
+    PROCESSOR_ARCHITECTURE_IA32_ON_ARM64 = 14
+}
 
-    [Flags]
-    internal enum DriverStoreImportFlag : uint
-    {
-        None = 0,
-        SkipTempCopy = 1,
-        SkipExternalFileCheck = 2,
-        NoRestorePoint = 4,
-        NonInteractive = 8,
-        Replace = 32,
-        Hardlink = 64,
-        PublishSameName = 256,
-        Inbox = 512,
-        F6 = 1024,
-        BaseVersion = 2048,
-        SystemDefaultLocale = 4096,
-        SystemCritical = 8192
-    }
+[Flags]
+internal enum DriverStoreImportFlag : uint
+{
+    None = 0,
+    SkipTempCopy = 1,
+    SkipExternalFileCheck = 2,
+    NoRestorePoint = 4,
+    NonInteractive = 8,
+    Replace = 32,
+    Hardlink = 64,
+    PublishSameName = 256,
+    Inbox = 512,
+    F6 = 1024,
+    BaseVersion = 2048,
+    SystemDefaultLocale = 4096,
+    SystemCritical = 8192
+}
 
-    [Flags]
-    internal enum DriverStoreOfflineAddDriverPackageFlags : uint
-    {
-        None = 0,
-        SkipInstall = 1,
-        Inbox = 2,
-        F6 = 4,
-        SkipExternalFilePresenceCheck = 8,
-        NoTempCopy = 16,
-        UseHardLinks = 32,
-        InstallOnly = 64,
-        ReplacePackage = 128,
-        Force = 256,
-        BaseVersion = 512
-    }
+[Flags]
+internal enum DriverStoreOfflineAddDriverPackageFlags : uint
+{
+    None = 0,
+    SkipInstall = 1,
+    Inbox = 2,
+    F6 = 4,
+    SkipExternalFilePresenceCheck = 8,
+    NoTempCopy = 16,
+    UseHardLinks = 32,
+    InstallOnly = 64,
+    ReplacePackage = 128,
+    Force = 256,
+    BaseVersion = 512
+}
 
-    [Flags]
-    internal enum DriverStoreConfigureFlags : uint
-    {
-        None = 0,
-        Force = 1,
-        ActiveOnly = 2,
-        SourceConfigurations = 65536,
-        SourceDeviceIds = 131072,
-        TargetDeviceNodes = 1048576
-    }
+[Flags]
+internal enum DriverStoreConfigureFlags : uint
+{
+    None = 0,
+    Force = 1,
+    ActiveOnly = 2,
+    SourceConfigurations = 65536,
+    SourceDeviceIds = 131072,
+    TargetDeviceNodes = 1048576
+}
 
-    [Flags]
-    internal enum DriverStoreReflectCriticalFlag : uint
-    {
-        None = 0,
-        Force = 1,
-        Configurations = 2
-    }
+[Flags]
+internal enum DriverStoreReflectCriticalFlag : uint
+{
+    None = 0,
+    Force = 1,
+    Configurations = 2
+}
 
-    [Flags]
-    internal enum DriverStoreReflectFlag : uint
-    {
-        None = 0,
-        FilesOnly = 1,
-        ActiveDrivers = 2,
-        ExternalOnly = 4,
-        Configurations = 8
-    }
+[Flags]
+internal enum DriverStoreReflectFlag : uint
+{
+    None = 0,
+    FilesOnly = 1,
+    ActiveDrivers = 2,
+    ExternalOnly = 4,
+    Configurations = 8
+}
 
-    [Flags]
-    internal enum DriverStorePublishFlag : uint
-    {
-        None = 0
-    }
+[Flags]
+internal enum DriverStorePublishFlag : uint
+{
+    None = 0
+}
 
-    [Flags]
-    internal enum DriverStoreUnpublishFlag : uint
-    {
-        None = 0
-    }
+[Flags]
+internal enum DriverStoreUnpublishFlag : uint
+{
+    None = 0
+}
 
-    internal enum DriverStoreObjectType : uint
-    {
-        DriverDatabase = 1
-    }
+internal enum DriverStoreObjectType : uint
+{
+    DriverDatabase = 1
+}
 
-    internal enum DevPropType : uint
-    {
-        DevPropTypeUint32 = 7,
-        DevPropTypeUint64 = 9,
-        DevPropTypeString = 18
-    }
+internal enum DevPropType : uint
+{
+    DevPropTypeUint32 = 7,
+    DevPropTypeUint64 = 9,
+    DevPropTypeString = 18
+}
 
-    [Flags]
-    internal enum DriverStoreSetObjectPropertyFlag : uint
-    {
-        None = 0
-    }
+[Flags]
+internal enum DriverStoreSetObjectPropertyFlag : uint
+{
+    None = 0
+}
 
-    [Flags]
-    internal enum DriverPackageEnumFilesFlag : uint
-    {
-        Copy = 1,
-        Delete = 2,
-        Rename = 4,
-        Inf = 16,
-        Catalog = 32,
-        Binaries = 64,
-        CopyInfs = 128,
-        IncludeInfs = 256,
-        External = 4096,
-        UniqueSource = 8192,
-        UniqueDestination = 16384
-    }
+[Flags]
+internal enum DriverPackageEnumFilesFlag : uint
+{
+    Copy = 1,
+    Delete = 2,
+    Rename = 4,
+    Inf = 16,
+    Catalog = 32,
+    Binaries = 64,
+    CopyInfs = 128,
+    IncludeInfs = 256,
+    External = 4096,
+    UniqueSource = 8192,
+    UniqueDestination = 16384
+}
 
-    [Flags]
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    internal enum DriverPackageOpenFlag : uint
-    {
-        VersionOnly = 1,
-        FilesOnly = 2,
-        DefaultLanguage = 4,
-        LocalizableStrings = 8,
-        TargetOSVersion = 16,
-        StrictValidation = 32,
-        ClassSchemaOnly = 64,
-        LogTelemetry = 128,
-        PrimaryOnly = 256
-    }
+[Flags]
+[SuppressMessage("ReSharper", "InconsistentNaming")]
+internal enum DriverPackageOpenFlag : uint
+{
+    VersionOnly = 1,
+    FilesOnly = 2,
+    DefaultLanguage = 4,
+    LocalizableStrings = 8,
+    TargetOSVersion = 16,
+    StrictValidation = 32,
+    ClassSchemaOnly = 64,
+    LogTelemetry = 128,
+    PrimaryOnly = 256
+}
 
-    internal enum DriverPackageGetPropertyFlag : uint
-    {
-        None
-    }
+internal enum DriverPackageGetPropertyFlag : uint
+{
+    None
+}
 
-    [Flags]
-    internal enum DriverStoreCopyFlag : uint
+[Flags]
+internal enum DriverStoreCopyFlag : uint
+{
+    None = 0,
+    External = 1,
+    CopyInfs = 2,
+    SkipExistingCopyInfs = 4,
+    SystemDefaultLocale = 8,
+    Hardlink = 16
+}
+
+/// <summary>
+///     Driver Store enumeration and manipulation utility.
+/// </summary>
+public static class DriverStore
+{
+    private static readonly string WinDir = Environment.GetEnvironmentVariable("WINDIR");
+
+    /// <summary>
+    ///     Gets a list of existing packages (absolute INF paths) in the local driver store.
+    /// </summary>
+    public static IEnumerable<string> ExistingDrivers
     {
-        None = 0,
-        External = 1,
-        CopyInfs = 2,
-        SkipExistingCopyInfs = 4,
-        SystemDefaultLocale = 8,
-        Hardlink = 16
+        get
+        {
+            List<string> existingDrivers = new();
+
+            uint ntStatus = DriverStoreNative.DriverStoreOfflineEnumDriverPackage(
+                (driverPackageInfPath, ptr, unknown
+                ) =>
+                {
+                    DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo
+                        driverStoreOfflineEnumDriverPackageInfoW =
+                            (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(ptr,
+                                typeof(DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo));
+
+                    if (driverStoreOfflineEnumDriverPackageInfoW.InboxInf == 0)
+                    {
+                        existingDrivers.Add(driverPackageInfPath);
+                    }
+
+                    return 1;
+                }
+                , IntPtr.Zero, WinDir);
+
+            if ((ntStatus & 0x80000000) != 0)
+            {
+                throw new Win32Exception($"DriverStoreOfflineEnumDriverPackage: ntStatus=0x{ntStatus:x8}");
+            }
+
+            return existingDrivers;
+        }
     }
 
     /// <summary>
-    ///     Driver Store enumeration and manipulation utility.
+    ///     Removes a driver identified by absolute package path.
     /// </summary>
-    public static class DriverStore
+    /// <param name="driverStoreFileName">The absolute package path to remove.</param>
+    public static void RemoveDriver(string driverStoreFileName)
     {
-        private static readonly string WinDir = Environment.GetEnvironmentVariable("WINDIR");
+        uint ntStatus;
 
-        /// <summary>
-        ///     Gets a list of existing packages (absolute INF paths) in the local driver store.
-        /// </summary>
-        public static IEnumerable<string> ExistingDrivers
+        ntStatus = DriverStoreNative.DriverStoreOfflineDeleteDriverPackage(driverStoreFileName, 0, IntPtr.Zero,
+            WinDir, Path.GetPathRoot(WinDir));
+        if ((ntStatus & 0x80000000) != 0)
         {
-            get
-            {
-                List<string> existingDrivers = new();
-
-                uint ntStatus = DriverStoreNative.DriverStoreOfflineEnumDriverPackage(
-                    (
-                        string driverPackageInfPath,
-                        IntPtr ptr,
-                        IntPtr unknown
-                    ) =>
-                    {
-                        DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo
-                            driverStoreOfflineEnumDriverPackageInfoW =
-                                (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(ptr,
-                                    typeof(DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo));
-
-                        if (driverStoreOfflineEnumDriverPackageInfoW.InboxInf == 0)
-                        {
-                            existingDrivers.Add(driverPackageInfPath);
-                        }
-
-                        return 1;
-                    }
-                    , IntPtr.Zero, WinDir);
-
-                if ((ntStatus & 0x80000000) != 0)
-                {
-                    throw new Win32Exception($"DriverStoreOfflineEnumDriverPackage: ntStatus=0x{ntStatus:x8}");
-                }
-
-                return existingDrivers;
-            }
-        }
-
-        /// <summary>
-        ///     Removes a driver identified by absolute package path.
-        /// </summary>
-        /// <param name="driverStoreFileName">The absolute package path to remove.</param>
-        public static void RemoveDriver(string driverStoreFileName)
-        {
-            uint ntStatus;
-
-            ntStatus = DriverStoreNative.DriverStoreOfflineDeleteDriverPackage(driverStoreFileName, 0, IntPtr.Zero,
-                WinDir, Path.GetPathRoot(WinDir));
-            if ((ntStatus & 0x80000000) != 0) throw new Win32Exception(Marshal.GetLastWin32Error());
+            throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }
+}
 
-    internal static class DriverStoreNative
+internal static class DriverStoreNative
+{
+    public delegate int CallbackRoutine(
+        [MarshalAs(UnmanagedType.LPWStr)] string DriverPackageInfPath,
+        IntPtr DriverStoreOfflineEnumDriverPackageInfo,
+        IntPtr Unknown);
+
+    public delegate bool EnumFilesDelegate(IntPtr driverPackageHandle, IntPtr pDriverFile, IntPtr lParam);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreDeleteW", SetLastError = true)]
+    internal static extern uint DriverStoreDelete(
+        IntPtr driverStoreHandle,
+        string DriverStoreFilename,
+        uint Flags);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreOfflineDeleteDriverPackageW",
+        SetLastError = true)]
+    internal static extern uint DriverStoreOfflineDeleteDriverPackage(
+        string DriverPackageInfPath,
+        uint Flags,
+        IntPtr Reserved,
+        string TargetSystemRoot,
+        string TargetSystemDrive);
+
+    [DllImport("drvstore.dll", EntryPoint = "DriverStoreOfflineEnumDriverPackageW", CharSet = CharSet.Unicode,
+        SetLastError = true)]
+    internal static extern uint DriverStoreOfflineEnumDriverPackage(CallbackRoutine CallbackRoutine, IntPtr lParam,
+        string TargetSystemRoot);
+
+    [DllImport("drvstore.dll", EntryPoint = "DriverStoreUnreflectCriticalW", CharSet = CharSet.Unicode,
+        SetLastError = true)]
+    internal static extern uint DriverStoreUnreflectCritical(
+        IntPtr driverStoreHandle,
+        string DriverStoreFileName,
+        uint Flags,
+        string FilterDeviceIds);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreOpenW", SetLastError = true)]
+    internal static extern IntPtr DriverStoreOpen(
+        string targetSystemPath,
+        string targetBootDrive,
+        DriverStoreOpenFlag Flags,
+        IntPtr transactionHandle);
+
+    [DllImport("drvstore.dll", SetLastError = true)]
+    internal static extern bool DriverStoreClose(IntPtr driverStoreHandle);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreImportW", SetLastError = true)]
+    internal static extern uint DriverStoreImport(
+        IntPtr driverStoreHandle,
+        string driverPackageFileName,
+        ProcessorArchitecture ProcessorArchitecture,
+        string localeName,
+        DriverStoreImportFlag flags,
+        StringBuilder driverStoreFileName,
+        int driverStoreFileNameSize);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreOfflineAddDriverPackageW",
+        SetLastError = true)]
+    internal static extern uint DriverStoreOfflineAddDriverPackage(
+        string DriverPackageInfPath,
+        DriverStoreOfflineAddDriverPackageFlags Flags,
+        IntPtr Reserved,
+        ProcessorArchitecture ProcessorArchitecture,
+        string LocaleName,
+        StringBuilder DestInfPath,
+        ref int cchDestInfPath,
+        string TargetSystemRoot,
+        string TargetSystemDrive);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreConfigureW", SetLastError = true)]
+    internal static extern uint DriverStoreConfigure(
+        IntPtr hDriverStore,
+        string DriverStoreFilename,
+        DriverStoreConfigureFlags Flags,
+        string SourceFilter,
+        string TargetFilter);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreReflectCriticalW",
+        SetLastError = true)]
+    internal static extern uint DriverStoreReflectCritical(
+        IntPtr driverStoreHandle,
+        string driverStoreFileName,
+        DriverStoreReflectCriticalFlag flag,
+        string filterDeviceId);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreReflectW", SetLastError = true)]
+    internal static extern uint DriverStoreReflect(
+        IntPtr driverStoreHandle,
+        string driverStoreFileName,
+        DriverStoreReflectFlag flag,
+        string filterSectionNames);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStorePublishW", SetLastError = true)]
+    internal static extern uint DriverStorePublish(
+        IntPtr driverStoreHandle,
+        string driverStoreFileName,
+        DriverStorePublishFlag flag,
+        StringBuilder publishedFileName,
+        int publishedFileNameSize,
+        ref bool isPublishedFileNameChanged);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreUnpublishW", SetLastError = true)]
+    internal static extern uint DriverStoreUnpublish(
+        IntPtr driverStoreHandle,
+        string driverStoreFileName,
+        DriverStoreUnpublishFlag flag,
+        StringBuilder publishedFileName,
+        int publishedFileNameSize,
+        ref bool isPublishedFileNameChanged);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreSetObjectPropertyW",
+        SetLastError = true)]
+    internal static extern bool DriverStoreSetObjectProperty(
+        IntPtr driverStoreHandle,
+        DriverStoreObjectType objectType,
+        string objectName,
+        ref DEVPROPKEY propertyKey,
+        DevPropType propertyType,
+        ref uint propertyBuffer,
+        int propertySize,
+        DriverStoreSetObjectPropertyFlag flag);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern bool DriverPackageEnumFilesW(
+        IntPtr driverPackageHandle,
+        IntPtr enumContext,
+        DriverPackageEnumFilesFlag flags,
+        EnumFilesDelegate callbackRoutine,
+        IntPtr lParam);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverPackageOpenW", SetLastError = true)]
+    internal static extern IntPtr DriverPackageOpen(
+        string driverPackageFilename,
+        ProcessorArchitecture processorArchitecture,
+        string localeName,
+        DriverPackageOpenFlag flags,
+        IntPtr resolveContext);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverPackageGetVersionInfoW",
+        SetLastError = true)]
+    internal static extern bool DriverPackageGetVersionInfo(
+        IntPtr driverPackageHandle,
+        IntPtr pVersionInfo);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverPackageGetPropertyW",
+        SetLastError = true)]
+    internal static extern bool DriverPackageGetProperty(
+        IntPtr driverPackageHandle,
+        IntPtr enumContext,
+        string sectionName,
+        IntPtr propertyKey,
+        IntPtr propertyType,
+        IntPtr propertyBuffer,
+        uint bufferSize,
+        IntPtr propertySize,
+        DriverPackageGetPropertyFlag flags);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern void DriverPackageClose(IntPtr driverPackageHandle);
+
+    [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreCopyW", SetLastError = true)]
+    internal static extern uint DriverStoreCopy(
+        IntPtr driverPackageHandle,
+        string driverPackageFilename,
+        ProcessorArchitecture processorArchitecture,
+        IntPtr localeName,
+        DriverStoreCopyFlag flags,
+        string destinationPath);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Size = 0x2B8, Pack = 0x4)]
+    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    public struct DriverStoreOfflineEnumDriverPackageInfo
     {
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreDeleteW", SetLastError = true)]
-        internal static extern uint DriverStoreDelete(
-            IntPtr driverStoreHandle,
-            string DriverStoreFilename,
-            uint Flags);
+        public int InboxInf;
 
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreOfflineDeleteDriverPackageW", SetLastError = true)]
-        internal static extern uint DriverStoreOfflineDeleteDriverPackage(
-            string DriverPackageInfPath,
-            uint Flags,
-            IntPtr Reserved,
-            string TargetSystemRoot,
-            string TargetSystemDrive);
+        public ProcessorArchitecture ProcessorArchitecture;
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Size = 0x2B8, Pack = 0x4)]
-        [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        public struct DriverStoreOfflineEnumDriverPackageInfo
-        {
-            public int InboxInf;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 85)]
+        public string LocaleName;
 
-            public ProcessorArchitecture ProcessorArchitecture;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 85)]
-            public string LocaleName;
-
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string PublishedInfName;
-        };
-
-        public delegate int CallbackRoutine(
-            [MarshalAs(UnmanagedType.LPWStr)]
-            string DriverPackageInfPath,
-            IntPtr DriverStoreOfflineEnumDriverPackageInfo,
-            IntPtr Unknown);
-
-        [DllImport("drvstore.dll", EntryPoint = "DriverStoreOfflineEnumDriverPackageW", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern uint DriverStoreOfflineEnumDriverPackage(CallbackRoutine CallbackRoutine, IntPtr lParam, string TargetSystemRoot);
-
-        [DllImport("drvstore.dll", EntryPoint = "DriverStoreUnreflectCriticalW", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern uint DriverStoreUnreflectCritical(
-            IntPtr driverStoreHandle,
-            string DriverStoreFileName,
-            uint Flags,
-            string FilterDeviceIds);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreOpenW", SetLastError = true)]
-        internal static extern IntPtr DriverStoreOpen(
-            string targetSystemPath,
-            string targetBootDrive,
-            DriverStoreOpenFlag Flags,
-            IntPtr transactionHandle);
-
-        [DllImport("drvstore.dll", SetLastError = true)]
-        internal static extern bool DriverStoreClose(IntPtr driverStoreHandle);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreImportW", SetLastError = true)]
-        internal static extern uint DriverStoreImport(
-            IntPtr driverStoreHandle,
-            string driverPackageFileName,
-            ProcessorArchitecture ProcessorArchitecture,
-            string localeName,
-            DriverStoreImportFlag flags,
-            StringBuilder driverStoreFileName,
-            int driverStoreFileNameSize);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreOfflineAddDriverPackageW", SetLastError = true)]
-        internal static extern uint DriverStoreOfflineAddDriverPackage(
-            string DriverPackageInfPath,
-            DriverStoreOfflineAddDriverPackageFlags Flags,
-            IntPtr Reserved,
-            ProcessorArchitecture ProcessorArchitecture,
-            string LocaleName,
-            StringBuilder DestInfPath,
-            ref int cchDestInfPath,
-            string TargetSystemRoot,
-            string TargetSystemDrive);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreConfigureW", SetLastError = true)]
-        internal static extern uint DriverStoreConfigure(
-            IntPtr hDriverStore,
-            string DriverStoreFilename,
-            DriverStoreConfigureFlags Flags,
-            string SourceFilter,
-            string TargetFilter);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreReflectCriticalW", SetLastError = true)]
-        internal static extern uint DriverStoreReflectCritical(
-            IntPtr driverStoreHandle,
-            string driverStoreFileName,
-            DriverStoreReflectCriticalFlag flag,
-            string filterDeviceId);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreReflectW", SetLastError = true)]
-        internal static extern uint DriverStoreReflect(
-            IntPtr driverStoreHandle,
-            string driverStoreFileName,
-            DriverStoreReflectFlag flag,
-            string filterSectionNames);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStorePublishW", SetLastError = true)]
-        internal static extern uint DriverStorePublish(
-            IntPtr driverStoreHandle,
-            string driverStoreFileName,
-            DriverStorePublishFlag flag,
-            StringBuilder publishedFileName,
-            int publishedFileNameSize,
-            ref bool isPublishedFileNameChanged);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreUnpublishW", SetLastError = true)]
-        internal static extern uint DriverStoreUnpublish(
-            IntPtr driverStoreHandle,
-            string driverStoreFileName,
-            DriverStoreUnpublishFlag flag,
-            StringBuilder publishedFileName,
-            int publishedFileNameSize,
-            ref bool isPublishedFileNameChanged);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreSetObjectPropertyW", SetLastError = true)]
-        internal static extern bool DriverStoreSetObjectProperty(
-            IntPtr driverStoreHandle,
-            DriverStoreObjectType objectType,
-            string objectName,
-            ref DEVPROPKEY propertyKey,
-            DevPropType propertyType,
-            ref uint propertyBuffer,
-            int propertySize,
-            DriverStoreSetObjectPropertyFlag flag);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern bool DriverPackageEnumFilesW(
-            IntPtr driverPackageHandle,
-            IntPtr enumContext,
-            DriverPackageEnumFilesFlag flags,
-            EnumFilesDelegate callbackRoutine,
-            IntPtr lParam);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverPackageOpenW", SetLastError = true)]
-        internal static extern IntPtr DriverPackageOpen(
-            string driverPackageFilename,
-            ProcessorArchitecture processorArchitecture,
-            string localeName,
-            DriverPackageOpenFlag flags,
-            IntPtr resolveContext);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverPackageGetVersionInfoW", SetLastError = true)]
-        internal static extern bool DriverPackageGetVersionInfo(
-            IntPtr driverPackageHandle,
-            IntPtr pVersionInfo);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverPackageGetPropertyW", SetLastError = true)]
-        internal static extern bool DriverPackageGetProperty(
-            IntPtr driverPackageHandle,
-            IntPtr enumContext,
-            string sectionName,
-            IntPtr propertyKey,
-            IntPtr propertyType,
-            IntPtr propertyBuffer,
-            uint bufferSize,
-            IntPtr propertySize,
-            DriverPackageGetPropertyFlag flags);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        internal static extern void DriverPackageClose(IntPtr driverPackageHandle);
-
-        [DllImport("drvstore.dll", CharSet = CharSet.Unicode, EntryPoint = "DriverStoreCopyW", SetLastError = true)]
-        internal static extern uint DriverStoreCopy(
-            IntPtr driverPackageHandle,
-            string driverPackageFilename,
-            ProcessorArchitecture processorArchitecture,
-            IntPtr localeName,
-            DriverStoreCopyFlag flags,
-            string destinationPath);
-
-        public delegate bool EnumFilesDelegate(IntPtr driverPackageHandle, IntPtr pDriverFile, IntPtr lParam);
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string PublishedInfName;
     }
 }

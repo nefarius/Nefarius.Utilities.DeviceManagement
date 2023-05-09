@@ -40,8 +40,6 @@ public string SymLink { get; set; }
 
 ### **DeviceEventArgs()**
 
-
-
 ```csharp
 public DeviceEventArgs()
 ```

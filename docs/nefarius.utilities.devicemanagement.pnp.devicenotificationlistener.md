@@ -5,23 +5,31 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Utility class to listen for system-wide device arrivals and removals based on a provided device interface GUID.
 
 ```csharp
-public class DeviceNotificationListener : IDeviceNotificationListener, System.IDisposable
+public sealed class DeviceNotificationListener : IDeviceNotificationListener, System.IDisposable
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DeviceNotificationListener](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md)<br>
 Implements [IDeviceNotificationListener](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md), [IDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable)
 
+**Remarks:**
+
+Original source: https://gist.github.com/emoacht/73eff195317e387f4cda
+
 ## Constructors
 
 ### **DeviceNotificationListener()**
-
-
 
 ```csharp
 public DeviceNotificationListener()
 ```
 
 ## Methods
+
+### **Dispose()**
+
+```csharp
+public void Dispose()
+```
 
 ### **RegisterDeviceArrived(Action&lt;DeviceEventArgs&gt;, Nullable&lt;Guid&gt;)**
 
@@ -84,7 +92,7 @@ The event handler to unsubscribe.
 ### **StartListen(Guid)**
 
 Start listening for device arrivals/removals using the provided [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid). Call this after you've
- subscribed to Nefarius.Utilities.DeviceManagement.PnP.DeviceNotificationListener.DeviceArrived and Nefarius.Utilities.DeviceManagement.PnP.DeviceNotificationListener.DeviceRemoved events.
+ subscribed to [DeviceNotificationListener.DeviceArrived](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md#devicearrived) and [DeviceNotificationListener.DeviceRemoved](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md#deviceremoved) events.
 
 ```csharp
 public void StartListen(Guid interfaceGuid)
@@ -97,7 +105,7 @@ The device interface GUID to listen for.
 
 ### **StopListen(Nullable&lt;Guid&gt;)**
 
-Stop listening. The events Nefarius.Utilities.DeviceManagement.PnP.DeviceNotificationListener.DeviceArrived and Nefarius.Utilities.DeviceManagement.PnP.DeviceNotificationListener.DeviceRemoved will not get invoked
+Stop listening. The events [DeviceNotificationListener.DeviceArrived](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md#devicearrived) and [DeviceNotificationListener.DeviceRemoved](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md#deviceremoved) will not get invoked
  anymore after this call. If no [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid) is specified, all currently registered interfaces will get
  unsubscribed.
 
@@ -108,26 +116,6 @@ public void StopListen(Nullable<Guid> interfaceGuid)
 #### Parameters
 
 `interfaceGuid` [Nullable&lt;Guid&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
-
-### **Dispose()**
-
-
-
-```csharp
-public void Dispose()
-```
-
-### **Dispose(Boolean)**
-
-
-
-```csharp
-protected void Dispose(bool disposing)
-```
-
-#### Parameters
-
-`disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 
 ## Events
 
