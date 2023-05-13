@@ -17,12 +17,10 @@ public class DevconTests
     [Test]
     public void TestFindInDeviceClassByHardwareId()
     {
-        // system devices class guid
-        Guid systemClass = Guid.Parse("{4d36e97d-e325-11ce-bfc1-08002be10318}");
         // High precision event timer
         string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
 
-        Assert.True(Devcon.FindInDeviceClassByHardwareId(systemClass, hardwareId, out IEnumerable<string>? instances));
+        Assert.True(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId, out IEnumerable<string>? instances));
         Assert.That(instances.Count(), Is.EqualTo(1));
 
         // not a class GUID
