@@ -19,14 +19,13 @@ public class DeviceNotificationListenerTests
         TimeSpan waitTime = TimeSpan.FromSeconds(10);
 
         // Requires any HID device
-        Guid xusbInterfaceGuid =
-            new Guid((int)0x4D1E55B2L, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
+        Guid xusbInterfaceGuid = new((int)0x4D1E55B2L, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
 
-        using DeviceNotificationListener listener = new DeviceNotificationListener();
+        using DeviceNotificationListener listener = new();
 
         listener.StartListen(xusbInterfaceGuid);
 
-        AutoResetEvent wait = new AutoResetEvent(false);
+        AutoResetEvent wait = new(false);
 
         // Arrival
         listener.DeviceArrived += args =>

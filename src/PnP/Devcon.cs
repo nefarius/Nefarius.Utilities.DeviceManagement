@@ -12,6 +12,8 @@ using Nefarius.Utilities.DeviceManagement.Exceptions;
 
 using Win32Exception = System.ComponentModel.Win32Exception;
 
+// ReSharper disable InvertIf
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
@@ -53,9 +55,10 @@ public static class Devcon
     /// <param name="hardwareId">The hardware ID to search for.</param>
     /// <param name="instanceIds">A list of instances found for the given search criteria.</param>
     /// <param name="presentOnly">True to filter currently plugged in devices, false to get all matching devices.</param>
+    /// <param name="allowPartial">True to match substrings, false to match the exact ID value.</param>
     /// <returns>True if found, false otherwise.</returns>
     public static unsafe bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
-        out IEnumerable<string> instanceIds, bool presentOnly)
+        out IEnumerable<string> instanceIds, bool presentOnly, bool allowPartial = false /* backwards compatibility */)
     {
         instanceIds = new List<string>();
         bool found = false;
@@ -105,13 +108,16 @@ public static class Devcon
                 List<string> hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds)
                     .Select(id => id.ToUpper()).ToList();
 
-                if (!hardwareIds.Contains(hardwareId.ToUpper()))
+                if (
+                    /* partial match */
+                    (allowPartial && hardwareIds.Any(id => hardwareId.Contains(hardwareId.ToUpper()))) ||
+                    /* exact match */
+                    (!allowPartial && hardwareIds.Contains(hardwareId.ToUpper()))
+                )
                 {
-                    continue;
+                    ((List<string>)instanceIds).Add(instanceId);
+                    found = true;
                 }
-
-                ((List<string>)instanceIds).Add(instanceId);
-                found = true;
             }
         }
         finally

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -90,7 +89,7 @@ public class DevicePropertyKeyGenerator : ISourceGenerator
                     {
                         typeName = "DEVPROP_TYPE_BOOLEAN";
                     }
-                    
+
                     DEVPROPTYPE nativeTypeValue = (DEVPROPTYPE)Enum.Parse(typeof(DEVPROPTYPE), typeName);
 
                     // unsupported type hit

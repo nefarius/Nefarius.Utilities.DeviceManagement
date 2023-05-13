@@ -10,8 +10,6 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
-using Nefarius.Utilities.DeviceManagement.Exceptions;
-
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
@@ -50,13 +48,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     private static string GenerateRandomString()
     {
         // Creating object of random class
-        Random rand = new Random();
+        Random rand = new();
 
         // Choosing the size of string
         // Using Next() string
         int stringlen = rand.Next(4, 10);
         int randValue;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new();
         char letter;
         for (int i = 0; i < stringlen; i++)
         {
@@ -85,7 +83,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private unsafe class ListenerItem
+    private class ListenerItem
     {
         public Guid InterfaceGuid { get; set; }
         public Thread Thread { get; set; }
@@ -112,8 +110,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             _arrivedRegistrations.Add(new DeviceEventRegistration
             {
-                Handler = handler,
-                InterfaceGuid = interfaceGuid ?? Guid.Empty
+                Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
             });
         }
     }
@@ -144,8 +141,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             _removedRegistrations.Add(new DeviceEventRegistration
             {
-                Handler = handler,
-                InterfaceGuid = interfaceGuid ?? Guid.Empty
+                Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
             });
         }
     }
@@ -186,10 +182,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                             (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                 typeof(DEV_BROADCAST_DEVICEINTERFACE));
 
-                        DeviceEventArgs arrivedEvent = new DeviceEventArgs
+                        DeviceEventArgs arrivedEvent = new()
                         {
-                            InterfaceGuid = interfaceGuid,
-                            SymLink = deviceInterface.dbcc_name
+                            InterfaceGuid = interfaceGuid, SymLink = deviceInterface.dbcc_name
                         };
 
                         FireDeviceArrived(arrivedEvent);
@@ -206,10 +201,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                             (DEV_BROADCAST_DEVICEINTERFACE)Marshal.PtrToStructure(lParam,
                                 typeof(DEV_BROADCAST_DEVICEINTERFACE));
 
-                        DeviceEventArgs removedEvent = new DeviceEventArgs
+                        DeviceEventArgs removedEvent = new()
                         {
-                            InterfaceGuid = interfaceGuid,
-                            SymLink = deviceInterface.dbcc_name
+                            InterfaceGuid = interfaceGuid, SymLink = deviceInterface.dbcc_name
                         };
 
                         FireDeviceRemoved(removedEvent);
@@ -263,8 +257,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         if (_listeners.All(i => i.InterfaceGuid != interfaceGuid))
         {
-            Thread listenerThread = new Thread(Start);
-            ListenerItem listenerItem = new ListenerItem { InterfaceGuid = interfaceGuid, Thread = listenerThread };
+            Thread listenerThread = new(Start);
+            ListenerItem listenerItem = new() { InterfaceGuid = interfaceGuid, Thread = listenerThread };
             _listeners.Add(listenerItem);
             listenerThread.Start(listenerItem);
         }
@@ -277,7 +271,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         string windowName = GenerateRandomString();
         using FreeLibrarySafeHandle hInst = PInvoke.GetModuleHandle((string)null);
 
-        WNDCLASSEXW windowClass = new WNDCLASSEXW
+        WNDCLASSEXW windowClass = new()
         {
             cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
             style = WNDCLASS_STYLES.CS_HREDRAW | WNDCLASS_STYLES.CS_VREDRAW,
@@ -315,7 +309,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     ///     anymore after this call. If no <see cref="Guid" /> is specified, all currently registered interfaces will get
     ///     unsubscribed.
     /// </summary>
-    public unsafe void StopListen(Guid? interfaceGuid = null)
+    public void StopListen(Guid? interfaceGuid = null)
     {
         _cancellationTokenSource.Cancel();
 
@@ -359,11 +353,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
             {
                 break;
             }
-            else
-            {
-                PInvoke.TranslateMessage(msg);
-                PInvoke.DispatchMessage(msg);
-            }
+
+            PInvoke.TranslateMessage(msg);
+            PInvoke.DispatchMessage(msg);
         }
     }
 
@@ -371,7 +363,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         ListenerItem listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
 
-        DEV_BROADCAST_DEVICEINTERFACE dbcc = new DEV_BROADCAST_DEVICEINTERFACE
+        DEV_BROADCAST_DEVICEINTERFACE dbcc = new()
         {
             dbcc_size = (uint)Marshal.SizeOf(typeof(DEV_BROADCAST_DEVICEINTERFACE)),
             dbcc_devicetype = DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE,

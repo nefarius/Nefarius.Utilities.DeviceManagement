@@ -33,7 +33,7 @@ public static class DeviceClassIds
     ///     Xbox Peripherals.
     /// </summary>
     public static Guid XboxComposite => Guid.Parse("{05f5cfe2-4733-4950-a6bb-07aad01a3a84}");
-    
+
     /// <summary>
     ///     Human Interface Devices (HID).
     /// </summary>

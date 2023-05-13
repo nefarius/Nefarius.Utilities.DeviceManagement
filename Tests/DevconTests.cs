@@ -1,4 +1,5 @@
 using Nefarius.Utilities.DeviceManagement.PnP;
+
 #pragma warning disable CS1591
 
 namespace Tests;
@@ -29,6 +30,14 @@ public class DevconTests
 
         Assert.False(Devcon.FindInDeviceClassByHardwareId(nonexistent, string.Empty));
         Assert.False(Devcon.FindInDeviceClassByHardwareId(Guid.Empty, hardwareId));
+    }
+
+    [Test]
+    public void TestFindInDeviceClassByHardwareIdWithNonexistent()
+    {
+        Assert.False(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, "ROOT\\NOPE",
+            out IEnumerable<string>? instances));
+        CollectionAssert.IsEmpty(instances);
     }
 
     /// <summary>
