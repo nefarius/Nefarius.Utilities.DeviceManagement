@@ -41,6 +41,19 @@ public class DevconTests
     }
 
     /// <summary>
+    ///     Requires BthPS3 being installed for this test to work.
+    /// </summary>
+    [Test]
+    public void TestFindInDeviceClassByHardwareIdWithPartial()
+    {
+        string partialHardwareId = @"BTHENUM\{1cb831ea-79cd-4508-b0fc-85f7c85ae8e0}";
+
+        Assert.True(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.Bluetooth, partialHardwareId,
+            out IEnumerable<string>? instances, true, true));
+        CollectionAssert.IsNotEmpty(instances);
+    }
+
+    /// <summary>
     ///     Requires two Xbox controllers, either 360 or One or mixed, connected for this test to work.
     /// </summary>
     [Test]
