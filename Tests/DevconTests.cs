@@ -57,7 +57,7 @@ public class DevconTests
     ///     Requires two Xbox controllers, either 360 or One or mixed, connected for this test to work.
     /// </summary>
     [Test]
-    public void TestFindByInterfaceGuid()
+    public void TestFindXusbByInterfaceGuid()
     {
         // Requires two Xbox controllers, either 360 or One or mixed
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");

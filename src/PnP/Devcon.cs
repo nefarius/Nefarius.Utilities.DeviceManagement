@@ -110,9 +110,9 @@ public static class Devcon
 
                 if (
                     /* partial match */
-                    (allowPartial && hardwareIds.Any(id => hardwareId.Contains(hardwareId.ToUpper()))) ||
+                    (allowPartial && hardwareIds.Any(id => id.Contains(hardwareId.ToUpper()))) ||
                     /* exact match */
-                    (!allowPartial && hardwareIds.Contains(hardwareId.ToUpper()))
+                    (!allowPartial && hardwareIds.Contains(hardwareId, StringComparer.OrdinalIgnoreCase))
                 )
                 {
                     ((List<string>)instanceIds).Add(instanceId);
