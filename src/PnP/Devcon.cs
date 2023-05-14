@@ -266,8 +266,11 @@ public static class Devcon
     /// <param name="instanceId">The instance ID of the enumerated device.</param>
     /// <param name="instance">Optional instance ID (zero-based) specifying the device to process on multiple matches.</param>
     /// <returns>True if at least one device was found with the provided class, false otherwise.</returns>
-    /// <remarks>This is here for backwards compatibility.</remarks>
-    [Obsolete("Please use FindByInterfaceGuid instead.")]
+    /// <remarks>
+    ///     This is here for backwards compatibility, please use
+    ///     <see cref="FindByInterfaceGuid(System.Guid,out string,out string,int,bool)" /> instead.
+    /// </remarks>
+    [Obsolete("Do not use, see remarks.")]
     public static bool Find(Guid target, out string path, out string instanceId, int instance = 0)
     {
         return FindByInterfaceGuid(target, out path, out instanceId, instance);
