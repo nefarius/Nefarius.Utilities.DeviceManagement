@@ -17,7 +17,7 @@ using Win32Exception = System.ComponentModel.Win32Exception;
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
-///     Managed wrapper for SetupAPI.
+///     "Device Console" utility class. Managed wrapper for common SetupAPI actions.
 /// </summary>
 /// <remarks>https://docs.microsoft.com/en-us/windows-hardware/drivers/install/setupapi</remarks>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -87,6 +87,7 @@ public static class Devcon
                 }
 
                 uint nBytes = (charsRequired + 1) * 2;
+                // ReSharper disable once StackAllocInsideLoop
                 char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
                 ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
@@ -200,6 +201,7 @@ public static class Devcon
                             }
 
                             uint nBytes = (charsRequired + 1) * 2;
+                            // ReSharper disable once StackAllocInsideLoop
                             char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
                             PInvoke.CM_Get_Device_IDW(da.DevInst, ptrInstanceBuf, nBytes, 0);
