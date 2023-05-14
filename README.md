@@ -94,6 +94,13 @@ var instanceId = PnPDevice.GetInstanceIdFromInterfaceId(path);
 PnPDevice device = PnPDevice.GetDeviceByInterfaceId(path);
 ```
 
+### Add a driver service to a device class' upper filters 
+
+```csharp
+string service = "HidHide";
+DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, service);
+```
+
 ## Sources & 3rd party credits
 
 - [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
