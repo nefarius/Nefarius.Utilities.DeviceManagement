@@ -22,6 +22,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 /// <remarks>https://docs.microsoft.com/en-us/windows-hardware/drivers/install/setupapi</remarks>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "OutParameterValueIsAlwaysDiscarded.Global")]
 public static class Devcon
 {
     /// <summary>
