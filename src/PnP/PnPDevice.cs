@@ -191,8 +191,12 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
     ///     force-closed.
     /// </summary>
-    [Obsolete(
-        "This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects.")]
+    /// <remarks>
+    ///     This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects. If
+    ///     this is the behaviour you seek, consider using <see cref="RemoveAndSetup" /> instead. This method remains here for
+    ///     backwards compatibility.
+    /// </remarks>
+    [Obsolete("This method can cause unintended side-effects, see remarks for details.")]
     public unsafe void Restart()
     {
         CONFIGRET ret = PInvoke.CM_Query_And_Remove_SubTree(
@@ -274,6 +278,37 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         return device is not null &&
                (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.
+    /// </summary>
+    /// <remarks>Device restart may fail if it has open handles that currently can not be force-closed.</remarks>
+    /// <exception cref="ConfigManagerException"></exception>
+    public unsafe void RemoveAndSetup()
+    {
+        CONFIGRET ret = PInvoke.CM_Query_And_Remove_SubTree(
+            _instanceHandle,
+            null, null, 0,
+            PInvoke.CM_REMOVE_NO_RESTART
+        );
+
+        if (ret != CONFIGRET.CR_SUCCESS)
+        {
+            throw new ConfigManagerException("Node removal failed.", ret);
+        }
+
+        ret = PInvoke.CM_Setup_DevNode(
+            _instanceHandle,
+            PInvoke.CM_SETUP_DEVNODE_READY
+        );
+
+        if (ret is CONFIGRET.CR_NO_SUCH_DEVINST or CONFIGRET.CR_SUCCESS)
+        {
+            return;
+        }
+
+        throw new ConfigManagerException("Node addition failed.", ret);
     }
 
     /// <summary>
