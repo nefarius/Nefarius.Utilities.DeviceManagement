@@ -4,6 +4,7 @@ configuration:
   - Release
 install:
   - cmd: git submodule -q update --init
+  - cmd: choco install dotnet-sdk --pre
 dotnet_csproj:
   patch: true
   file: '**\*.csproj'
