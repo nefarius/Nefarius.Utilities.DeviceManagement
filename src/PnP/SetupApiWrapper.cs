@@ -4,6 +4,11 @@ using System.Runtime.InteropServices;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
+/// <summary>
+///     SetupAPI imports.
+/// </summary>
+/// <example>https://learn.microsoft.com/en-us/windows-hardware/drivers/install/setupapi</example>
+/// <remarks>TODO: migrate over to CsWin32</remarks>
 internal static class SetupApiWrapper
 {
     #region Constant and Structure Definitions
