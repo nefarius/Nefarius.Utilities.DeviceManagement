@@ -2,6 +2,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
+using Windows.Win32;
+using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Windows.Win32.Foundation;
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
@@ -11,6 +15,8 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 /// <remarks>TODO: migrate over to CsWin32</remarks>
 internal static class SetupApiWrapper
 {
+    private const int LineLen = 256;
+
     #region Constant and Structure Definitions
 
     [StructLayout(LayoutKind.Sequential)]
@@ -24,6 +30,30 @@ internal static class SetupApiWrapper
         internal readonly Guid ClassGuid;
         internal readonly uint DevInst;
         internal readonly IntPtr Reserved;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    internal struct SP_DRVINFO_DATA
+    {
+#pragma warning disable IDE1006
+        internal readonly int cbSize;
+#pragma warning restore IDE1006
+        internal readonly UInt32 DriverType;
+        internal IntPtr Reserved;
+
+        [MarshalAs(UnmanagedType.LPWStr, SizeConst = LineLen)]
+        internal readonly string Description;
+
+        [MarshalAs(UnmanagedType.LPWStr, SizeConst = LineLen)]
+        internal readonly string MfgName;
+
+        [MarshalAs(UnmanagedType.LPWStr, SizeConst = LineLen)]
+        internal readonly string ProviderName;
+
+        internal readonly FILETIME DriverDate;
+        internal readonly UInt64 DriverVersion;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -116,7 +146,7 @@ internal static class SetupApiWrapper
 
     #region Newdev
 
-    [DllImport("newdev.dll", SetLastError = true)]
+    [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern bool DiInstallDriver(
         IntPtr hwndParent,
         string fullInfPath,
@@ -127,6 +157,18 @@ internal static class SetupApiWrapper
     internal static extern bool DiUninstallDriver(
         [In] IntPtr hwndParent,
         [In] string infPath,
+        [In] uint flags,
+        [Out] out bool needReboot
+    );
+
+    [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern unsafe bool DiInstallDevice(
+        [In][Optional] IntPtr hwndParent,
+        [In] HDEVINFO deviceInfoSet,
+        [In] SP_DEVINFO_DATA* deviceInfoData,
+#pragma warning disable CS8500
+        [In] [Optional] SP_DRVINFO_DATA* driverInfoData,
+#pragma warning restore CS8500
         [In] uint flags,
         [Out] out bool needReboot
     );
