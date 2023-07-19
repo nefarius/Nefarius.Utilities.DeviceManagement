@@ -65,10 +65,10 @@ public static class Devcon
         bool found = false;
         SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
         deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
-        IntPtr deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
+        HDEVINFO deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
             ref target,
             IntPtr.Zero,
-            IntPtr.Zero,
+            HWND.Null,
             presentOnly ? (int)PInvoke.DIGCF_PRESENT : 0
         );
 
@@ -148,7 +148,7 @@ public static class Devcon
     public static unsafe bool FindByInterfaceGuid(Guid target, out string path, out string instanceId, int instance = 0,
         bool presentOnly = true)
     {
-        IntPtr deviceInfoSet = IntPtr.Zero;
+        HDEVINFO deviceInfoSet = HDEVINFO.Null;
 
         try
         {
@@ -163,7 +163,7 @@ public static class Devcon
                 flags |= (int)PInvoke.DIGCF_PRESENT;
             }
 
-            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, IntPtr.Zero, flags);
+            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, HWND.Null, flags);
 
             deviceInterfaceData.cbSize = da.cbSize = Marshal.SizeOf(deviceInterfaceData);
 
@@ -222,7 +222,7 @@ public static class Devcon
         }
         finally
         {
-            if (deviceInfoSet != IntPtr.Zero)
+            if (deviceInfoSet != HDEVINFO.Null)
             {
                 SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
@@ -297,12 +297,12 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Create(string className, Guid classGuid, string node)
     {
-        IntPtr deviceInfoSet = (IntPtr)(-1);
+        HDEVINFO deviceInfoSet = HDEVINFO.Null;
         SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
 
         try
         {
-            deviceInfoSet = SetupApiWrapper.SetupDiCreateDeviceInfoList(ref classGuid, IntPtr.Zero);
+            deviceInfoSet = SetupApiWrapper.SetupDiCreateDeviceInfoList(ref classGuid, HWND.Null);
 
             if (deviceInfoSet == (IntPtr)(-1))
             {
@@ -316,7 +316,7 @@ public static class Devcon
                     className,
                     ref classGuid,
                     null,
-                    IntPtr.Zero,
+                    HWND.Null, 
                     (int)PInvoke.DICD_GENERATE_ID,
                     ref deviceInfoData
                 ))
@@ -346,7 +346,7 @@ public static class Devcon
         }
         finally
         {
-            if (deviceInfoSet != (IntPtr)(-1))
+            if (deviceInfoSet != HDEVINFO.Null)
             {
                 SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
@@ -373,9 +373,9 @@ public static class Devcon
     /// <param name="instanceId">The instance ID.</param>
     /// <param name="rebootRequired">True if a reboot is required to complete the uninstall action, false otherwise.</param>
     /// <returns>True on success, false otherwise.</returns>
-    public static bool Remove(Guid classGuid, string instanceId, out bool rebootRequired)
+    public static unsafe bool Remove(Guid classGuid, string instanceId, out bool rebootRequired)
     {
-        IntPtr deviceInfoSet = IntPtr.Zero;
+        HDEVINFO deviceInfoSet = HDEVINFO.Null;
         IntPtr installParams = Marshal.AllocHGlobal(584); // Max struct size on x64 platform
 
         try
@@ -386,7 +386,7 @@ public static class Devcon
             deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
                 ref classGuid,
                 IntPtr.Zero,
-                IntPtr.Zero,
+                HWND.Null, 
                 (int)PInvoke.DIGCF_PRESENT | (int)PInvoke.DIGCF_DEVICEINTERFACE
             );
 
@@ -432,7 +432,7 @@ public static class Devcon
                     );
 
                     // Fill SP_DEVINSTALL_PARAMS struct
-                    if (!SetupApiWrapper.SetupDiGetDeviceInstallParams(deviceInfoSet, ref deviceInfoData,
+                    if (!SetupApiWrapper.SetupDiGetDeviceInstallParams(deviceInfoSet, &deviceInfoData,
                             installParams))
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -459,7 +459,7 @@ public static class Devcon
         }
         finally
         {
-            if (deviceInfoSet != IntPtr.Zero)
+            if (deviceInfoSet != HDEVINFO.Null)
             {
                 SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }

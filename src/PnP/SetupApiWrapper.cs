@@ -82,58 +82,98 @@ internal static class SetupApiWrapper
 
     #region SetupAPI
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern IntPtr SetupDiCreateDeviceInfoList(ref Guid classGuid, IntPtr hwndParent);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiDestroyDeviceInfoList(IntPtr deviceInfoSet);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiCreateDeviceInfo(IntPtr deviceInfoSet, string deviceName, ref Guid classGuid,
-        string deviceDescription, IntPtr hwndParent, int creationFlags, ref SP_DEVINFO_DATA deviceInfoData);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiSetDeviceRegistryProperty(IntPtr deviceInfoSet,
-        ref SP_DEVINFO_DATA deviceInfoData, int property, [MarshalAs(UnmanagedType.LPWStr)] string propertyBuffer,
-        int propertyBufferSize);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiCallClassInstaller(int installFunction, IntPtr deviceInfoSet,
-        ref SP_DEVINFO_DATA deviceInfoData);
-
-    [DllImport("setupapi.dll", SetLastError = true)]
-    internal static extern bool SetupDiEnumDeviceInfo(IntPtr deviceInfoSet,
-        UInt32 memberIndex,
-        ref SP_DEVINFO_DATA deviceInfoData);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern IntPtr SetupDiGetClassDevs(ref Guid classGuid, IntPtr enumerator, IntPtr hwndParent,
-        int flags);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiEnumDeviceInterfaces(IntPtr deviceInfoSet, IntPtr deviceInfoData,
-        ref Guid interfaceClassGuid, int memberIndex, ref SP_DEVINFO_DATA deviceInterfaceData);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiGetDeviceInterfaceDetail(IntPtr deviceInfoSet,
-        ref SP_DEVINFO_DATA deviceInterfaceData, IntPtr deviceInterfaceDetailData,
-        int deviceInterfaceDetailDataSize,
-        ref int requiredSize, ref SP_DEVINFO_DATA deviceInfoData);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiOpenDeviceInfo(IntPtr deviceInfoSet, string deviceInstanceId,
-        IntPtr hwndParent, int flags, ref SP_DEVINFO_DATA deviceInfoData);
-
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Auto)]
-    internal static extern bool SetupDiSetClassInstallParams(IntPtr deviceInfoSet,
-        ref SP_DEVINFO_DATA deviceInterfaceData, ref SP_REMOVEDEVICE_PARAMS classInstallParams,
-        int classInstallParamsSize);
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern HDEVINFO SetupDiCreateDeviceInfoList(
+        ref Guid classGuid,
+        HWND hwndParent
+    );
 
     [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool SetupDiGetDeviceInstallParams(
-        IntPtr hDevInfo,
+    internal static extern bool SetupDiDestroyDeviceInfoList(
+        HDEVINFO deviceInfoSet
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiCreateDeviceInfo(
+        HDEVINFO deviceInfoSet,
+        string deviceName,
+        ref Guid classGuid,
+        string deviceDescription,
+        HWND hwndParent,
+        int creationFlags,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiSetDeviceRegistryProperty(
+        HDEVINFO deviceInfoSet,
         ref SP_DEVINFO_DATA deviceInfoData,
-        IntPtr deviceInstallParams
+        int property,
+        [MarshalAs(UnmanagedType.LPWStr)] string propertyBuffer,
+        int propertyBufferSize
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiCallClassInstaller(
+        int installFunction,
+        IntPtr deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true)]
+    internal static extern bool SetupDiEnumDeviceInfo(
+        IntPtr deviceInfoSet,
+        UInt32 memberIndex,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern HDEVINFO SetupDiGetClassDevs(
+        ref Guid classGuid,
+        IntPtr enumerator,
+        HWND hwndParent,
+        int flags
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiEnumDeviceInterfaces(
+        HDEVINFO deviceInfoSet,
+        IntPtr deviceInfoData,
+        ref Guid interfaceClassGuid,
+        int memberIndex,
+        ref SP_DEVINFO_DATA deviceInterfaceData
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiGetDeviceInterfaceDetail(
+        HDEVINFO deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInterfaceData,
+        IntPtr deviceInterfaceDetailData,
+        int deviceInterfaceDetailDataSize,
+        ref int requiredSize,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiOpenDeviceInfo(
+        HDEVINFO deviceInfoSet,
+        string deviceInstanceId,
+        IntPtr hwndParent,
+        int flags,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern bool SetupDiSetClassInstallParams(HDEVINFO deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInterfaceData, ref SP_REMOVEDEVICE_PARAMS classInstallParams,
+        int classInstallParamsSize
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern unsafe bool SetupDiGetDeviceInstallParams(
+        [In] HDEVINFO hDevInfo,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [Out] IntPtr deviceInstallParams
     );
 
     [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
@@ -141,16 +181,24 @@ internal static class SetupApiWrapper
     internal static extern bool SetupUninstallOEMInf(
         [MarshalAs(UnmanagedType.LPWStr)] string infName,
         uint flags,
-        IntPtr reserved);
+        IntPtr reserved
+    );
 
     [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiOpenDeviceInfo(
-        [In] IntPtr deviceInfoSet,
+        [In] HDEVINFO deviceInfoSet,
         [In] [MarshalAs(UnmanagedType.LPWStr)] string deviceInstanceId,
         [In] [Optional] IntPtr parent,
         [In] UInt32 openFlags,
         [Out] [Optional] SP_DEVINFO_DATA* deviceInfoData
+    );
+
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiSetSelectedDevice(
+        [In] HDEVINFO deviceInfoSet,
+        [In] SP_DEVINFO_DATA* deviceInfoData
     );
 
     #endregion
