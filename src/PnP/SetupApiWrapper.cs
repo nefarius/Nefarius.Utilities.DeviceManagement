@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Foundation;
 
@@ -12,7 +11,9 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 ///     SetupAPI imports.
 /// </summary>
 /// <example>https://learn.microsoft.com/en-us/windows-hardware/drivers/install/setupapi</example>
-/// <remarks>TODO: migrate over to CsWin32</remarks>
+/// <remarks>
+///     TODO: migrate over to CsWin32
+/// </remarks>
 internal static class SetupApiWrapper
 {
     private const int LineLen = 256;
@@ -163,7 +164,7 @@ internal static class SetupApiWrapper
 
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern unsafe bool DiInstallDevice(
-        [In][Optional] IntPtr hwndParent,
+        [In] [Optional] IntPtr hwndParent,
         [In] HDEVINFO deviceInfoSet,
         [In] SP_DEVINFO_DATA* deviceInfoData,
 #pragma warning disable CS8500
