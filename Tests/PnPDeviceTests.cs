@@ -15,7 +15,7 @@ public class PnPDeviceTests
     [Test]
     public void TestGetDriverMeta()
     {
-        string path = @"\\?\usb#vid_08bb&pid_29c0#6&35844985&0&4#{a5dcbf10-6530-11d2-901f-00c04fb951ed}";
+        const string path = @"\\?\usb#vid_08bb&pid_29c0#6&35844985&0&4#{a5dcbf10-6530-11d2-901f-00c04fb951ed}";
 
         PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
 
@@ -27,12 +27,14 @@ public class PnPDeviceTests
     {
         // Requires one Xbox controller, either 360 or One or compatible
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
+        Assert.Multiple(() =>
+        {
+            // 1st controller
+            Assert.That(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out string? path, out string? instanceId), Is.True);
 
-        // 1st controller
-        Assert.True(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out string? path, out string? instanceId));
-
-        // compare IDs
-        Assert.That(PnPDevice.GetInstanceIdFromInterfaceId(path), Is.EqualTo(instanceId).IgnoreCase);
+            // compare IDs
+            Assert.That(PnPDevice.GetInstanceIdFromInterfaceId(path), Is.EqualTo(instanceId).IgnoreCase);
+        });
     }
 
     /// <summary>
@@ -44,12 +46,12 @@ public class PnPDeviceTests
         Guid xnaCompositeClass = Guid.Parse("{d61ca365-5af4-4486-998b-9db4734c6ca3}");
         string hardwareId = "USB\\VID_045E&PID_028E";
 
-        Assert.True(Devcon.FindInDeviceClassByHardwareId(xnaCompositeClass, hardwareId,
-            out IEnumerable<string>? instances, true));
+        Assert.That(Devcon.FindInDeviceClassByHardwareId(xnaCompositeClass, hardwareId,
+            out IEnumerable<string>? instances, true), Is.True);
 
         List<string> list = instances.ToList();
 
-        Assert.That(list.Count, Is.GreaterThanOrEqualTo(1));
+        Assert.That(list, Is.Not.Empty);
 
         PnPDevice? device = list.Select(e => PnPDevice.GetDeviceByInstanceId(e)).FirstOrDefault(dev => dev.IsVirtual());
 

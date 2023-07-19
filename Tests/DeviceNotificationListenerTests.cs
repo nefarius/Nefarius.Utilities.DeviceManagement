@@ -33,7 +33,7 @@ public class DeviceNotificationListenerTests
 
             PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(args.SymLink);
 
-            Assert.IsNotNull(device);
+            Assert.That(device, Is.Not.Null);
 
             Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
                 Is.EqualTo("HID").IgnoreCase);
@@ -52,7 +52,7 @@ public class DeviceNotificationListenerTests
 
             PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(args.SymLink, DeviceLocationFlags.Phantom);
 
-            Assert.IsNotNull(device);
+            Assert.That(device, Is.Not.Null);
 
             Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
                 Is.EqualTo("HID").IgnoreCase);
