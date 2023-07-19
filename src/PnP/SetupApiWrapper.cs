@@ -143,6 +143,16 @@ internal static class SetupApiWrapper
         uint flags,
         IntPtr reserved);
 
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiOpenDeviceInfo(
+        [In] IntPtr deviceInfoSet,
+        [In] [MarshalAs(UnmanagedType.LPWStr)] string deviceInstanceId,
+        [In] [Optional] IntPtr parent,
+        [In] UInt32 openFlags,
+        [Out] [Optional] SP_DEVINFO_DATA* deviceInfoData
+    );
+
     #endregion
 
     #region Newdev
