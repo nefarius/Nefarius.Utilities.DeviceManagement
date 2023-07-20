@@ -76,6 +76,26 @@ internal static class SetupApiWrapper
         internal int HwProfile;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
+    internal struct SP_DEVINSTALL_PARAMS
+    {
+        internal Int32 cbSize;
+        internal Int32 Flags;
+        internal Int32 FlagsEx;
+        internal IntPtr hwndParent;
+        internal IntPtr InstallMsgHandler;
+        internal IntPtr InstallMsgHandlerContext;
+        internal IntPtr FileQueue;
+        internal IntPtr ClassInstallReserved;
+        internal int Reserved;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        internal string DriverPath;
+    }
+
     #endregion
 
     #region Interop Definitions
@@ -173,6 +193,15 @@ internal static class SetupApiWrapper
     internal static extern unsafe bool SetupDiGetDeviceInstallParams(
         [In] HDEVINFO hDevInfo,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+#pragma warning disable CS8500
+        [Out] SP_DEVINSTALL_PARAMS* deviceInstallParams
+#pragma warning restore CS8500
+    );
+
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern unsafe bool SetupDiGetDeviceInstallParams(
+        [In] HDEVINFO hDevInfo,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [Out] IntPtr deviceInstallParams
     );
 
@@ -201,16 +230,26 @@ internal static class SetupApiWrapper
         [In] SP_DEVINFO_DATA* deviceInfoData
     );
 
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiSetDeviceInstallParams(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+#pragma warning disable CS8500
+        [In] SP_DEVINSTALL_PARAMS* deviceInstallParams
+#pragma warning restore CS8500
+    );
+
     #endregion
 
     #region Newdev
 
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern bool DiInstallDriver(
-        IntPtr hwndParent,
-        string fullInfPath,
-        uint flags,
-        out bool needReboot);
+        [In] [Optional] HWND hwndParent,
+        [In] string fullInfPath,
+        [In] uint flags,
+        [Out] [Optional] out bool needReboot);
 
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern bool DiUninstallDriver(

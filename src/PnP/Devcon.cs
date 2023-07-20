@@ -284,7 +284,7 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Install(string fullInfPath, out bool rebootRequired)
     {
-        return SetupApiWrapper.DiInstallDriver(IntPtr.Zero, fullInfPath, PInvoke.DIIRFLAG_FORCE_INF,
+        return SetupApiWrapper.DiInstallDriver(HWND.Null, fullInfPath, PInvoke.DIIRFLAG_FORCE_INF,
             out rebootRequired);
     }
 
