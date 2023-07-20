@@ -184,8 +184,10 @@ internal static class SetupApiWrapper
     );
 
     [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static extern bool SetupDiSetClassInstallParams(HDEVINFO deviceInfoSet,
-        ref SP_DEVINFO_DATA deviceInterfaceData, ref SP_REMOVEDEVICE_PARAMS classInstallParams,
+    internal static extern unsafe bool SetupDiSetClassInstallParams(
+        HDEVINFO deviceInfoSet,
+        SP_DEVINFO_DATA* deviceInterfaceData, 
+        SP_REMOVEDEVICE_PARAMS* classInstallParams,
         int classInstallParamsSize
     );
 

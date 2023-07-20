@@ -412,8 +412,8 @@ public static class Devcon
                 // Prepare class (un-)installer
                 if (SetupApiWrapper.SetupDiSetClassInstallParams(
                         deviceInfoSet,
-                        ref deviceInfoData,
-                        ref props,
+                        &deviceInfoData,
+                        &props,
                         Marshal.SizeOf(props)
                     ))
                 {
