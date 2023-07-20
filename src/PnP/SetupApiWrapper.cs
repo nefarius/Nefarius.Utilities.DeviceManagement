@@ -240,6 +240,36 @@ internal static class SetupApiWrapper
 #pragma warning restore CS8500
     );
 
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiBuildDriverInfoList(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
+        [In] UInt32 driverType
+    );
+
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiEnumDriverInfo(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [In] UInt32 driverType,
+        [In] UInt32 memberIndex,
+#pragma warning disable CS8500
+        [Out] SP_DRVINFO_DATA* driverInfoData
+#pragma warning restore CS8500
+    );
+
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiSetSelectedDriver(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
+#pragma warning disable CS8500
+        [In] [Out] SP_DRVINFO_DATA* driverInfoData
+#pragma warning restore CS8500
+    );
+
     #endregion
 
     #region Newdev
