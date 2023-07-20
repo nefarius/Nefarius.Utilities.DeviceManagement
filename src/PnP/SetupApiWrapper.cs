@@ -44,13 +44,13 @@ internal static class SetupApiWrapper
         internal readonly UInt32 DriverType;
         internal IntPtr Reserved;
 
-        [MarshalAs(UnmanagedType.LPWStr, SizeConst = LineLen)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LineLen)]
         internal readonly string Description;
 
-        [MarshalAs(UnmanagedType.LPWStr, SizeConst = LineLen)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LineLen)]
         internal readonly string MfgName;
 
-        [MarshalAs(UnmanagedType.LPWStr, SizeConst = LineLen)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LineLen)]
         internal readonly string ProviderName;
 
         internal readonly FILETIME DriverDate;
