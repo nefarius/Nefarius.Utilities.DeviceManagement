@@ -283,7 +283,7 @@ internal static class SetupApiWrapper
 
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern bool DiUninstallDriver(
-        [In] IntPtr hwndParent,
+        [In] HWND hwndParent,
         [In] string infPath,
         [In] uint flags,
         [Out] out bool needReboot

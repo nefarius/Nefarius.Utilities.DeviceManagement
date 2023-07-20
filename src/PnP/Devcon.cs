@@ -543,7 +543,7 @@ public static class Devcon
         if (forceDelete
             && Kernel32.MethodExists("newdev.dll", "DiUninstallDriverW")
             && !SetupApiWrapper.DiUninstallDriver(
-                IntPtr.Zero,
+                HWND.Null, 
                 fullInfPath,
                 PInvoke.DIURFLAG_NO_REMOVE_INF,
                 out _))
