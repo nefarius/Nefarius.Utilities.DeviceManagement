@@ -42,7 +42,7 @@ public class DeviceNotificationListenerTests
         };
 
         // plug in HID device now
-        Assert.IsTrue(wait.WaitOne(waitTime));
+        Assert.That(wait.WaitOne(waitTime), Is.True);
 
         // Removal
         listener.DeviceRemoved += args =>
@@ -61,7 +61,7 @@ public class DeviceNotificationListenerTests
         };
 
         // unplug it now
-        Assert.IsTrue(wait.WaitOne(waitTime));
+        Assert.That(wait.WaitOne(waitTime), Is.True);
 
         listener.StopListen();
     }
