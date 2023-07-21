@@ -5,6 +5,7 @@ using System.Text;
 
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
@@ -315,9 +316,9 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
         for (UInt32 devIndex = 0; SetupApiWrapper.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
         {
-            var instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
+            DEVPROPKEY instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
 
-            var success = SetupApiWrapper.SetupDiGetDeviceProperty(
+            bool success = SetupApiWrapper.SetupDiGetDeviceProperty(
                 hDevInfo,
                 &spDevinfoData,
                 &instanceProp,
@@ -328,15 +329,15 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 0
             );
 
-            var error = (WIN32_ERROR)Marshal.GetLastWin32Error();
+            WIN32_ERROR error = (WIN32_ERROR)Marshal.GetLastWin32Error();
 
             if (success || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
             {
                 throw new Win32Exception("Unexpected result while querying Instance ID property size");
             }
 
-            var sb = new StringBuilder((int)requiredSize);
-            
+            StringBuilder sb = new StringBuilder((int)requiredSize);
+
             success = SetupApiWrapper.SetupDiGetDeviceProperty(
                 hDevInfo,
                 &spDevinfoData,
@@ -347,13 +348,13 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 out _,
                 0
             );
-            
+
             if (!success)
             {
                 throw new Win32Exception("Failed to query Instance ID property");
             }
 
-            var instanceId = sb.ToString();
+            string instanceId = sb.ToString();
         }
 
         throw new NotImplementedException();
