@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
@@ -186,7 +188,7 @@ internal static class SetupApiWrapper
     [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern unsafe bool SetupDiSetClassInstallParams(
         HDEVINFO deviceInfoSet,
-        SP_DEVINFO_DATA* deviceInterfaceData, 
+        SP_DEVINFO_DATA* deviceInterfaceData,
         SP_REMOVEDEVICE_PARAMS* classInstallParams,
         int classInstallParamsSize
     );
@@ -270,6 +272,19 @@ internal static class SetupApiWrapper
 #pragma warning disable CS8500
         [In] [Out] SP_DRVINFO_DATA* driverInfoData
 #pragma warning restore CS8500
+    );
+
+    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiGetDeviceProperty(
+        [In] HDEVINFO deviceInfoSet,
+        [In] SP_DEVINFO_DATA* deviceInfoData,
+        [In] DEVPROPKEY* propertyKey,
+        [Out] out DEVPROPTYPE propertyType,
+        [Out] [Optional] StringBuilder propertyBuffer,
+        [In] UInt32 propertyBufferSize,
+        [Out] [Optional] out UInt32 requiredSize,
+        [In] UInt32 flags
     );
 
     #endregion

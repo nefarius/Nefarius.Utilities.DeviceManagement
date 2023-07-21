@@ -85,6 +85,15 @@ public interface IPnPDevice
     bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default);
 
     /// <summary>
+    ///     Installs the NULL-driver on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
+    ///     driver and reboot the device in "raw" or "driverless" mode.
+    /// </remarks>
+    void InstallNullDriver();
+
+    /// <summary>
     ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
     /// </summary>
     /// <typeparam name="T">The managed type of the fetched property value.</typeparam>
@@ -281,6 +290,12 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         return device is not null &&
                (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <inheritdoc />
+    public void InstallNullDriver()
+    {
+        throw new NotImplementedException();
     }
 
     /// <summary>
