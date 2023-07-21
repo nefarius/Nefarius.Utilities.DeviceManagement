@@ -107,6 +107,9 @@ public interface IPnPDevice
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 {
+    /// <summary>
+    ///     A CfgMgr32-compatible handle of this device instance.
+    /// </summary>
     private readonly uint _instanceHandle;
 
     /// <summary>
