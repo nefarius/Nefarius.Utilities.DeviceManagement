@@ -144,9 +144,16 @@ internal static class SetupApiWrapper
 
     [DllImport("setupapi.dll", SetLastError = true)]
     internal static extern bool SetupDiEnumDeviceInfo(
-        IntPtr deviceInfoSet,
+        HDEVINFO deviceInfoSet,
         UInt32 memberIndex,
         ref SP_DEVINFO_DATA deviceInfoData
+    );
+    
+    [DllImport("setupapi.dll", SetLastError = true)]
+    internal static extern unsafe bool SetupDiEnumDeviceInfo(
+        HDEVINFO deviceInfoSet,
+        UInt32 memberIndex,
+        SP_DEVINFO_DATA* deviceInfoData
     );
 
     [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
@@ -154,7 +161,15 @@ internal static class SetupApiWrapper
         ref Guid classGuid,
         IntPtr enumerator,
         HWND hwndParent,
-        int flags
+        UInt32 flags
+    );
+    
+    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static extern unsafe HDEVINFO SetupDiGetClassDevs(
+        Guid* classGuid,
+        string enumerator,
+        HWND hwndParent,
+        UInt32 flags
     );
 
     [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]

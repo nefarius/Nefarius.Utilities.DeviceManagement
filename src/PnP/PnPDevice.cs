@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Text;
 
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
+using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 
@@ -293,8 +296,66 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     }
 
     /// <inheritdoc />
-    public void InstallNullDriver()
+    public unsafe void InstallNullDriver()
     {
+        SetupApiWrapper.SP_DEVINFO_DATA spDevinfoData = new();
+        spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
+
+        HDEVINFO hDevInfo = SetupApiWrapper.SetupDiGetClassDevs(
+            null,
+            null,
+            HWND.Null,
+            PInvoke.DIGCF_ALLCLASSES | PInvoke.DIGCF_PRESENT
+        );
+
+        if (hDevInfo.IsNull)
+        {
+            throw new Win32Exception("Failed to get devices for all classes");
+        }
+
+        for (UInt32 devIndex = 0; SetupApiWrapper.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
+        {
+            var instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
+
+            var success = SetupApiWrapper.SetupDiGetDeviceProperty(
+                hDevInfo,
+                &spDevinfoData,
+                &instanceProp,
+                out _,
+                null,
+                0,
+                out uint requiredSize,
+                0
+            );
+
+            var error = (WIN32_ERROR)Marshal.GetLastWin32Error();
+
+            if (success || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
+            {
+                throw new Win32Exception("Unexpected result while querying Instance ID property size");
+            }
+
+            var sb = new StringBuilder((int)requiredSize);
+            
+            success = SetupApiWrapper.SetupDiGetDeviceProperty(
+                hDevInfo,
+                &spDevinfoData,
+                &instanceProp,
+                out _,
+                sb,
+                requiredSize,
+                out _,
+                0
+            );
+            
+            if (!success)
+            {
+                throw new Win32Exception("Failed to query Instance ID property");
+            }
+
+            var instanceId = sb.ToString();
+        }
+
         throw new NotImplementedException();
     }
 

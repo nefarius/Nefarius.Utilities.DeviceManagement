@@ -69,7 +69,7 @@ public static class Devcon
             ref target,
             IntPtr.Zero,
             HWND.Null,
-            presentOnly ? (int)PInvoke.DIGCF_PRESENT : 0
+            presentOnly ? PInvoke.DIGCF_PRESENT : 0
         );
 
         try
@@ -163,7 +163,7 @@ public static class Devcon
                 flags |= (int)PInvoke.DIGCF_PRESENT;
             }
 
-            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, HWND.Null, flags);
+            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, HWND.Null, (uint)flags);
 
             deviceInterfaceData.cbSize = da.cbSize = Marshal.SizeOf(deviceInterfaceData);
 
