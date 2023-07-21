@@ -93,9 +93,20 @@ public interface IPnPDevice
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode.
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     void InstallNullDriver();
+
+    /// <summary>
+    ///     Installs the NULL-driver on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     for the change to take effect without requiring a reboot.
+    /// </remarks>
+    void InstallNullDriver(out bool rebootRequired);
 
     /// <summary>
     ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
@@ -297,7 +308,13 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     }
 
     /// <inheritdoc />
-    public unsafe void InstallNullDriver()
+    public void InstallNullDriver()
+    {
+        InstallNullDriver(out _);
+    }
+
+    /// <inheritdoc />
+    public unsafe void InstallNullDriver(out bool rebootRequired)
     {
         SetupApiWrapper.SP_DEVINFO_DATA spDevinfoData = new();
         spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
@@ -336,7 +353,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new Win32Exception("Unexpected result while querying Instance ID property size");
             }
 
-            StringBuilder sb = new StringBuilder((int)requiredSize);
+            StringBuilder sb = new((int)requiredSize);
 
             success = SetupApiWrapper.SetupDiGetDeviceProperty(
                 hDevInfo,
@@ -355,9 +372,30 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             }
 
             string instanceId = sb.ToString();
+
+            if (!InstanceId.Equals(instanceId, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            success = SetupApiWrapper.DiInstallDevice(
+                HWND.Null,
+                hDevInfo,
+                &spDevinfoData,
+                null,
+                PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
+                out rebootRequired
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("NULL-driver installation failed");
+            }
+
+            return;
         }
 
-        throw new NotImplementedException();
+        throw new ArgumentOutOfRangeException(nameof(InstanceId), $"Failed to find device instance {InstanceId}");
     }
 
     /// <summary>

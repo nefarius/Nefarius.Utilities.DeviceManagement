@@ -323,7 +323,7 @@ internal static class SetupApiWrapper
 
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern unsafe bool DiInstallDevice(
-        [In] [Optional] IntPtr hwndParent,
+        [In] [Optional] HWND hwndParent,
         [In] HDEVINFO deviceInfoSet,
         [In] SP_DEVINFO_DATA* deviceInfoData,
 #pragma warning disable CS8500

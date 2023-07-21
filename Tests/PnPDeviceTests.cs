@@ -12,6 +12,19 @@ public class PnPDeviceTests
     {
     }
 
+    /// <summary>
+    ///     Requires one emulated X360 controller.
+    /// </summary>
+    [Test]
+    public void TestPnPDeviceInstallNullDriver()
+    {
+        Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId), Is.True);
+
+        var device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        
+        device.InstallNullDriver();
+    }
+    
     [Test]
     public void TestGetDriverMeta()
     {
@@ -56,18 +69,5 @@ public class PnPDeviceTests
         Assert.That(device, Is.Not.Null);
 
         Assert.That(device!.IsVirtual(), Is.True);
-    }
-
-    /// <summary>
-    ///     Requires one emulated X360 controller.
-    /// </summary>
-    [Test]
-    public void TestPnPDeviceInstallNullDriver()
-    {
-        Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId), Is.True);
-
-        var device = PnPDevice.GetDeviceByInstanceId(instanceId);
-        
-        device.InstallNullDriver();
     }
 }
