@@ -63,9 +63,9 @@ public static class Devcon
     {
         instanceIds = new List<string>();
         bool found = false;
-        SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
+        SetupApi.SP_DEVINFO_DATA deviceInfoData = new();
         deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
-        HDEVINFO deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
+        HDEVINFO deviceInfoSet = SetupApi.SetupDiGetClassDevs(
             ref target,
             IntPtr.Zero,
             HWND.Null,
@@ -76,7 +76,7 @@ public static class Devcon
         {
             for (
                 uint i = 0;
-                SetupApiWrapper.SetupDiEnumDeviceInfo(deviceInfoSet, i, ref deviceInfoData);
+                SetupApi.SetupDiEnumDeviceInfo(deviceInfoSet, i, ref deviceInfoData);
                 i++
             )
             {
@@ -126,7 +126,7 @@ public static class Devcon
         {
             if (deviceInfoSet != IntPtr.Zero)
             {
-                SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+                SetupApi.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
         }
 
@@ -152,7 +152,7 @@ public static class Devcon
 
         try
         {
-            SetupApiWrapper.SP_DEVINFO_DATA deviceInterfaceData = new(),
+            SetupApi.SP_DEVINFO_DATA deviceInterfaceData = new(),
                 da = new();
             int bufferSize = 0, memberIndex = 0;
 
@@ -163,14 +163,14 @@ public static class Devcon
                 flags |= (int)PInvoke.DIGCF_PRESENT;
             }
 
-            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(ref target, IntPtr.Zero, HWND.Null, (uint)flags);
+            deviceInfoSet = SetupApi.SetupDiGetClassDevs(ref target, IntPtr.Zero, HWND.Null, (uint)flags);
 
             deviceInterfaceData.cbSize = da.cbSize = Marshal.SizeOf(deviceInterfaceData);
 
-            while (SetupApiWrapper.SetupDiEnumDeviceInterfaces(deviceInfoSet, IntPtr.Zero, ref target, memberIndex,
+            while (SetupApi.SetupDiEnumDeviceInterfaces(deviceInfoSet, IntPtr.Zero, ref target, memberIndex,
                        ref deviceInterfaceData))
             {
-                SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(
+                SetupApi.SetupDiGetDeviceInterfaceDetail(
                     deviceInfoSet,
                     ref deviceInterfaceData,
                     IntPtr.Zero,
@@ -184,7 +184,7 @@ public static class Devcon
                     Marshal.WriteInt32(detailDataBuffer,
                         IntPtr.Size == 4 ? 4 + Marshal.SystemDefaultCharSize : 8);
 
-                    if (SetupApiWrapper.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData,
+                    if (SetupApi.SetupDiGetDeviceInterfaceDetail(deviceInfoSet, ref deviceInterfaceData,
                             detailDataBuffer,
                             bufferSize, ref bufferSize, ref da))
                     {
@@ -224,7 +224,7 @@ public static class Devcon
         {
             if (deviceInfoSet != HDEVINFO.Null)
             {
-                SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+                SetupApi.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
         }
 
@@ -284,7 +284,7 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Install(string fullInfPath, out bool rebootRequired)
     {
-        return SetupApiWrapper.DiInstallDriver(HWND.Null, fullInfPath, PInvoke.DIIRFLAG_FORCE_INF,
+        return SetupApi.DiInstallDriver(HWND.Null, fullInfPath, PInvoke.DIIRFLAG_FORCE_INF,
             out rebootRequired);
     }
 
@@ -298,11 +298,11 @@ public static class Devcon
     public static bool Create(string className, Guid classGuid, string node)
     {
         HDEVINFO deviceInfoSet = HDEVINFO.Null;
-        SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
+        SetupApi.SP_DEVINFO_DATA deviceInfoData = new();
 
         try
         {
-            deviceInfoSet = SetupApiWrapper.SetupDiCreateDeviceInfoList(ref classGuid, HWND.Null);
+            deviceInfoSet = SetupApi.SetupDiCreateDeviceInfoList(ref classGuid, HWND.Null);
 
             if (deviceInfoSet == (IntPtr)(-1))
             {
@@ -311,7 +311,7 @@ public static class Devcon
 
             deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
 
-            if (!SetupApiWrapper.SetupDiCreateDeviceInfo(
+            if (!SetupApi.SetupDiCreateDeviceInfo(
                     deviceInfoSet,
                     className,
                     ref classGuid,
@@ -324,7 +324,7 @@ public static class Devcon
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            if (!SetupApiWrapper.SetupDiSetDeviceRegistryProperty(
+            if (!SetupApi.SetupDiSetDeviceRegistryProperty(
                     deviceInfoSet,
                     ref deviceInfoData,
                     (int)PInvoke.SPDRP_HARDWAREID,
@@ -335,7 +335,7 @@ public static class Devcon
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            if (!SetupApiWrapper.SetupDiCallClassInstaller(
+            if (!SetupApi.SetupDiCallClassInstaller(
                     (int)PInvoke.DIF_REGISTERDEVICE,
                     deviceInfoSet,
                     ref deviceInfoData
@@ -348,7 +348,7 @@ public static class Devcon
         {
             if (deviceInfoSet != HDEVINFO.Null)
             {
-                SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+                SetupApi.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
         }
 
@@ -380,17 +380,17 @@ public static class Devcon
 
         try
         {
-            SetupApiWrapper.SP_DEVINFO_DATA deviceInfoData = new();
+            SetupApi.SP_DEVINFO_DATA deviceInfoData = new();
             deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
 
-            deviceInfoSet = SetupApiWrapper.SetupDiGetClassDevs(
+            deviceInfoSet = SetupApi.SetupDiGetClassDevs(
                 ref classGuid,
                 IntPtr.Zero,
                 HWND.Null, 
                 (int)PInvoke.DIGCF_PRESENT | (int)PInvoke.DIGCF_DEVICEINTERFACE
             );
 
-            if (SetupApiWrapper.SetupDiOpenDeviceInfo(
+            if (SetupApi.SetupDiOpenDeviceInfo(
                     deviceInfoSet,
                     instanceId,
                     IntPtr.Zero,
@@ -398,9 +398,9 @@ public static class Devcon
                     ref deviceInfoData
                 ))
             {
-                SetupApiWrapper.SP_REMOVEDEVICE_PARAMS props = new()
+                SetupApi.SP_REMOVEDEVICE_PARAMS props = new()
                 {
-                    ClassInstallHeader = new SetupApiWrapper.SP_CLASSINSTALL_HEADER()
+                    ClassInstallHeader = new SetupApi.SP_CLASSINSTALL_HEADER()
                 };
 
                 props.ClassInstallHeader.cbSize = Marshal.SizeOf(props.ClassInstallHeader);
@@ -410,7 +410,7 @@ public static class Devcon
                 props.HwProfile = 0x00;
 
                 // Prepare class (un-)installer
-                if (SetupApiWrapper.SetupDiSetClassInstallParams(
+                if (SetupApi.SetupDiSetClassInstallParams(
                         deviceInfoSet,
                         &deviceInfoData,
                         &props,
@@ -418,7 +418,7 @@ public static class Devcon
                     ))
                 {
                     // Invoke class installer with uninstall action
-                    if (!SetupApiWrapper.SetupDiCallClassInstaller((int)PInvoke.DIF_REMOVE, deviceInfoSet,
+                    if (!SetupApi.SetupDiCallClassInstaller((int)PInvoke.DIF_REMOVE, deviceInfoSet,
                             ref deviceInfoData))
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -432,7 +432,7 @@ public static class Devcon
                     );
 
                     // Fill SP_DEVINSTALL_PARAMS struct
-                    if (!SetupApiWrapper.SetupDiGetDeviceInstallParams(deviceInfoSet, &deviceInfoData,
+                    if (!SetupApi.SetupDiGetDeviceInstallParams(deviceInfoSet, &deviceInfoData,
                             installParams))
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -461,7 +461,7 @@ public static class Devcon
         {
             if (deviceInfoSet != HDEVINFO.Null)
             {
-                SetupApiWrapper.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+                SetupApi.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
 
             Marshal.FreeHGlobal(installParams);
@@ -542,7 +542,7 @@ public static class Devcon
 
         if (forceDelete
             && Kernel32.MethodExists("newdev.dll", "DiUninstallDriverW")
-            && !SetupApiWrapper.DiUninstallDriver(
+            && !SetupApi.DiUninstallDriver(
                 HWND.Null, 
                 fullInfPath,
                 PInvoke.DIURFLAG_NO_REMOVE_INF,
@@ -551,7 +551,7 @@ public static class Devcon
             throw new Win32Exception(Marshal.GetLastWin32Error());
         }
 
-        if (!SetupApiWrapper.SetupUninstallOEMInf(
+        if (!SetupApi.SetupUninstallOEMInf(
                 oemInfName,
                 forceDelete
                     ? PInvoke.SUOI_FORCEDELETE

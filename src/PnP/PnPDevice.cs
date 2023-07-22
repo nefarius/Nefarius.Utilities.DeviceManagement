@@ -316,10 +316,10 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <inheritdoc />
     public unsafe void InstallNullDriver(out bool rebootRequired)
     {
-        SetupApiWrapper.SP_DEVINFO_DATA spDevinfoData = new();
+        SetupApi.SP_DEVINFO_DATA spDevinfoData = new();
         spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
 
-        HDEVINFO hDevInfo = SetupApiWrapper.SetupDiGetClassDevs(
+        HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
             null,
             null,
             HWND.Null,
@@ -331,11 +331,11 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             throw new Win32Exception("Failed to get devices for all classes");
         }
 
-        for (UInt32 devIndex = 0; SetupApiWrapper.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
+        for (UInt32 devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
         {
             DEVPROPKEY instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
 
-            bool success = SetupApiWrapper.SetupDiGetDeviceProperty(
+            bool success = SetupApi.SetupDiGetDeviceProperty(
                 hDevInfo,
                 &spDevinfoData,
                 &instanceProp,
@@ -355,7 +355,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
             StringBuilder sb = new((int)requiredSize);
 
-            success = SetupApiWrapper.SetupDiGetDeviceProperty(
+            success = SetupApi.SetupDiGetDeviceProperty(
                 hDevInfo,
                 &spDevinfoData,
                 &instanceProp,
@@ -378,7 +378,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 continue;
             }
 
-            success = SetupApiWrapper.DiInstallDevice(
+            success = SetupApi.DiInstallDevice(
                 HWND.Null,
                 hDevInfo,
                 &spDevinfoData,

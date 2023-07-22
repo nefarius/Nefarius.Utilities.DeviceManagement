@@ -16,7 +16,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 /// <remarks>
 ///     TODO: migrate over to CsWin32
 /// </remarks>
-internal static class SetupApiWrapper
+internal static class SetupApi
 {
     private const int LineLen = 256;
 
@@ -104,18 +104,18 @@ internal static class SetupApiWrapper
 
     #region SetupAPI
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern HDEVINFO SetupDiCreateDeviceInfoList(
         ref Guid classGuid,
         HWND hwndParent
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiDestroyDeviceInfoList(
         HDEVINFO deviceInfoSet
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiCreateDeviceInfo(
         HDEVINFO deviceInfoSet,
         string deviceName,
@@ -126,7 +126,7 @@ internal static class SetupApiWrapper
         ref SP_DEVINFO_DATA deviceInfoData
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiSetDeviceRegistryProperty(
         HDEVINFO deviceInfoSet,
         ref SP_DEVINFO_DATA deviceInfoData,
@@ -135,28 +135,28 @@ internal static class SetupApiWrapper
         int propertyBufferSize
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiCallClassInstaller(
         int installFunction,
         IntPtr deviceInfoSet,
         ref SP_DEVINFO_DATA deviceInfoData
     );
 
-    [DllImport("setupapi.dll", SetLastError = true)]
+    [DllImport(nameof(SetupApi), SetLastError = true)]
     internal static extern bool SetupDiEnumDeviceInfo(
         HDEVINFO deviceInfoSet,
         UInt32 memberIndex,
         ref SP_DEVINFO_DATA deviceInfoData
     );
     
-    [DllImport("setupapi.dll", SetLastError = true)]
+    [DllImport(nameof(SetupApi), SetLastError = true)]
     internal static extern unsafe bool SetupDiEnumDeviceInfo(
         HDEVINFO deviceInfoSet,
         UInt32 memberIndex,
         SP_DEVINFO_DATA* deviceInfoData
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern HDEVINFO SetupDiGetClassDevs(
         ref Guid classGuid,
         IntPtr enumerator,
@@ -164,7 +164,7 @@ internal static class SetupApiWrapper
         UInt32 flags
     );
     
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern unsafe HDEVINFO SetupDiGetClassDevs(
         Guid* classGuid,
         string enumerator,
@@ -172,7 +172,7 @@ internal static class SetupApiWrapper
         UInt32 flags
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiEnumDeviceInterfaces(
         HDEVINFO deviceInfoSet,
         IntPtr deviceInfoData,
@@ -181,7 +181,7 @@ internal static class SetupApiWrapper
         ref SP_DEVINFO_DATA deviceInterfaceData
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiGetDeviceInterfaceDetail(
         HDEVINFO deviceInfoSet,
         ref SP_DEVINFO_DATA deviceInterfaceData,
@@ -191,7 +191,7 @@ internal static class SetupApiWrapper
         ref SP_DEVINFO_DATA deviceInfoData
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern bool SetupDiOpenDeviceInfo(
         HDEVINFO deviceInfoSet,
         string deviceInstanceId,
@@ -200,7 +200,7 @@ internal static class SetupApiWrapper
         ref SP_DEVINFO_DATA deviceInfoData
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern unsafe bool SetupDiSetClassInstallParams(
         HDEVINFO deviceInfoSet,
         SP_DEVINFO_DATA* deviceInterfaceData,
@@ -208,7 +208,7 @@ internal static class SetupApiWrapper
         int classInstallParamsSize
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern unsafe bool SetupDiGetDeviceInstallParams(
         [In] HDEVINFO hDevInfo,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
@@ -217,14 +217,14 @@ internal static class SetupApiWrapper
 #pragma warning restore CS8500
     );
 
-    [DllImport("setupapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern unsafe bool SetupDiGetDeviceInstallParams(
         [In] HDEVINFO hDevInfo,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [Out] IntPtr deviceInstallParams
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool SetupUninstallOEMInf(
         [MarshalAs(UnmanagedType.LPWStr)] string infName,
@@ -232,7 +232,7 @@ internal static class SetupApiWrapper
         IntPtr reserved
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiOpenDeviceInfo(
         [In] HDEVINFO deviceInfoSet,
@@ -242,14 +242,14 @@ internal static class SetupApiWrapper
         [Out] [Optional] SP_DEVINFO_DATA* deviceInfoData
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiSetSelectedDevice(
         [In] HDEVINFO deviceInfoSet,
         [In] SP_DEVINFO_DATA* deviceInfoData
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiSetDeviceInstallParams(
         [In] HDEVINFO deviceInfoSet,
@@ -259,7 +259,7 @@ internal static class SetupApiWrapper
 #pragma warning restore CS8500
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiBuildDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
@@ -267,7 +267,7 @@ internal static class SetupApiWrapper
         [In] UInt32 driverType
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiEnumDriverInfo(
         [In] HDEVINFO deviceInfoSet,
@@ -279,7 +279,7 @@ internal static class SetupApiWrapper
 #pragma warning restore CS8500
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiSetSelectedDriver(
         [In] HDEVINFO deviceInfoSet,
@@ -289,7 +289,7 @@ internal static class SetupApiWrapper
 #pragma warning restore CS8500
     );
 
-    [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static unsafe extern bool SetupDiGetDeviceProperty(
         [In] HDEVINFO deviceInfoSet,
