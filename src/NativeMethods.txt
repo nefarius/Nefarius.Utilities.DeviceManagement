@@ -48,6 +48,7 @@ DeviceIoControl
 DispatchMessage
 FILETIME
 FILE_ACCESS_RIGHTS
+FormatMessage
 GUID_DEVINTERFACE_USB_HUB
 GetMessage
 GetModuleHandle
@@ -59,6 +60,7 @@ INSTALLFLAG_FORCE
 INSTALLFLAG_NONINTERACTIVE
 IOCTL_USB_HUB_CYCLE_PORT
 LoadLibrary
+LocalFree
 MAX_PATH
 OpenSCManager
 OpenService
