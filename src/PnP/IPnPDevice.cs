@@ -62,6 +62,10 @@ public interface IPnPDevice
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     void InstallNullDriver(out bool rebootRequired);
+    
+    void InstallCustomDriver(string infName);
+    
+    void InstallCustomDriver(string infName, out bool rebootRequired);
 
     /// <summary>
     ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.

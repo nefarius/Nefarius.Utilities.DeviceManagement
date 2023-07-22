@@ -35,13 +35,13 @@ internal static class SetupApi
         internal readonly IntPtr Reserved;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     internal struct SP_DRVINFO_DATA
     {
 #pragma warning disable IDE1006
-        internal readonly int cbSize;
+        internal int cbSize;
 #pragma warning restore IDE1006
         internal readonly UInt32 DriverType;
         internal IntPtr Reserved;
@@ -78,7 +78,7 @@ internal static class SetupApi
         internal int HwProfile;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
@@ -87,12 +87,12 @@ internal static class SetupApi
         internal Int32 cbSize;
         internal Int32 Flags;
         internal Int32 FlagsEx;
-        internal IntPtr hwndParent;
+        internal HWND hwndParent;
         internal IntPtr InstallMsgHandler;
         internal IntPtr InstallMsgHandlerContext;
         internal IntPtr FileQueue;
         internal IntPtr ClassInstallReserved;
-        internal int Reserved;
+        internal UInt32 Reserved;
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
         internal string DriverPath;
@@ -107,6 +107,12 @@ internal static class SetupApi
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern HDEVINFO SetupDiCreateDeviceInfoList(
         ref Guid classGuid,
+        HWND hwndParent
+    );
+    
+    [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
+    internal static unsafe extern HDEVINFO SetupDiCreateDeviceInfoList(
+        Guid* classGuid,
         HWND hwndParent
     );
 
@@ -212,9 +218,7 @@ internal static class SetupApi
     internal static extern unsafe bool SetupDiGetDeviceInstallParams(
         [In] HDEVINFO hDevInfo,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-#pragma warning disable CS8500
-        [Out] SP_DEVINSTALL_PARAMS* deviceInstallParams
-#pragma warning restore CS8500
+        [In][Out] ref SP_DEVINSTALL_PARAMS deviceInstallParams
     );
 
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
@@ -254,9 +258,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiSetDeviceInstallParams(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-#pragma warning disable CS8500
-        [In] SP_DEVINSTALL_PARAMS* deviceInstallParams
-#pragma warning restore CS8500
+        [In] ref SP_DEVINSTALL_PARAMS deviceInstallParams
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
@@ -264,7 +266,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiBuildDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
         [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
-        [In] UInt32 driverType
+        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
@@ -272,11 +274,9 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiEnumDriverInfo(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] UInt32 driverType,
+        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType,
         [In] UInt32 memberIndex,
-#pragma warning disable CS8500
-        [Out] SP_DRVINFO_DATA* driverInfoData
-#pragma warning restore CS8500
+        [In][Out] ref SP_DRVINFO_DATA driverInfoData
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]

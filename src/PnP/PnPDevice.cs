@@ -285,6 +285,104 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         throw new ArgumentOutOfRangeException(nameof(InstanceId), $"Failed to find device instance {InstanceId}");
     }
 
+    /// <inheritdoc />
+    public void InstallCustomDriver(string infName)
+    {
+        InstallCustomDriver(infName, out _);
+    }
+
+    /// <inheritdoc />
+    public unsafe void InstallCustomDriver(string infName, out bool rebootRequired)
+    {
+        SetupApi.SP_DEVINSTALL_PARAMS deviceInstallParams = new();
+        deviceInstallParams.cbSize = Marshal.SizeOf(deviceInstallParams);
+
+        SetupApi.SP_DRVINFO_DATA driverInfoData = new();
+        driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
+
+        SetupApi.SP_DEVINFO_DATA devInfoData = new();
+        devInfoData.cbSize = Marshal.SizeOf(devInfoData);
+
+        HDEVINFO hDevInfo = SetupApi.SetupDiCreateDeviceInfoList(null, HWND.Null);
+
+        if (hDevInfo.IsNull)
+        {
+            throw new Win32Exception("Failed to get get empty device info list");
+        }
+
+        bool success = SetupApi.SetupDiOpenDeviceInfo(
+            hDevInfo,
+            InstanceId,
+            HWND.Null,
+            0,
+            &devInfoData
+        );
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to open device info");
+        }
+
+        success = SetupApi.SetupDiSetSelectedDevice(hDevInfo, &devInfoData);
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to set the selected device");
+        }
+
+        success = SetupApi.SetupDiGetDeviceInstallParams(
+            hDevInfo,
+            &devInfoData,
+            ref deviceInstallParams
+        );
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to get the device install parameters");
+        }
+
+        deviceInstallParams.Flags |= PInvoke.DI_ENUMSINGLEINF;
+        deviceInstallParams.FlagsEx |= PInvoke.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
+        deviceInstallParams.DriverPath = infName;
+
+        success = SetupApi.SetupDiSetDeviceInstallParams(
+            hDevInfo,
+            &devInfoData,
+            ref deviceInstallParams
+        );
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to set the device install parameters");
+        }
+
+        success = SetupApi.SetupDiBuildDriverInfoList(
+            hDevInfo,
+            &devInfoData,
+            SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+        );
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to build driver info list");
+        }
+
+        success = SetupApi.SetupDiEnumDriverInfo(
+            hDevInfo,
+            &devInfoData,
+            SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER,
+            0,
+            ref driverInfoData
+        );
+        
+        if (!success)
+        {
+            throw new Win32Exception("Failed to enumerate driver info");
+        }
+
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.
     /// </summary>

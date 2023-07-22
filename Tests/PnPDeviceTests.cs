@@ -11,6 +11,19 @@ public class PnPDeviceTests
     public void Setup()
     {
     }
+    
+    /// <summary>
+    ///     Requires one physical (or virtual) DualSense controller.
+    /// </summary>
+    [Test]
+    public void TestPnPDeviceInstallCustomDriver()
+    {
+        const string instanceId = @"USB\VID_054C&PID_0CE6\8&1265CE96&0&5";
+        
+        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        
+        device.InstallCustomDriver("winusb.inf");
+    }
 
     /// <summary>
     ///     Requires one emulated X360 controller.
