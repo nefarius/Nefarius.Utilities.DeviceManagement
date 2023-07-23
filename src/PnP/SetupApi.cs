@@ -109,7 +109,7 @@ internal static class SetupApi
         ref Guid classGuid,
         HWND hwndParent
     );
-    
+
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static unsafe extern HDEVINFO SetupDiCreateDeviceInfoList(
         Guid* classGuid,
@@ -154,7 +154,7 @@ internal static class SetupApi
         UInt32 memberIndex,
         ref SP_DEVINFO_DATA deviceInfoData
     );
-    
+
     [DllImport(nameof(SetupApi), SetLastError = true)]
     internal static extern unsafe bool SetupDiEnumDeviceInfo(
         HDEVINFO deviceInfoSet,
@@ -169,7 +169,7 @@ internal static class SetupApi
         HWND hwndParent,
         UInt32 flags
     );
-    
+
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
     internal static extern unsafe HDEVINFO SetupDiGetClassDevs(
         Guid* classGuid,
@@ -218,7 +218,7 @@ internal static class SetupApi
     internal static extern unsafe bool SetupDiGetDeviceInstallParams(
         [In] HDEVINFO hDevInfo,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In][Out] ref SP_DEVINSTALL_PARAMS deviceInstallParams
+        [In] [Out] ref SP_DEVINSTALL_PARAMS deviceInstallParams
     );
 
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
@@ -276,7 +276,7 @@ internal static class SetupApi
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType,
         [In] UInt32 memberIndex,
-        [In][Out] ref SP_DRVINFO_DATA driverInfoData
+        [In] [Out] ref SP_DRVINFO_DATA driverInfoData
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
@@ -284,9 +284,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiSetSelectedDriver(
         [In] HDEVINFO deviceInfoSet,
         [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
-#pragma warning disable CS8500
-        [In] [Out] SP_DRVINFO_DATA* driverInfoData
-#pragma warning restore CS8500
+        [In] [Out] ref SP_DRVINFO_DATA driverInfoData
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
@@ -317,6 +315,16 @@ internal static class SetupApi
     internal static extern bool DiUninstallDriver(
         [In] HWND hwndParent,
         [In] string infPath,
+        [In] uint flags,
+        [Out] out bool needReboot
+    );
+
+    [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern unsafe bool DiInstallDevice(
+        [In] [Optional] HWND hwndParent,
+        [In] HDEVINFO deviceInfoSet,
+        [In] SP_DEVINFO_DATA* deviceInfoData,
+        [In] ref SP_DRVINFO_DATA driverInfoData,
         [In] uint flags,
         [Out] out bool needReboot
     );

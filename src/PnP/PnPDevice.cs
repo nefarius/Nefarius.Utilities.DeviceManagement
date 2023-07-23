@@ -323,6 +323,14 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             throw new Win32Exception("Failed to open device info");
         }
 
+        // extra plausibility check to inform the caller with a more helpful message
+        if (devInfoData.ClassGuid != Guid.Empty)
+        {
+            throw new InvalidOperationException(
+                $"Expected class GUID {Guid.Empty} but got {devInfoData.ClassGuid}, " +
+                $"subsequent calls will not succeed, did you forget to call {nameof(InstallNullDriver)}?");
+        }
+
         success = SetupApi.SetupDiSetSelectedDevice(hDevInfo, &devInfoData);
 
         if (!success)
@@ -374,13 +382,36 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             0,
             ref driverInfoData
         );
-        
+
         if (!success)
         {
             throw new Win32Exception("Failed to enumerate driver info");
         }
 
-        throw new NotImplementedException();
+        success = SetupApi.SetupDiSetSelectedDriver(
+            hDevInfo,
+            &devInfoData,
+            ref driverInfoData
+        );
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to set selected driver");
+        }
+
+        success = SetupApi.DiInstallDevice(
+            HWND.Null,
+            hDevInfo,
+            &devInfoData,
+            ref driverInfoData,
+            0,
+            out rebootRequired
+        );
+
+        if (!success)
+        {
+            throw new Win32Exception("Failed to install selected driver");
+        }
     }
 
     /// <summary>
