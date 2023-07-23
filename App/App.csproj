@@ -7,4 +7,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\src\Nefarius.Utilities.DeviceManagement.csproj" />
+    </ItemGroup>
+
 </Project>
