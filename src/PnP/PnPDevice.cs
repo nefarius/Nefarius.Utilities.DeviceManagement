@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -294,6 +295,16 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <inheritdoc />
     public unsafe void InstallCustomDriver(string infName, out bool rebootRequired)
     {
+        DirectoryInfo systemRoot = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
+
+        string fullInfPath = Path.Combine(systemRoot!.FullName, "INF", infName);
+
+        if (!File.Exists(fullInfPath))
+        {
+            throw new ArgumentException($"The provided INF file {infName} wasn't found in the system directory",
+                nameof(infName));
+        }
+
         SetupApi.SP_DEVINSTALL_PARAMS deviceInstallParams = new();
         deviceInstallParams.cbSize = Marshal.SizeOf(deviceInstallParams);
 

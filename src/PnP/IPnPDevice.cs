@@ -62,9 +62,34 @@ public interface IPnPDevice
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     void InstallNullDriver(out bool rebootRequired);
-    
+
+    /// <summary>
+    ///     Installs a custom driver identified by the provided INF name on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This method force-installs a given INF file on this device instance, even if no matching hardware or compatible IDs
+    ///     are found. This method can only succeed if <see cref="InstallNullDriver()" /> is called prior.
+    /// </remarks>
+    /// <param name="infName">
+    ///     The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+    ///     or absolute path.
+    /// </param>
     void InstallCustomDriver(string infName);
-    
+
+    /// <summary>
+    ///     Installs a custom driver identified by the provided INF name on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This method force-installs a given INF file on this device instance, even if no matching hardware or compatible IDs
+    ///     are found. This method can only succeed if <see cref="InstallNullDriver()" /> is called prior.
+    /// </remarks>
+    /// <param name="infName">
+    ///     The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+    ///     or absolute path.
+    /// </param>
+    /// <param name="rebootRequired">
+    ///     Gets whether a reboot is required for the changes to take effect or not.
+    /// </param>
     void InstallCustomDriver(string infName, out bool rebootRequired);
 
     /// <summary>
