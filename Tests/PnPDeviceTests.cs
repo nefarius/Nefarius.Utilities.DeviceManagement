@@ -18,7 +18,7 @@ public class PnPDeviceTests
     [Test]
     public void TestPnPDeviceInstallCustomDriver()
     {
-        const string instanceId = @"USB\VID_054C&PID_0CE6\8&1265CE96&0&5";
+        const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
         
         PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
         
