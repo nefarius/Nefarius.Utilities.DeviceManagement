@@ -14,6 +14,9 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on W
   various [unified device properties](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/unified-device-property-model--windows-vista-and-later-)
 - Convert various notations (Symlink to Instance ID etc.)
 - Enumerate and remove elements form the Driver Store
+- Hot-swap device function drivers
+- Add/Remove/Clear class filters
+- Power-cycle USB hub ports
 
 ## Documentation
 
