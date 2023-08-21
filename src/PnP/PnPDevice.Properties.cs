@@ -51,6 +51,7 @@ public partial class PnPDevice
     /// <typeparam name="T">The managed type of the fetched property value.</typeparam>
     /// <param name="propertyKey">The <see cref="DevicePropertyKey" /> to query for.</param>
     /// <returns>On success, the value of the queried property.</returns>
+    /// <remarks>If the queried property doesn't exist, the default value of the managed type is returned.</remarks>
     public T GetProperty<T>(DevicePropertyKey propertyKey)
     {
         if (typeof(T) != propertyKey.PropertyType)

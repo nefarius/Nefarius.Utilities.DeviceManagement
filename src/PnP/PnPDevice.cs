@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -424,6 +425,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             throw new Win32Exception("Failed to install selected driver");
         }
     }
+
 
     /// <summary>
     ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.
