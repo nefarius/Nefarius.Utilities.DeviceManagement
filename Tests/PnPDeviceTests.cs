@@ -11,11 +11,37 @@ public class PnPDeviceTests
     public void Setup()
     {
     }
+    
+    /// <summary>
+    ///     Requires one physical (or virtual) DualSense controller.
+    /// </summary>
+    [Test]
+    public void TestPnPDeviceInstallCustomDriver()
+    {
+        const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
+        
+        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        
+        device.InstallCustomDriver("winusb.inf");
+    }
 
+    /// <summary>
+    ///     Requires one emulated X360 controller.
+    /// </summary>
+    [Test]
+    public void TestPnPDeviceInstallNullDriver()
+    {
+        Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId), Is.True);
+
+        var device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        
+        device.InstallNullDriver();
+    }
+    
     [Test]
     public void TestGetDriverMeta()
     {
-        string path = @"\\?\usb#vid_08bb&pid_29c0#6&35844985&0&4#{a5dcbf10-6530-11d2-901f-00c04fb951ed}";
+        const string path = @"\\?\usb#vid_08bb&pid_29c0#6&35844985&0&4#{a5dcbf10-6530-11d2-901f-00c04fb951ed}";
 
         PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
 
@@ -26,13 +52,14 @@ public class PnPDeviceTests
     public void TestGetInstanceIdFromInterfaceId()
     {
         // Requires one Xbox controller, either 360 or One or compatible
-        Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
+        Assert.Multiple(() =>
+        {
+            // 1st controller
+            Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId), Is.True);
 
-        // 1st controller
-        Assert.True(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out string? path, out string? instanceId));
-
-        // compare IDs
-        Assert.That(PnPDevice.GetInstanceIdFromInterfaceId(path), Is.EqualTo(instanceId).IgnoreCase);
+            // compare IDs
+            Assert.That(PnPDevice.GetInstanceIdFromInterfaceId(path), Is.EqualTo(instanceId).IgnoreCase);
+        });
     }
 
     /// <summary>
@@ -41,15 +68,14 @@ public class PnPDeviceTests
     [Test]
     public void TestPnPDeviceIsVirtual()
     {
-        Guid xnaCompositeClass = Guid.Parse("{d61ca365-5af4-4486-998b-9db4734c6ca3}");
         string hardwareId = "USB\\VID_045E&PID_028E";
 
-        Assert.True(Devcon.FindInDeviceClassByHardwareId(xnaCompositeClass, hardwareId,
-            out IEnumerable<string>? instances, true));
+        Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.XnaComposite, hardwareId,
+            out IEnumerable<string>? instances, true), Is.True);
 
         List<string> list = instances.ToList();
 
-        Assert.That(list.Count, Is.GreaterThanOrEqualTo(1));
+        Assert.That(list, Is.Not.Empty);
 
         PnPDevice? device = list.Select(e => PnPDevice.GetDeviceByInstanceId(e)).FirstOrDefault(dev => dev.IsVirtual());
 

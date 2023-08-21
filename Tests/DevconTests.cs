@@ -18,23 +18,27 @@ public class DevconTests
     public void TestFindInDeviceClassByHardwareId()
     {
         // High precision event timer
-        string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
-
-        Assert.True(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId, out IEnumerable<string>? instances));
-        Assert.That(instances.Count(), Is.EqualTo(1));
+        const string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
+        Assert.Multiple(() =>
+        {
+            Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId, out IEnumerable<string>? instances), Is.True);
+            Assert.That(instances.Count(), Is.EqualTo(1));
+        });
 
         // not a class GUID
         Guid nonexistent = Guid.Parse("{1A9D912E-A993-4BFF-9891-B15B7A8BC32B}");
-
-        Assert.False(Devcon.FindInDeviceClassByHardwareId(nonexistent, string.Empty));
-        Assert.False(Devcon.FindInDeviceClassByHardwareId(Guid.Empty, hardwareId));
+        Assert.Multiple(() =>
+        {
+            Assert.That(Devcon.FindInDeviceClassByHardwareId(nonexistent, string.Empty), Is.False);
+            Assert.That(Devcon.FindInDeviceClassByHardwareId(Guid.Empty, hardwareId), Is.False);
+        });
     }
 
     [Test]
     public void TestFindInDeviceClassByHardwareIdWithNonexistent()
     {
-        Assert.False(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, "ROOT\\NOPE",
-            out IEnumerable<string>? instances));
+        Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, "ROOT\\NOPE",
+            out IEnumerable<string>? instances), Is.False);
         CollectionAssert.IsEmpty(instances);
     }
 
@@ -46,8 +50,8 @@ public class DevconTests
     {
         string partialHardwareId = @"BTHENUM\{1cb831ea-79cd-4508-b0fc-85f7c85ae8e0}";
 
-        Assert.True(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.Bluetooth, partialHardwareId,
-            out IEnumerable<string>? instances, true, true));
+        Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.Bluetooth, partialHardwareId,
+            out IEnumerable<string>? instances, true, true), Is.True);
         CollectionAssert.IsNotEmpty(instances);
     }
 
@@ -59,19 +63,25 @@ public class DevconTests
     {
         // Requires two Xbox controllers, either 360 or One or mixed
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
+        Assert.Multiple(() =>
+        {
 
-        // 1st controller
-        Assert.True(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out PnPDevice? device01));
+            // 1st controller
+            Assert.That(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out PnPDevice? device01), Is.True);
 
-        // check Service property against expected values
-        Assert.That(device01.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
-            Is.EqualTo("USB").Or.EqualTo("HID"));
+            // check Service property against expected values
+            Assert.That(device01.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
+                Is.EqualTo("USB").Or.EqualTo("HID"));
+        });
+        Assert.Multiple(() =>
+        {
 
-        // 2nd controller
-        Assert.True(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out PnPDevice? device02, 1));
+            // 2nd controller
+            Assert.That(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out PnPDevice? device02, 1), Is.True);
 
-        // check Service property against expected values
-        Assert.That(device02.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
-            Is.EqualTo("USB").Or.EqualTo("HID"));
+            // check Service property against expected values
+            Assert.That(device02.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
+                Is.EqualTo("USB").Or.EqualTo("HID"));
+        });
     }
 }

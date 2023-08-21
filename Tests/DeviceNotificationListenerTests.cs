@@ -18,12 +18,10 @@ public class DeviceNotificationListenerTests
     {
         TimeSpan waitTime = TimeSpan.FromSeconds(10);
 
-        // Requires any HID device
-        Guid xusbInterfaceGuid = new((int)0x4D1E55B2L, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
-
         using DeviceNotificationListener listener = new();
 
-        listener.StartListen(xusbInterfaceGuid);
+        // Requires any HID device
+        listener.StartListen(DeviceInterfaceIds.HidDevice);
 
         AutoResetEvent wait = new(false);
 
@@ -31,11 +29,11 @@ public class DeviceNotificationListenerTests
         listener.DeviceArrived += args =>
         {
             // compare interface GUID
-            Assert.That(args.InterfaceGuid, Is.EqualTo(xusbInterfaceGuid));
+            Assert.That(args.InterfaceGuid, Is.EqualTo(DeviceInterfaceIds.HidDevice));
 
             PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(args.SymLink);
 
-            Assert.IsNotNull(device);
+            Assert.That(device, Is.Not.Null);
 
             Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
                 Is.EqualTo("HID").IgnoreCase);
@@ -44,17 +42,17 @@ public class DeviceNotificationListenerTests
         };
 
         // plug in HID device now
-        Assert.IsTrue(wait.WaitOne(waitTime));
+        Assert.That(wait.WaitOne(waitTime), Is.True);
 
         // Removal
         listener.DeviceRemoved += args =>
         {
             // compare interface GUID
-            Assert.That(args.InterfaceGuid, Is.EqualTo(xusbInterfaceGuid));
+            Assert.That(args.InterfaceGuid, Is.EqualTo(DeviceInterfaceIds.HidDevice));
 
             PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(args.SymLink, DeviceLocationFlags.Phantom);
 
-            Assert.IsNotNull(device);
+            Assert.That(device, Is.Not.Null);
 
             Assert.That(device.GetProperty<string>(DevicePropertyKey.Device_EnumeratorName),
                 Is.EqualTo("HID").IgnoreCase);
@@ -63,7 +61,7 @@ public class DeviceNotificationListenerTests
         };
 
         // unplug it now
-        Assert.IsTrue(wait.WaitOne(waitTime));
+        Assert.That(wait.WaitOne(waitTime), Is.True);
 
         listener.StopListen();
     }
