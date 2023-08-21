@@ -71,3 +71,15 @@ public static Guid XboxComposite { get; }
 #### Property Value
 
 [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+
+### **HumanInterfaceDevices**
+
+Human Interface Devices (HID).
+
+```csharp
+public static Guid HumanInterfaceDevices { get; }
+```
+
+#### Property Value
+
+[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>

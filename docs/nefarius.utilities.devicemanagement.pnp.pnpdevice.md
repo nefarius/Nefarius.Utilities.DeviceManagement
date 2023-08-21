@@ -48,6 +48,12 @@ Attempts to restart this device. Device restart may fail if it has open handles 
 public void Restart()
 ```
 
+**Remarks:**
+
+This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects. If
+ this is the behaviour you seek, consider using  instead. This method remains here for
+ backwards compatibility.
+
 ### **Remove()**
 
 Attempts to remove this device node.
@@ -83,6 +89,60 @@ True if this devices originates from an emulator, false otherwise.
 This is achieved by walking up the node tree until the top most parent and check if the last parent below the
  tree root is a software device. Hardware devices originate from a PCI(e) bus while virtual devices originate from a
  root enumerated device.
+
+### **InstallNullDriver()**
+
+```csharp
+public void InstallNullDriver()
+```
+
+### **InstallNullDriver(Boolean&)**
+
+```csharp
+public void InstallNullDriver(Boolean& rebootRequired)
+```
+
+#### Parameters
+
+`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+
+### **InstallCustomDriver(String)**
+
+```csharp
+public void InstallCustomDriver(string infName)
+```
+
+#### Parameters
+
+`infName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### **InstallCustomDriver(String, Boolean&)**
+
+```csharp
+public void InstallCustomDriver(string infName, Boolean& rebootRequired)
+```
+
+#### Parameters
+
+`infName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+
+### **RemoveAndSetup()**
+
+Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.
+
+```csharp
+public void RemoveAndSetup()
+```
+
+#### Exceptions
+
+[ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+
+**Remarks:**
+
+Device restart may fail if it has open handles that currently can not be force-closed.
 
 ### **Disable()**
 

@@ -25,6 +25,18 @@ public Nullable<int> ErrorCode { get; }
 
 [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
+### **ErrorMessage**
+
+The Win32 error message.
+
+```csharp
+public string ErrorMessage { get; }
+```
+
+#### Property Value
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
 ### **TargetSite**
 
 ```csharp

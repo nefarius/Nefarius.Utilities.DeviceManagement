@@ -2,7 +2,7 @@
 
 Namespace: Nefarius.Utilities.DeviceManagement.PnP
 
-Managed wrapper for SetupAPI.
+"Device Console" utility class. Managed wrapper for common SetupAPI actions.
 
 ```csharp
 public static class Devcon
@@ -61,12 +61,12 @@ A list of instances found for the given search criteria.
 [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 True if found, false otherwise.
 
-### **FindInDeviceClassByHardwareId(Guid, String, IEnumerable`1&, Boolean)**
+### **FindInDeviceClassByHardwareId(Guid, String, IEnumerable`1&, Boolean, Boolean)**
 
 Attempts to find a device within a specified device class by a given hardware ID.
 
 ```csharp
-public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId, IEnumerable`1& instanceIds, bool presentOnly)
+public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId, IEnumerable`1& instanceIds, bool presentOnly, bool allowPartial)
 ```
 
 #### Parameters
@@ -82,6 +82,9 @@ A list of instances found for the given search criteria.
 
 `presentOnly` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 True to filter currently plugged in devices, false to get all matching devices.
+
+`allowPartial` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+True to match substrings, false to match the exact ID value.
 
 #### Returns
 
@@ -178,7 +181,8 @@ True if at least one device was found with the provided class, false otherwise.
 
 **Remarks:**
 
-This is here for backwards compatibility.
+This is here for backwards compatibility, please use
+ [Devcon.FindByInterfaceGuid(Guid, String&, String&, Int32, Boolean)](./nefarius.utilities.devicemanagement.pnp.devcon.md#findbyinterfaceguidguid-string&-string&-int32-boolean) instead.
 
 ### **Install(String, Boolean&)**
 
