@@ -106,6 +106,8 @@ DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, service);
 
 ## Sources & 3rd party credits
 
+This application benefits from these awesome projects ❤ (appearance in no special order):
+
 - [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
 - [ViGEm.Management](https://github.com/ViGEm/ViGEm.Management)
 - [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
