@@ -44,4 +44,14 @@ public partial class PnPDevice
             return childrenIds?.Select(id => GetDeviceByInstanceId(id));
         }
     }
+
+    /// <summary>
+    ///     List of hardware IDs, if any.
+    /// </summary>
+    public IEnumerable<string>? HardwareIds => GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+
+    /// <summary>
+    ///     List of compatible IDs, if any.
+    /// </summary>
+    public IEnumerable<string>? CompatibleIds => GetProperty<string[]>(DevicePropertyKey.Device_CompatibleIds);
 }

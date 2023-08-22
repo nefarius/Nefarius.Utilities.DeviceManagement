@@ -125,4 +125,14 @@ public interface IPnPDevice
     ///     Children of this <see cref="IPnPDevice"/>, if any.
     /// </summary>
     IEnumerable<IPnPDevice>? Children { get; }
+    
+    /// <summary>
+    ///     List of hardware IDs, if any.
+    /// </summary>
+    IEnumerable<string>? HardwareIds { get; }
+    
+    /// <summary>
+    ///     List of compatible IDs, if any.
+    /// </summary>
+    IEnumerable<string>? CompatibleIds { get; }
 }
