@@ -25,6 +25,66 @@ public uint Port { get; }
 
 [UInt32](https://docs.microsoft.com/en-us/dotnet/api/system.uint32)<br>
 
+### **Parent**
+
+The parent of this [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), if any.
+
+```csharp
+public IPnPDevice Parent { get; }
+```
+
+#### Property Value
+
+[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)<br>
+
+### **Siblings**
+
+Siblings of this [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md) sharing the same parent, if any.
+
+```csharp
+public IEnumerable<IPnPDevice> Siblings { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+### **Children**
+
+Children of this [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), if any.
+
+```csharp
+public IEnumerable<IPnPDevice> Children { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+### **HardwareIds**
+
+List of hardware IDs, if any.
+
+```csharp
+public IEnumerable<string> HardwareIds { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+### **CompatibleIds**
+
+List of compatible IDs, if any.
+
+```csharp
+public IEnumerable<string> CompatibleIds { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
 ### **InstanceId**
 
 The instance ID of the device. Uniquely identifies devices of equal make and model on the same machine.

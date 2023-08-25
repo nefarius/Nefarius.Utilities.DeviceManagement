@@ -34,6 +34,66 @@ public abstract string DeviceId { get; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
+### **Parent**
+
+The parent of this [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), if any.
+
+```csharp
+public abstract IPnPDevice Parent { get; }
+```
+
+#### Property Value
+
+[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)<br>
+
+### **Siblings**
+
+Siblings of this [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md) sharing the same parent, if any.
+
+```csharp
+public abstract IEnumerable<IPnPDevice> Siblings { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+### **Children**
+
+Children of this [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), if any.
+
+```csharp
+public abstract IEnumerable<IPnPDevice> Children { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+### **HardwareIds**
+
+List of hardware IDs, if any.
+
+```csharp
+public abstract IEnumerable<string> HardwareIds { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
+### **CompatibleIds**
+
+List of compatible IDs, if any.
+
+```csharp
+public abstract IEnumerable<string> CompatibleIds { get; }
+```
+
+#### Property Value
+
+[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+
 ## Methods
 
 ### **Restart()**
@@ -175,6 +235,10 @@ The  to query for.
 
 T<br>
 On success, the value of the queried property.
+
+**Remarks:**
+
+If the queried property doesn't exist, the default value of the managed type is returned.
 
 ### **SetProperty&lt;T&gt;(DevicePropertyKey, T)**
 
