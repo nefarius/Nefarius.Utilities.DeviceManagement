@@ -143,6 +143,10 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     Attempts to remove this device node.
     /// </summary>
     /// <exception cref="ConfigManagerException"></exception>
+    /// <remarks>
+    ///     This call DOES NOT invoke device and driver uninstall routines, as soon as the device is re-enumerated, it
+    ///     will reappear and become online.
+    /// </remarks>
     public unsafe void Remove()
     {
         CONFIGRET ret = PInvoke.CM_Query_And_Remove_SubTree(

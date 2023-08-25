@@ -126,6 +126,11 @@ public void Remove()
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
 
+**Remarks:**
+
+This call DOES NOT invoke device and driver uninstall routines, as soon as the device is re-enumerated, it
+ will reappear and become online.
+
 ### **IsVirtual(Func&lt;IPnPDevice, Boolean&gt;)**
 
 Walks up the [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)s parents chain to determine if the top most device is root enumerated.

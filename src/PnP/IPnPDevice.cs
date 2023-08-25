@@ -23,6 +23,31 @@ public interface IPnPDevice
     string DeviceId { get; }
 
     /// <summary>
+    ///     The parent of this <see cref="IPnPDevice" />, if any.
+    /// </summary>
+    IPnPDevice? Parent { get; }
+
+    /// <summary>
+    ///     Siblings of this <see cref="IPnPDevice" /> sharing the same parent, if any.
+    /// </summary>
+    IEnumerable<IPnPDevice>? Siblings { get; }
+
+    /// <summary>
+    ///     Children of this <see cref="IPnPDevice" />, if any.
+    /// </summary>
+    IEnumerable<IPnPDevice>? Children { get; }
+
+    /// <summary>
+    ///     List of hardware IDs, if any.
+    /// </summary>
+    IEnumerable<string>? HardwareIds { get; }
+
+    /// <summary>
+    ///     List of compatible IDs, if any.
+    /// </summary>
+    IEnumerable<string>? CompatibleIds { get; }
+
+    /// <summary>
     ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
     ///     force-closed.
     /// </summary>
@@ -31,6 +56,10 @@ public interface IPnPDevice
     /// <summary>
     ///     Attempts to remove this device node.
     /// </summary>
+    /// <remarks>
+    ///     This call DOES NOT invoke device and driver uninstall routines, as soon as the device is re-enumerated, it
+    ///     will reappear and become online.
+    /// </remarks>
     void Remove();
 
     /// <summary>
@@ -110,29 +139,4 @@ public interface IPnPDevice
     /// <param name="propertyKey">The <see cref="DevicePropertyKey" /> to update.</param>
     /// <param name="propertyValue">The value to set.</param>
     void SetProperty<T>(DevicePropertyKey propertyKey, T propertyValue);
-    
-    /// <summary>
-    ///     The parent of this <see cref="IPnPDevice"/>, if any.
-    /// </summary>
-    IPnPDevice? Parent { get; }
-    
-    /// <summary>
-    ///     Siblings of this <see cref="IPnPDevice"/> sharing the same parent, if any.
-    /// </summary>
-    IEnumerable<IPnPDevice>? Siblings { get; }
-    
-    /// <summary>
-    ///     Children of this <see cref="IPnPDevice"/>, if any.
-    /// </summary>
-    IEnumerable<IPnPDevice>? Children { get; }
-    
-    /// <summary>
-    ///     List of hardware IDs, if any.
-    /// </summary>
-    IEnumerable<string>? HardwareIds { get; }
-    
-    /// <summary>
-    ///     List of compatible IDs, if any.
-    /// </summary>
-    IEnumerable<string>? CompatibleIds { get; }
 }
