@@ -430,6 +430,16 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         }
     }
 
+    public void Uninstall()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Uninstall(out bool rebootRequired)
+    {
+        throw new NotImplementedException();
+    }
+
 
     /// <summary>
     ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.

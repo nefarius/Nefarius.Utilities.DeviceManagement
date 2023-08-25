@@ -123,6 +123,10 @@ public interface IPnPDevice
     /// </param>
     void InstallCustomDriver(string infName, out bool rebootRequired);
 
+    void Uninstall();
+    
+    void Uninstall(out bool rebootRequired);
+
     /// <summary>
     ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
     /// </summary>
