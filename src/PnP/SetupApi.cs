@@ -403,6 +403,15 @@ internal static class SetupApi
         [In] uint flags,
         [Out] out bool needReboot
     );
+    
+    [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern unsafe bool DiUninstallDevice(
+        [In] [Optional] HWND hwndParent,
+        [In] HDEVINFO deviceInfoSet,
+        [In] ref SP_DEVINFO_DATA deviceInfoData,
+        [In] uint flags,
+        [Out] out bool needReboot
+    );
 
     #endregion
 
