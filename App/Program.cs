@@ -14,15 +14,15 @@ Thread.Sleep(1000);
 
 device.InstallCustomDriver("winusb.inf");
 
-Thread.Sleep(1000);
+//Thread.Sleep(1000);
 
 // revert to original driver
 
-device.InstallNullDriver();
+device.Uninstall();
 
-Thread.Sleep(1000);
+//Thread.Sleep(1000);
 
-device.Remove();
+//device.Remove();
 
-Devcon.Refresh();
+//Devcon.Refresh();
 

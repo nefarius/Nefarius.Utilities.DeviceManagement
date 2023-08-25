@@ -334,7 +334,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiGetDriverInfoDetail(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SP_DRVINFO_DATA driverInfoData,
+        [In] SP_DRVINFO_DATA* driverInfoData,
         [In] [Out] SP_DRVINFO_DETAIL_DATA* driverInfoDetailData,
         [In] uint driverInfoDetailDataSize,
         [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
@@ -346,7 +346,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiGetDriverInfoDetail(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SP_DRVINFO_DATA driverInfoData,
+        [In] SP_DRVINFO_DATA* driverInfoData,
         [In] [Out] ref SP_DRVINFO_DETAIL_DATA driverInfoDetailData,
         [In] uint driverInfoDetailDataSize,
         [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]

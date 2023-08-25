@@ -435,9 +435,136 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         Uninstall(out _);
     }
 
-    public void Uninstall(out bool rebootRequired)
+    public unsafe void Uninstall(out bool rebootRequired)
     {
-        throw new NotImplementedException();
+        SetupApi.SP_DEVINFO_DATA spDevinfoData = new();
+        spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
+        
+        SetupApi.SP_DRVINFO_DATA driverInfoData = new();
+        driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
+        
+        SetupApi.SP_DEVINFO_DATA devInfoData = new();
+        devInfoData.cbSize = Marshal.SizeOf(devInfoData);
+
+        HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
+            null,
+            null,
+            HWND.Null,
+            PInvoke.DIGCF_ALLCLASSES | PInvoke.DIGCF_PRESENT
+        );
+
+        if (hDevInfo.IsNull)
+        {
+            throw new Win32Exception("Failed to get devices for all classes");
+        }
+
+        for (UInt32 devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
+        {
+            DEVPROPKEY instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
+
+            bool success = SetupApi.SetupDiGetDeviceProperty(
+                hDevInfo,
+                &spDevinfoData,
+                &instanceProp,
+                out _,
+                null,
+                0,
+                out uint requiredSize,
+                0
+            );
+
+            WIN32_ERROR error = (WIN32_ERROR)Marshal.GetLastWin32Error();
+
+            if (success || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
+            {
+                throw new Win32Exception("Unexpected result while querying Instance ID property size");
+            }
+
+            StringBuilder sb = new((int)requiredSize);
+
+            success = SetupApi.SetupDiGetDeviceProperty(
+                hDevInfo,
+                &spDevinfoData,
+                &instanceProp,
+                out _,
+                sb,
+                requiredSize,
+                out _,
+                0
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to query Instance ID property");
+            }
+
+            string instanceId = sb.ToString();
+
+            if (!InstanceId.Equals(instanceId, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+            
+            // found our device
+            
+            success = SetupApi.SetupDiBuildDriverInfoList(
+                hDevInfo,
+                &devInfoData,
+                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_COMPATDRIVER
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to build driver info list");
+            }
+
+            success = SetupApi.SetupDiEnumDriverInfo(
+                hDevInfo,
+                &devInfoData,
+                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_COMPATDRIVER,
+                0,
+                ref driverInfoData
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to enumerate driver info");
+            }
+
+            SetupApi.SP_DRVINFO_DETAIL_DATA drvInfoDetailData = new();
+            drvInfoDetailData.cbSize = Marshal.SizeOf(drvInfoDetailData);
+
+            SetupApi.SetupDiGetDriverInfoDetail(
+                hDevInfo,
+                &devInfoData,
+                &driverInfoData,
+                &drvInfoDetailData,
+                (uint)drvInfoDetailData.cbSize,
+                out uint requiredBufferSize
+            );
+            
+            
+            
+            
+
+            success = SetupApi.DiInstallDevice(
+                HWND.Null,
+                hDevInfo,
+                &spDevinfoData,
+                null,
+                PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
+                out rebootRequired
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("NULL-driver installation failed");
+            }
+
+            return;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(InstanceId), $"Failed to find device instance {InstanceId}");
     }
 
     /// <summary>
