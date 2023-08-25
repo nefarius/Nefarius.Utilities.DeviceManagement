@@ -171,7 +171,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
     /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
-    public bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default)
+    public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
     {
         IPnPDevice device = this;
 
@@ -300,7 +300,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <inheritdoc />
     public unsafe void InstallCustomDriver(string infName, out bool rebootRequired)
     {
-        DirectoryInfo systemRoot = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
+        DirectoryInfo systemRoot = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System))!;
 
         string fullInfPath = Path.Combine(systemRoot!.FullName, "INF", infName);
 
@@ -432,14 +432,13 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
     public void Uninstall()
     {
-        throw new NotImplementedException();
+        Uninstall(out _);
     }
 
     public void Uninstall(out bool rebootRequired)
     {
         throw new NotImplementedException();
     }
-
 
     /// <summary>
     ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.

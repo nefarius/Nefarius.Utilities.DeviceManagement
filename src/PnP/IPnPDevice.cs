@@ -72,7 +72,7 @@ public interface IPnPDevice
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
     /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
-    bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default);
+    bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default);
 
     /// <summary>
     ///     Installs the NULL-driver on this device instance.
