@@ -439,12 +439,9 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     {
         SetupApi.SP_DEVINFO_DATA spDevinfoData = new();
         spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
-        
+
         SetupApi.SP_DRVINFO_DATA driverInfoData = new();
         driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
-        
-        SetupApi.SP_DEVINFO_DATA devInfoData = new();
-        devInfoData.cbSize = Marshal.SizeOf(devInfoData);
 
         HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
             null,
@@ -504,12 +501,13 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             {
                 continue;
             }
-            
+
             // found our device
-            
+
+            /*
             success = SetupApi.SetupDiBuildDriverInfoList(
                 hDevInfo,
-                &devInfoData,
+                &spDevinfoData,
                 SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_COMPATDRIVER
             );
 
@@ -520,7 +518,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
             success = SetupApi.SetupDiEnumDriverInfo(
                 hDevInfo,
-                &devInfoData,
+                &spDevinfoData,
                 SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_COMPATDRIVER,
                 0,
                 ref driverInfoData
@@ -534,32 +532,73 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             SetupApi.SP_DRVINFO_DETAIL_DATA drvInfoDetailData = new();
             drvInfoDetailData.cbSize = Marshal.SizeOf(drvInfoDetailData);
 
-            SetupApi.SetupDiGetDriverInfoDetail(
+            // grab required buffer size
+            _ = SetupApi.SetupDiGetDriverInfoDetail(
                 hDevInfo,
-                &devInfoData,
-                &driverInfoData,
-                &drvInfoDetailData,
+                &spDevinfoData,
+                ref driverInfoData,
+                ref drvInfoDetailData,
                 (uint)drvInfoDetailData.cbSize,
                 out uint requiredBufferSize
             );
-            
-            
-            
-            
 
-            success = SetupApi.DiInstallDevice(
-                HWND.Null,
+            if (requiredBufferSize == 0)
+            {
+                throw new Win32Exception("Failed to get required driver info details buffer size");
+            }
+
+            IntPtr drvInfoDetailDataBuffer = Marshal.AllocHGlobal((int)requiredBufferSize);
+            Marshal.WriteInt32(drvInfoDetailDataBuffer, drvInfoDetailData.cbSize);
+
+            success = SetupApi.SetupDiGetDriverInfoDetail(
                 hDevInfo,
                 &spDevinfoData,
-                null,
-                PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
-                out rebootRequired
+                ref driverInfoData,
+                drvInfoDetailDataBuffer,
+                requiredBufferSize,
+                out _
             );
 
             if (!success)
             {
-                throw new Win32Exception("NULL-driver installation failed");
+                throw new Win32Exception("Failed to get driver info details");
             }
+
+            // this is save to do if we do not read the Hardware IDs dynamic field
+            drvInfoDetailData = Marshal.PtrToStructure<SetupApi.SP_DRVINFO_DETAIL_DATA>(drvInfoDetailDataBuffer);
+            */
+
+            // uninstall device
+            success = SetupApi.DiUninstallDevice(
+                HWND.Null,
+                hDevInfo,
+                &spDevinfoData,
+                0,
+                out bool devNeedsReboot
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Device uninstallation failed");
+            }
+
+            /*
+            success = SetupApi.DiUninstallDriver(
+                HWND.Null,
+                drvInfoDetailData.InfFileName,
+                0,
+                out bool drvNeedsReboot
+            );
+            
+            if (!success)
+            {
+                throw new Win32Exception("Driver uninstallation failed");
+            }
+
+            rebootRequired = devNeedsReboot || drvNeedsReboot;
+            */
+
+            rebootRequired = devNeedsReboot;
 
             return;
         }
