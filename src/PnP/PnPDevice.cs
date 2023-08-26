@@ -500,11 +500,36 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         }
     }
 
+    /// <summary>
+    ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
+    ///     driver to the best available compatible candidate on next device boot.
+    /// </summary>
+    /// <remarks>
+    ///     If this is used in combination with <see cref="InstallNullDriver()" /> or
+    ///     <see cref="InstallCustomDriver(string)" />, you can call <see cref="Devcon.Refresh" /> afterwards to trigger device
+    ///     installation.
+    /// </remarks>
+    /// <exception cref="Win32Exception"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public void Uninstall()
     {
         Uninstall(out _);
     }
 
+    /// <summary>
+    ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
+    ///     driver to the best available compatible candidate on next device boot.
+    /// </summary>
+    /// <remarks>
+    ///     If this is used in combination with <see cref="InstallNullDriver()" /> or
+    ///     <see cref="InstallCustomDriver(string)" />, you can call <see cref="Devcon.Refresh" /> afterwards to trigger device
+    ///     installation.
+    /// </remarks>
+    /// <param name="rebootRequired">
+    ///     Gets whether a reboot is required for the changes to take effect or not.
+    /// </param>
+    /// <exception cref="Win32Exception"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public unsafe void Uninstall(out bool rebootRequired)
     {
         SetupApi.SP_DEVINFO_DATA spDevinfoData = new();

@@ -218,6 +218,54 @@ void InstallCustomDriver(string infName, Boolean& rebootRequired)
 This method force-installs a given INF file on this device instance, even if no matching hardware or compatible IDs
  are found. This method can only succeed if  is called prior.
 
+### **Uninstall()**
+
+Uninstalls this device instance. Unlike  this call will unload and revert the device function
+ driver to the best available compatible candidate on next device boot.
+
+```csharp
+void Uninstall()
+```
+
+#### Exceptions
+
+!:Win32Exception<br>
+
+[ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
+
+**Remarks:**
+
+If this is used in combination with  or
+ [IPnPDevice.InstallCustomDriver(String)](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md#installcustomdriverstring), you can call  afterwards to trigger device
+ installation.
+
+### **Uninstall(Boolean&)**
+
+Uninstalls this device instance. Unlike  this call will unload and revert the device function
+ driver to the best available compatible candidate on next device boot.
+
+```csharp
+void Uninstall(Boolean& rebootRequired)
+```
+
+#### Parameters
+
+`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+
+                Gets whether a reboot is required for the changes to take effect or not.
+
+#### Exceptions
+
+!:Win32Exception<br>
+
+[ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
+
+**Remarks:**
+
+If this is used in combination with  or
+ [IPnPDevice.InstallCustomDriver(String)](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md#installcustomdriverstring), you can call  afterwards to trigger device
+ installation.
+
 ### **GetProperty&lt;T&gt;(DevicePropertyKey)**
 
 Returns a device instance property identified by [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md).
