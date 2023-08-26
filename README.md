@@ -104,6 +104,38 @@ string service = "HidHide";
 DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, service);
 ```
 
+### Replace a device instance's function driver with WinUSB
+
+```csharp
+const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
+        
+PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+
+// required for the next call to succeed
+device.InstallNullDriver();
+
+Thread.Sleep(1000);
+
+// accepts any INF already present in C:\Windows\INF directory
+device.InstallCustomDriver("winusb.inf");
+```
+
+### Uninstall device/revert function driver to default
+
+```csharp
+const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
+        
+PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+
+// uninstall/deconfigure device
+device.Uninstall();
+
+Thread.Sleep(1000);
+
+// trigger re-enumeration
+Devcon.Refresh();
+```
+
 ## Sources & 3rd party credits
 
 This library benefits from these awesome projects ❤ (appearance in no special order):
