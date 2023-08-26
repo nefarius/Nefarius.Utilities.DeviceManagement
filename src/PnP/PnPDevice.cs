@@ -171,7 +171,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
     /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
-    public bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default)
+    public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
     {
         IPnPDevice device = this;
 
@@ -200,17 +200,343 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Installs the NULL-driver on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     for the change to take effect without requiring a reboot.
+    /// </remarks>
     public void InstallNullDriver()
     {
         InstallNullDriver(out _);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Installs the NULL-driver on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     for the change to take effect without requiring a reboot.
+    /// </remarks>
     public unsafe void InstallNullDriver(out bool rebootRequired)
     {
         SetupApi.SP_DEVINFO_DATA spDevinfoData = new();
         spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
+
+        HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
+            null,
+            null,
+            HWND.Null,
+            PInvoke.DIGCF_ALLCLASSES | PInvoke.DIGCF_PRESENT
+        );
+
+        if (hDevInfo.IsNull)
+        {
+            throw new Win32Exception("Failed to get devices for all classes");
+        }
+
+        try
+        {
+            for (UInt32 devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
+            {
+                DEVPROPKEY instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
+
+                bool success = SetupApi.SetupDiGetDeviceProperty(
+                    hDevInfo,
+                    &spDevinfoData,
+                    &instanceProp,
+                    out _,
+                    null,
+                    0,
+                    out uint requiredSize,
+                    0
+                );
+
+                WIN32_ERROR error = (WIN32_ERROR)Marshal.GetLastWin32Error();
+
+                if (success || error != WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
+                {
+                    throw new Win32Exception("Unexpected result while querying Instance ID property size");
+                }
+
+                StringBuilder sb = new((int)requiredSize);
+
+                success = SetupApi.SetupDiGetDeviceProperty(
+                    hDevInfo,
+                    &spDevinfoData,
+                    &instanceProp,
+                    out _,
+                    sb,
+                    requiredSize,
+                    out _,
+                    0
+                );
+
+                if (!success)
+                {
+                    throw new Win32Exception("Failed to query Instance ID property");
+                }
+
+                string instanceId = sb.ToString();
+
+                if (!InstanceId.Equals(instanceId, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                success = SetupApi.DiInstallDevice(
+                    HWND.Null,
+                    hDevInfo,
+                    &spDevinfoData,
+                    null,
+                    PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
+                    out rebootRequired
+                );
+
+                if (!success)
+                {
+                    throw new Win32Exception("NULL-driver installation failed");
+                }
+
+                return;
+            }
+        }
+        finally
+        {
+            if (!hDevInfo.IsNull)
+            {
+                SetupApi.SetupDiDestroyDeviceInfoList(hDevInfo);
+            }
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(InstanceId), $"Failed to find device instance {InstanceId}");
+    }
+
+    /// <summary>
+    ///     Installs a custom driver identified by the provided INF name on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This method force-installs a given INF file on this device instance, even if no matching hardware or compatible IDs
+    ///     are found. This method can only succeed if <see cref="InstallNullDriver()" /> is called prior.
+    /// </remarks>
+    /// <param name="infName">
+    ///     The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+    ///     or absolute path.
+    /// </param>
+    public void InstallCustomDriver(string infName)
+    {
+        InstallCustomDriver(infName, out _);
+    }
+
+    /// <summary>
+    ///     Installs a custom driver identified by the provided INF name on this device instance.
+    /// </summary>
+    /// <remarks>
+    ///     This method force-installs a given INF file on this device instance, even if no matching hardware or compatible IDs
+    ///     are found. This method can only succeed if <see cref="InstallNullDriver()" /> is called prior.
+    /// </remarks>
+    /// <param name="infName">
+    ///     The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+    ///     or absolute path.
+    /// </param>
+    /// <param name="rebootRequired">
+    ///     Gets whether a reboot is required for the changes to take effect or not.
+    /// </param>
+    public unsafe void InstallCustomDriver(string infName, out bool rebootRequired)
+    {
+        DirectoryInfo systemRoot = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System))!;
+
+        string fullInfPath = Path.Combine(systemRoot!.FullName, "INF", infName);
+
+        if (!File.Exists(fullInfPath))
+        {
+            throw new ArgumentException($"The provided INF file {infName} wasn't found in the system directory",
+                nameof(infName));
+        }
+
+        SetupApi.SP_DEVINSTALL_PARAMS deviceInstallParams = new();
+        deviceInstallParams.cbSize = Marshal.SizeOf(deviceInstallParams);
+
+        SetupApi.SP_DRVINFO_DATA driverInfoData = new();
+        driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
+
+        SetupApi.SP_DEVINFO_DATA devInfoData = new();
+        devInfoData.cbSize = Marshal.SizeOf(devInfoData);
+
+        bool freeDriverInfoList = false;
+
+        HDEVINFO hDevInfo = SetupApi.SetupDiCreateDeviceInfoList(null, HWND.Null);
+
+        if (hDevInfo.IsNull)
+        {
+            throw new Win32Exception("Failed to get get empty device info list");
+        }
+
+        try
+        {
+            bool success = SetupApi.SetupDiOpenDeviceInfo(
+                hDevInfo,
+                InstanceId,
+                HWND.Null,
+                0,
+                &devInfoData
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to open device info");
+            }
+
+            // extra plausibility check to inform the caller with a more helpful message
+            if (devInfoData.ClassGuid != Guid.Empty)
+            {
+                throw new InvalidOperationException(
+                    $"Expected class GUID {Guid.Empty} but got {devInfoData.ClassGuid}, " +
+                    $"subsequent calls will not succeed, did you forget to call {nameof(InstallNullDriver)}?");
+            }
+
+            success = SetupApi.SetupDiSetSelectedDevice(hDevInfo, &devInfoData);
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to set the selected device");
+            }
+
+            success = SetupApi.SetupDiGetDeviceInstallParams(
+                hDevInfo,
+                &devInfoData,
+                ref deviceInstallParams
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to get the device install parameters");
+            }
+
+            deviceInstallParams.Flags |= PInvoke.DI_ENUMSINGLEINF;
+            deviceInstallParams.FlagsEx |= PInvoke.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
+            deviceInstallParams.DriverPath = infName;
+
+            success = SetupApi.SetupDiSetDeviceInstallParams(
+                hDevInfo,
+                &devInfoData,
+                ref deviceInstallParams
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to set the device install parameters");
+            }
+
+            success = SetupApi.SetupDiBuildDriverInfoList(
+                hDevInfo,
+                &devInfoData,
+                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to build driver info list");
+            }
+
+            freeDriverInfoList = true;
+
+            success = SetupApi.SetupDiEnumDriverInfo(
+                hDevInfo,
+                &devInfoData,
+                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER,
+                0,
+                ref driverInfoData
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to enumerate driver info");
+            }
+
+            success = SetupApi.SetupDiSetSelectedDriver(
+                hDevInfo,
+                &devInfoData,
+                ref driverInfoData
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to set selected driver");
+            }
+
+            success = SetupApi.DiInstallDevice(
+                HWND.Null,
+                hDevInfo,
+                &devInfoData,
+                ref driverInfoData,
+                0,
+                out rebootRequired
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to install selected driver");
+            }
+        }
+        finally
+        {
+            if (freeDriverInfoList)
+            {
+                SetupApi.SetupDiDestroyDriverInfoList(
+                    hDevInfo,
+                    &devInfoData,
+                    SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+                );
+            }
+
+            if (!hDevInfo.IsNull)
+            {
+                SetupApi.SetupDiDestroyDeviceInfoList(hDevInfo);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
+    ///     driver to the best available compatible candidate on next device boot.
+    /// </summary>
+    /// <remarks>
+    ///     If this is used in combination with <see cref="InstallNullDriver()" /> or
+    ///     <see cref="InstallCustomDriver(string)" />, you can call <see cref="Devcon.Refresh" /> afterwards to trigger device
+    ///     installation.
+    /// </remarks>
+    /// <exception cref="Win32Exception"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public void Uninstall()
+    {
+        Uninstall(out _);
+    }
+
+    /// <summary>
+    ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
+    ///     driver to the best available compatible candidate on next device boot.
+    /// </summary>
+    /// <remarks>
+    ///     If this is used in combination with <see cref="InstallNullDriver()" /> or
+    ///     <see cref="InstallCustomDriver(string)" />, you can call <see cref="Devcon.Refresh" /> afterwards to trigger device
+    ///     installation.
+    /// </remarks>
+    /// <param name="rebootRequired">
+    ///     Gets whether a reboot is required for the changes to take effect or not.
+    /// </param>
+    /// <exception cref="Win32Exception"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public unsafe void Uninstall(out bool rebootRequired)
+    {
+        SetupApi.SP_DEVINFO_DATA spDevinfoData = new();
+        spDevinfoData.cbSize = Marshal.SizeOf(spDevinfoData);
+
+        SetupApi.SP_DRVINFO_DATA driverInfoData = new();
+        driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
 
         HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
             null,
@@ -271,165 +597,109 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 continue;
             }
 
-            success = SetupApi.DiInstallDevice(
-                HWND.Null,
+            // found our device
+
+            /*
+            success = SetupApi.SetupDiBuildDriverInfoList(
                 hDevInfo,
                 &spDevinfoData,
-                null,
-                PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
-                out rebootRequired
+                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_COMPATDRIVER
             );
 
             if (!success)
             {
-                throw new Win32Exception("NULL-driver installation failed");
+                throw new Win32Exception("Failed to build driver info list");
             }
+
+            success = SetupApi.SetupDiEnumDriverInfo(
+                hDevInfo,
+                &spDevinfoData,
+                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_COMPATDRIVER,
+                0,
+                ref driverInfoData
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to enumerate driver info");
+            }
+
+            SetupApi.SP_DRVINFO_DETAIL_DATA drvInfoDetailData = new();
+            drvInfoDetailData.cbSize = Marshal.SizeOf(drvInfoDetailData);
+
+            // grab required buffer size
+            _ = SetupApi.SetupDiGetDriverInfoDetail(
+                hDevInfo,
+                &spDevinfoData,
+                ref driverInfoData,
+                ref drvInfoDetailData,
+                (uint)drvInfoDetailData.cbSize,
+                out uint requiredBufferSize
+            );
+
+            if (requiredBufferSize == 0)
+            {
+                throw new Win32Exception("Failed to get required driver info details buffer size");
+            }
+
+            IntPtr drvInfoDetailDataBuffer = Marshal.AllocHGlobal((int)requiredBufferSize);
+            Marshal.WriteInt32(drvInfoDetailDataBuffer, drvInfoDetailData.cbSize);
+
+            success = SetupApi.SetupDiGetDriverInfoDetail(
+                hDevInfo,
+                &spDevinfoData,
+                ref driverInfoData,
+                drvInfoDetailDataBuffer,
+                requiredBufferSize,
+                out _
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Failed to get driver info details");
+            }
+
+            // this is save to do if we do not read the Hardware IDs dynamic field
+            drvInfoDetailData = Marshal.PtrToStructure<SetupApi.SP_DRVINFO_DETAIL_DATA>(drvInfoDetailDataBuffer);
+            */
+
+            // uninstall device
+            success = SetupApi.DiUninstallDevice(
+                HWND.Null,
+                hDevInfo,
+                &spDevinfoData,
+                0,
+                out bool devNeedsReboot
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Device uninstallation failed");
+            }
+
+            /*
+            success = SetupApi.DiUninstallDriver(
+                HWND.Null,
+                drvInfoDetailData.InfFileName,
+                0,
+                out bool drvNeedsReboot
+            );
+
+            if (!success)
+            {
+                throw new Win32Exception("Driver uninstallation failed");
+            }
+
+            rebootRequired = devNeedsReboot || drvNeedsReboot;
+            */
+
+            rebootRequired = devNeedsReboot;
 
             return;
         }
 
         throw new ArgumentOutOfRangeException(nameof(InstanceId), $"Failed to find device instance {InstanceId}");
     }
-
-    /// <inheritdoc />
-    public void InstallCustomDriver(string infName)
-    {
-        InstallCustomDriver(infName, out _);
-    }
-
-    /// <inheritdoc />
-    public unsafe void InstallCustomDriver(string infName, out bool rebootRequired)
-    {
-        DirectoryInfo systemRoot = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.System));
-
-        string fullInfPath = Path.Combine(systemRoot!.FullName, "INF", infName);
-
-        if (!File.Exists(fullInfPath))
-        {
-            throw new ArgumentException($"The provided INF file {infName} wasn't found in the system directory",
-                nameof(infName));
-        }
-
-        SetupApi.SP_DEVINSTALL_PARAMS deviceInstallParams = new();
-        deviceInstallParams.cbSize = Marshal.SizeOf(deviceInstallParams);
-
-        SetupApi.SP_DRVINFO_DATA driverInfoData = new();
-        driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
-
-        SetupApi.SP_DEVINFO_DATA devInfoData = new();
-        devInfoData.cbSize = Marshal.SizeOf(devInfoData);
-
-        HDEVINFO hDevInfo = SetupApi.SetupDiCreateDeviceInfoList(null, HWND.Null);
-
-        if (hDevInfo.IsNull)
-        {
-            throw new Win32Exception("Failed to get get empty device info list");
-        }
-
-        bool success = SetupApi.SetupDiOpenDeviceInfo(
-            hDevInfo,
-            InstanceId,
-            HWND.Null,
-            0,
-            &devInfoData
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to open device info");
-        }
-
-        // extra plausibility check to inform the caller with a more helpful message
-        if (devInfoData.ClassGuid != Guid.Empty)
-        {
-            throw new InvalidOperationException(
-                $"Expected class GUID {Guid.Empty} but got {devInfoData.ClassGuid}, " +
-                $"subsequent calls will not succeed, did you forget to call {nameof(InstallNullDriver)}?");
-        }
-
-        success = SetupApi.SetupDiSetSelectedDevice(hDevInfo, &devInfoData);
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to set the selected device");
-        }
-
-        success = SetupApi.SetupDiGetDeviceInstallParams(
-            hDevInfo,
-            &devInfoData,
-            ref deviceInstallParams
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to get the device install parameters");
-        }
-
-        deviceInstallParams.Flags |= PInvoke.DI_ENUMSINGLEINF;
-        deviceInstallParams.FlagsEx |= PInvoke.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
-        deviceInstallParams.DriverPath = infName;
-
-        success = SetupApi.SetupDiSetDeviceInstallParams(
-            hDevInfo,
-            &devInfoData,
-            ref deviceInstallParams
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to set the device install parameters");
-        }
-
-        success = SetupApi.SetupDiBuildDriverInfoList(
-            hDevInfo,
-            &devInfoData,
-            SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to build driver info list");
-        }
-
-        success = SetupApi.SetupDiEnumDriverInfo(
-            hDevInfo,
-            &devInfoData,
-            SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER,
-            0,
-            ref driverInfoData
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to enumerate driver info");
-        }
-
-        success = SetupApi.SetupDiSetSelectedDriver(
-            hDevInfo,
-            &devInfoData,
-            ref driverInfoData
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to set selected driver");
-        }
-
-        success = SetupApi.DiInstallDevice(
-            HWND.Null,
-            hDevInfo,
-            &devInfoData,
-            ref driverInfoData,
-            0,
-            out rebootRequired
-        );
-
-        if (!success)
-        {
-            throw new Win32Exception("Failed to install selected driver");
-        }
-    }
-
 
     /// <summary>
     ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.

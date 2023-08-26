@@ -18,11 +18,8 @@ Thread.Sleep(1000);
 
 // revert to original driver
 
-device.InstallNullDriver();
+device.Uninstall();
 
-Thread.Sleep(1000);
-
-device.Remove();
+Thread.Sleep(5000);
 
 Devcon.Refresh();
-

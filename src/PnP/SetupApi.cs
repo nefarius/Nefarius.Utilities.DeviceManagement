@@ -19,6 +19,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 internal static class SetupApi
 {
     private const int LineLen = 256;
+    private const int MaxPath = 260;
 
     #region Constant and Structure Definitions
 
@@ -57,6 +58,33 @@ internal static class SetupApi
 
         internal readonly FILETIME DriverDate;
         internal readonly UInt64 DriverVersion;
+    }
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    internal struct SP_DRVINFO_DETAIL_DATA
+    {
+#pragma warning disable IDE1006
+        internal int cbSize;
+#pragma warning restore IDE1006
+
+        internal readonly FILETIME InfDate;
+        internal readonly UInt32 CompatIDsOffset;
+        internal readonly UInt32 CompatIDsLength;
+        internal IntPtr Reserved;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LineLen)]
+        internal readonly string SectionName;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MaxPath)]
+        internal readonly string InfFileName;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LineLen)]
+        internal readonly string DrvDescription;
+
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 1)]
+        internal readonly string HardwareID;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -296,8 +324,73 @@ internal static class SetupApi
         [Out] out DEVPROPTYPE propertyType,
         [Out] [Optional] StringBuilder propertyBuffer,
         [In] UInt32 propertyBufferSize,
-        [Out] [Optional] out UInt32 requiredSize,
+        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
+        out UInt32 requiredSize,
         [In] UInt32 flags
+    );
+
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiGetDriverInfoDetail(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [In] SP_DRVINFO_DATA* driverInfoData,
+        [In] [Out] SP_DRVINFO_DETAIL_DATA* driverInfoDetailData,
+        [In] uint driverInfoDetailDataSize,
+        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
+        out uint requiredSize
+    );
+    
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiGetDriverInfoDetail(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [In] ref SP_DRVINFO_DATA driverInfoData,
+        [In] [Out] ref SP_DRVINFO_DETAIL_DATA driverInfoDetailData,
+        [In] uint driverInfoDetailDataSize,
+        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
+        out uint requiredSize
+    );
+    
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiGetDriverInfoDetail(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [In] ref SP_DRVINFO_DATA driverInfoData,
+        [In] [Out] IntPtr driverInfoDetailData,
+        [In] uint driverInfoDetailDataSize,
+        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
+        out uint requiredSize
+    );
+    
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiGetDriverInfoDetail(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [In] SP_DRVINFO_DATA* driverInfoData,
+        [In] [Out] ref SP_DRVINFO_DETAIL_DATA driverInfoDetailData,
+        [In] uint driverInfoDetailDataSize,
+        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
+        out uint requiredSize
+    );
+    
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static unsafe extern bool SetupDiDestroyDriverInfoList(
+        [In] HDEVINFO deviceInfoSet,
+        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
+        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType
+    );
+    
+    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetupDiDestroyDriverInfoList(
+        [In] HDEVINFO deviceInfoSet,
+        [In] ref SP_DEVINFO_DATA deviceInfoData,
+        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType
     );
 
     #endregion
@@ -309,7 +402,8 @@ internal static class SetupApi
         [In] [Optional] HWND hwndParent,
         [In] string fullInfPath,
         [In] uint flags,
-        [Out] [Optional] out bool needReboot);
+        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
+        out bool needReboot);
 
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern bool DiUninstallDriver(
@@ -337,6 +431,24 @@ internal static class SetupApi
 #pragma warning disable CS8500
         [In] [Optional] SP_DRVINFO_DATA* driverInfoData,
 #pragma warning restore CS8500
+        [In] uint flags,
+        [Out] out bool needReboot
+    );
+
+    [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern unsafe bool DiUninstallDevice(
+        [In] [Optional] HWND hwndParent,
+        [In] HDEVINFO deviceInfoSet,
+        [In] SP_DEVINFO_DATA* deviceInfoData,
+        [In] uint flags,
+        [Out] out bool needReboot
+    );
+    
+    [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    internal static extern bool DiUninstallDevice(
+        [In] [Optional] HWND hwndParent,
+        [In] HDEVINFO deviceInfoSet,
+        [In] ref SP_DEVINFO_DATA deviceInfoData,
         [In] uint flags,
         [Out] out bool needReboot
     );

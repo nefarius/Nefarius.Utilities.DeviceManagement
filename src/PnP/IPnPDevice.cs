@@ -72,7 +72,7 @@ public interface IPnPDevice
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
     /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
-    bool IsVirtual(Func<IPnPDevice, bool> excludeIfMatches = default);
+    bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default);
 
     /// <summary>
     ///     Installs the NULL-driver on this device instance.
@@ -122,6 +122,35 @@ public interface IPnPDevice
     ///     Gets whether a reboot is required for the changes to take effect or not.
     /// </param>
     void InstallCustomDriver(string infName, out bool rebootRequired);
+    
+    /// <summary>
+    ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
+    ///     driver to the best available compatible candidate on next device boot.
+    /// </summary>
+    /// <remarks>
+    ///     If this is used in combination with <see cref="InstallNullDriver()" /> or
+    ///     <see cref="InstallCustomDriver(string)" />, you can call <see cref="Devcon.Refresh" /> afterwards to trigger device
+    ///     installation.
+    /// </remarks>
+    /// <exception cref="Win32Exception"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    void Uninstall();
+    
+    /// <summary>
+    ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
+    ///     driver to the best available compatible candidate on next device boot.
+    /// </summary>
+    /// <remarks>
+    ///     If this is used in combination with <see cref="InstallNullDriver()" /> or
+    ///     <see cref="InstallCustomDriver(string)" />, you can call <see cref="Devcon.Refresh" /> afterwards to trigger device
+    ///     installation.
+    /// </remarks>
+    /// <param name="rebootRequired">
+    ///     Gets whether a reboot is required for the changes to take effect or not.
+    /// </param>
+    /// <exception cref="Win32Exception"></exception>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    void Uninstall(out bool rebootRequired);
 
     /// <summary>
     ///     Returns a device instance property identified by <see cref="DevicePropertyKey" />.
