@@ -136,6 +136,17 @@ Thread.Sleep(1000);
 Devcon.Refresh();
 ```
 
+### Cycle hub port a given USB device is attached to
+
+```csharp
+if (Devcon.FindByInterfaceGuid(HostRadio.DeviceInterface, out PnPDevice radioDevice))
+{
+    UsbPnPDevice? usbHostRadio = radioDevice.ToUsbPnPDevice();
+
+    usbHostRadio.CyclePort();
+}
+```
+
 ## Sources & 3rd party credits
 
 This library benefits from these awesome projects ❤ (appearance in no special order):
