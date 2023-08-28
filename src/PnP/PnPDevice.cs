@@ -291,7 +291,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                     HWND.Null,
                     hDevInfo,
                     &spDevinfoData,
-                    null,
+                    IntPtr.Zero,
                     PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
                     out rebootRequired
                 );

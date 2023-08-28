@@ -328,18 +328,6 @@ internal static class SetupApi
         out UInt32 requiredSize,
         [In] UInt32 flags
     );
-
-    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiGetDriverInfoDetail(
-        [In] HDEVINFO deviceInfoSet,
-        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SP_DRVINFO_DATA* driverInfoData,
-        [In] [Out] SP_DRVINFO_DETAIL_DATA* driverInfoDetailData,
-        [In] uint driverInfoDetailDataSize,
-        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
-        out uint requiredSize
-    );
     
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -360,18 +348,6 @@ internal static class SetupApi
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] ref SP_DRVINFO_DATA driverInfoData,
         [In] [Out] IntPtr driverInfoDetailData,
-        [In] uint driverInfoDetailDataSize,
-        [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
-        out uint requiredSize
-    );
-    
-    [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiGetDriverInfoDetail(
-        [In] HDEVINFO deviceInfoSet,
-        [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SP_DRVINFO_DATA* driverInfoData,
-        [In] [Out] ref SP_DRVINFO_DETAIL_DATA driverInfoDetailData,
         [In] uint driverInfoDetailDataSize,
         [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
         out uint requiredSize
@@ -428,9 +404,7 @@ internal static class SetupApi
         [In] [Optional] HWND hwndParent,
         [In] HDEVINFO deviceInfoSet,
         [In] SP_DEVINFO_DATA* deviceInfoData,
-#pragma warning disable CS8500
-        [In] [Optional] SP_DRVINFO_DATA* driverInfoData,
-#pragma warning restore CS8500
+        [In] [Optional] IntPtr driverInfoData,
         [In] uint flags,
         [Out] out bool needReboot
     );
