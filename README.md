@@ -9,16 +9,16 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on W
 ## Features
 
 - Listen for device plugin and unplug events **without depending on WinForms or WPF**
-- Enumerate devices (present and absent)
-- Install/update drivers
-- Uninstall devices
+- Enumerate and remove elements from the Driver Store
+- Convert various notations (Symlink to Instance ID etc.)
 - Get and set
   various [unified device properties](https://learn.microsoft.com/en-us/windows-hardware/drivers/install/unified-device-property-model--windows-vista-and-later-)
-- Convert various notations (Symlink to Instance ID etc.)
-- Enumerate and remove elements from the Driver Store
+- Enumerate devices (present and absent)
 - Hot-swap device function drivers
 - Add/Remove/Clear class filters
 - Power-cycle USB hub ports
+- Install/update drivers
+- Uninstall devices
 
 ## Documentation
 
