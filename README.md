@@ -26,9 +26,11 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on W
 
 ### Generating documentation
 
-- `dotnet build -c:Release`
-- `dotnet tool install -g XMLDoc2Markdown`
-- `xmldoc2md .\bin\netstandard2.0\Nefarius.Utilities.DeviceManagement.dll .\docs\`
+```PowerShell
+dotnet build -c:Release
+dotnet tool install -g XMLDoc2Markdown
+xmldoc2md .\bin\netstandard2.0\Nefarius.Utilities.DeviceManagement.dll .\docs\
+```
 
 ## Examples
 
