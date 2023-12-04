@@ -1,5 +1,7 @@
 using Nefarius.Utilities.DeviceManagement.PnP;
 
+using NUnit.Framework.Legacy;
+
 #pragma warning disable CS1591
 
 namespace Tests;
