@@ -12,31 +12,7 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 
 ## Properties
 
-### **System**
-
-System devices.
-
-```csharp
-public static Guid System { get; }
-```
-
-#### Property Value
-
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
-
-### **Usb**
-
-USB devices.
-
-```csharp
-public static Guid Usb { get; }
-```
-
-#### Property Value
-
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
-
-### **Bluetooth**
+### <a id="properties-bluetooth"/>**Bluetooth**
 
 Bluetooth devices.
 
@@ -48,19 +24,43 @@ public static Guid Bluetooth { get; }
 
 [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
 
-### **XnaComposite**
+### <a id="properties-humaninterfacedevices"/>**HumanInterfaceDevices**
 
-Xbox 360 Peripherals.
+Human Interface Devices (HID).
 
 ```csharp
-public static Guid XnaComposite { get; }
+public static Guid HumanInterfaceDevices { get; }
 ```
 
 #### Property Value
 
 [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
 
-### **XboxComposite**
+### <a id="properties-system"/>**System**
+
+System devices.
+
+```csharp
+public static Guid System { get; }
+```
+
+#### Property Value
+
+[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+
+### <a id="properties-usb"/>**Usb**
+
+USB devices.
+
+```csharp
+public static Guid Usb { get; }
+```
+
+#### Property Value
+
+[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+
+### <a id="properties-xboxcomposite"/>**XboxComposite**
 
 Xbox Peripherals.
 
@@ -72,12 +72,12 @@ public static Guid XboxComposite { get; }
 
 [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
 
-### **HumanInterfaceDevices**
+### <a id="properties-xnacomposite"/>**XnaComposite**
 
-Human Interface Devices (HID).
+Xbox 360 Peripherals.
 
 ```csharp
-public static Guid HumanInterfaceDevices { get; }
+public static Guid XnaComposite { get; }
 ```
 
 #### Property Value

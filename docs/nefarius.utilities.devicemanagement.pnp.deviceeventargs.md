@@ -12,7 +12,7 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 
 ## Properties
 
-### **InterfaceGuid**
+### <a id="properties-interfaceguid"/>**InterfaceGuid**
 
 The [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid) of the device interface.
 
@@ -24,7 +24,7 @@ public Guid InterfaceGuid { get; set; }
 
 [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
 
-### **SymLink**
+### <a id="properties-symlink"/>**SymLink**
 
 The symbolic link path.
 
@@ -38,7 +38,7 @@ public string SymLink { get; set; }
 
 ## Constructors
 
-### **DeviceEventArgs()**
+### <a id="constructors-.ctor"/>**DeviceEventArgs()**
 
 ```csharp
 public DeviceEventArgs()

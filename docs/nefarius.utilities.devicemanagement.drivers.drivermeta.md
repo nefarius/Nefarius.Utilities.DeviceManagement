@@ -12,7 +12,7 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 
 ## Properties
 
-### **DriverDate**
+### <a id="properties-driverdate"/>**DriverDate**
 
 Gets the date of the driver.
 
@@ -24,7 +24,7 @@ public DateTime DriverDate { get; internal set; }
 
 [DateTime](https://docs.microsoft.com/en-us/dotnet/api/system.datetime)<br>
 
-### **DriverDescription**
+### <a id="properties-driverdescription"/>**DriverDescription**
 
 Gets the description the device got from the function driver.
 
@@ -36,7 +36,7 @@ public string DriverDescription { get; internal set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **DriverVersion**
+### <a id="properties-driverversion"/>**DriverVersion**
 
 Gets the driver version.
 
@@ -48,7 +48,7 @@ public Version DriverVersion { get; internal set; }
 
 [Version](https://docs.microsoft.com/en-us/dotnet/api/system.version)<br>
 
-### **InfPath**
+### <a id="properties-infpath"/>**InfPath**
 
 Gets the active INF name/sub-path. Typically resides in C:\Windows\INF.
 
@@ -60,7 +60,7 @@ public string InfPath { get; internal set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **InfSection**
+### <a id="properties-infsection"/>**InfSection**
 
 Gets the section of the INF which applied on driver installation.
 
@@ -72,7 +72,7 @@ public string InfSection { get; internal set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **MatchingDeviceId**
+### <a id="properties-matchingdeviceid"/>**MatchingDeviceId**
 
 Gets the device ID this driver is active on.
 
@@ -84,7 +84,7 @@ public string MatchingDeviceId { get; internal set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **ProviderName**
+### <a id="properties-providername"/>**ProviderName**
 
 Gets the provider (manufacturer) name of the driver.
 

@@ -5,7 +5,7 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Describes a custom device property.
 
 ```csharp
-public class CustomDeviceProperty : DevicePropertyKey, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.DevicePropertyKey, Nefarius.Utilities.DeviceManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class CustomDeviceProperty : DevicePropertyKey, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.DevicePropertyKey, Nefarius.Utilities.DeviceManagement, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md) → [CustomDeviceProperty](./nefarius.utilities.devicemanagement.pnp.customdeviceproperty.md)<br>
@@ -13,7 +13,7 @@ Implements [IEquatable&lt;DevicePropertyKey&gt;](https://docs.microsoft.com/en-u
 
 ## Properties
 
-### **CategoryGuid**
+### <a id="properties-categoryguid"/>**CategoryGuid**
 
 The [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid) for teh category this property belongs to.
 
@@ -25,7 +25,7 @@ public Guid CategoryGuid { get; }
 
 [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
 
-### **PropertyIdentifier**
+### <a id="properties-propertyidentifier"/>**PropertyIdentifier**
 
 The unique identifier withing the category group for this property.
 
@@ -37,7 +37,7 @@ public uint PropertyIdentifier { get; }
 
 [UInt32](https://docs.microsoft.com/en-us/dotnet/api/system.uint32)<br>
 
-### **PropertyType**
+### <a id="properties-propertytype"/>**PropertyType**
 
 The managed type of the property (integer, string, array, ...).
 
@@ -51,7 +51,7 @@ public Type PropertyType { get; }
 
 ## Methods
 
-### **CreateCustomDeviceProperty(Guid, UInt32, Type)**
+### <a id="methods-createcustomdeviceproperty"/>**CreateCustomDeviceProperty(Guid, UInt32, Type)**
 
 Creates a custom device property.
 
@@ -72,5 +72,4 @@ The managed type to translate from/to.
 
 #### Returns
 
-[DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)<br>
-A new instance of .
+A new instance of [CustomDeviceProperty](./nefarius.utilities.devicemanagement.pnp.customdeviceproperty.md).

@@ -13,19 +13,29 @@ Implements [ISerializable](https://docs.microsoft.com/en-us/dotnet/api/system.ru
 
 ## Properties
 
-### **ErrorCode**
+### <a id="properties-data"/>**Data**
+
+```csharp
+public IDictionary Data { get; }
+```
+
+#### Property Value
+
+[IDictionary](https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary)<br>
+
+### <a id="properties-errorcode"/>**ErrorCode**
 
 The native Windows error code.
 
 ```csharp
-public Nullable<int> ErrorCode { get; }
+public Nullable<Int32> ErrorCode { get; }
 ```
 
 #### Property Value
 
 [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
-### **ErrorMessage**
+### <a id="properties-errormessage"/>**ErrorMessage**
 
 The Win32 error message.
 
@@ -37,47 +47,7 @@ public string ErrorMessage { get; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **TargetSite**
-
-```csharp
-public MethodBase TargetSite { get; }
-```
-
-#### Property Value
-
-[MethodBase](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.methodbase)<br>
-
-### **Message**
-
-```csharp
-public string Message { get; }
-```
-
-#### Property Value
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **Data**
-
-```csharp
-public IDictionary Data { get; }
-```
-
-#### Property Value
-
-[IDictionary](https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary)<br>
-
-### **InnerException**
-
-```csharp
-public Exception InnerException { get; }
-```
-
-#### Property Value
-
-[Exception](https://docs.microsoft.com/en-us/dotnet/api/system.exception)<br>
-
-### **HelpLink**
+### <a id="properties-helplink"/>**HelpLink**
 
 ```csharp
 public string HelpLink { get; set; }
@@ -87,17 +57,7 @@ public string HelpLink { get; set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **Source**
-
-```csharp
-public string Source { get; set; }
-```
-
-#### Property Value
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **HResult**
+### <a id="properties-hresult"/>**HResult**
 
 ```csharp
 public int HResult { get; set; }
@@ -107,7 +67,37 @@ public int HResult { get; set; }
 
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
-### **StackTrace**
+### <a id="properties-innerexception"/>**InnerException**
+
+```csharp
+public Exception InnerException { get; }
+```
+
+#### Property Value
+
+[Exception](https://docs.microsoft.com/en-us/dotnet/api/system.exception)<br>
+
+### <a id="properties-message"/>**Message**
+
+```csharp
+public string Message { get; }
+```
+
+#### Property Value
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### <a id="properties-source"/>**Source**
+
+```csharp
+public string Source { get; set; }
+```
+
+#### Property Value
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### <a id="properties-stacktrace"/>**StackTrace**
 
 ```csharp
 public string StackTrace { get; }
@@ -116,3 +106,13 @@ public string StackTrace { get; }
 #### Property Value
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
+### <a id="properties-targetsite"/>**TargetSite**
+
+```csharp
+public MethodBase TargetSite { get; }
+```
+
+#### Property Value
+
+[MethodBase](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.methodbase)<br>

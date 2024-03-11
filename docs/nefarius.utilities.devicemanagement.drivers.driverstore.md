@@ -12,12 +12,12 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 
 ## Properties
 
-### **ExistingDrivers**
+### <a id="properties-existingdrivers"/>**ExistingDrivers**
 
 Gets a list of existing packages (absolute INF paths) in the local driver store.
 
 ```csharp
-public static IEnumerable<string> ExistingDrivers { get; }
+public static IEnumerable<String> ExistingDrivers { get; }
 ```
 
 #### Property Value
@@ -26,7 +26,7 @@ public static IEnumerable<string> ExistingDrivers { get; }
 
 ## Methods
 
-### **RemoveDriver(String)**
+### <a id="methods-removedriver"/>**RemoveDriver(String)**
 
 Removes a driver identified by absolute package path.
 
