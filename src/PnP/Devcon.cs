@@ -107,8 +107,14 @@ public static class Devcon
                         : DeviceLocationFlags.Phantom
                 );
 
-                List<string> hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds)
-                    .Select(id => id.ToUpper()).ToList();
+                string[] property = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+
+                if (property is null)
+                {
+                    continue;
+                }
+
+                List<string> hardwareIds = property.Select(id => id.ToUpper()).ToList();
 
                 if (
                     /* partial match */
@@ -316,7 +322,7 @@ public static class Devcon
                     className,
                     ref classGuid,
                     null,
-                    HWND.Null, 
+                    HWND.Null,
                     (int)PInvoke.DICD_GENERATE_ID,
                     ref deviceInfoData
                 ))
@@ -386,7 +392,7 @@ public static class Devcon
             deviceInfoSet = SetupApi.SetupDiGetClassDevs(
                 ref classGuid,
                 IntPtr.Zero,
-                HWND.Null, 
+                HWND.Null,
                 (int)PInvoke.DIGCF_PRESENT | (int)PInvoke.DIGCF_DEVICEINTERFACE
             );
 
@@ -543,7 +549,7 @@ public static class Devcon
         if (forceDelete
             && Kernel32.MethodExists("newdev.dll", "DiUninstallDriverW")
             && !SetupApi.DiUninstallDriver(
-                HWND.Null, 
+                HWND.Null,
                 fullInfPath,
                 PInvoke.DIURFLAG_NO_REMOVE_INF,
                 out _))
