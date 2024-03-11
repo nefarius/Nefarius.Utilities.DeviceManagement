@@ -159,7 +159,7 @@ public interface IPnPDevice
     /// <param name="propertyKey">The <see cref="DevicePropertyKey" /> to query for.</param>
     /// <returns>On success, the value of the queried property.</returns>
     /// <remarks>If the queried property doesn't exist, the default value of the managed type is returned.</remarks>
-    T GetProperty<T>(DevicePropertyKey propertyKey);
+    T? GetProperty<T>(DevicePropertyKey propertyKey);
 
     /// <summary>
     ///     Creates or updates an existing property with a given value.

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -52,7 +53,7 @@ public partial class PnPDevice
     /// <param name="propertyKey">The <see cref="DevicePropertyKey" /> to query for.</param>
     /// <returns>On success, the value of the queried property.</returns>
     /// <remarks>If the queried property doesn't exist, the default value of the managed type is returned.</remarks>
-    public T GetProperty<T>(DevicePropertyKey propertyKey)
+    public T? GetProperty<T>(DevicePropertyKey propertyKey)
     {
         if (typeof(T) != propertyKey.PropertyType)
         {
@@ -114,7 +115,7 @@ public partial class PnPDevice
             // Regular strings
             if (managedType == typeof(string))
             {
-                string value = Marshal.PtrToStringUni(buffer);
+                string? value = Marshal.PtrToStringUni(buffer);
                 return (T)Convert.ChangeType(value, typeof(T));
             }
 
