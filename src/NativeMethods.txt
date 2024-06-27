@@ -53,6 +53,7 @@ GUID_DEVINTERFACE_USB_HUB
 GetMessage
 GetModuleHandle
 GetProcAddress
+GetOverlappedResult
 HDEVINFO
 HWND
 HidD_GetHidGuid
@@ -78,6 +79,7 @@ SETUP_DI_BUILD_DRIVER_DRIVER_TYPE
 SPDRP_HARDWAREID
 SUOI_FORCEDELETE
 SetupDiOpenClassRegKey
+SetLastError
 TranslateMessage
 UnregisterDeviceNotification
 UpdateDriverForPlugAndPlayDevices
