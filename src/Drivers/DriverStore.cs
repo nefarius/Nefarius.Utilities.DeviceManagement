@@ -29,8 +29,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
+using Windows.Win32;
 using Windows.Win32.Devices.Properties;
+using Windows.Win32.Foundation;
+
+using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.Drivers;
 
@@ -206,6 +211,7 @@ internal enum DriverStoreCopyFlag : uint
 /// <summary>
 ///     Driver Store enumeration and manipulation utility.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class DriverStore
 {
     private static readonly string WinDir = Environment.GetEnvironmentVariable("WINDIR");
@@ -239,7 +245,7 @@ public static class DriverStore
 
             if ((ntStatus & 0x80000000) != 0)
             {
-                throw new Win32Exception($"DriverStoreOfflineEnumDriverPackage: ntStatus=0x{ntStatus:x8}");
+                throw new Win32Exception(NtStatusUtil.ConvertNtStatusToWin32Error(ntStatus));
             }
 
             return existingDrivers;
@@ -252,13 +258,11 @@ public static class DriverStore
     /// <param name="driverStoreFileName">The absolute package path to remove.</param>
     public static void RemoveDriver(string driverStoreFileName)
     {
-        uint ntStatus;
-
-        ntStatus = DriverStoreNative.DriverStoreOfflineDeleteDriverPackage(driverStoreFileName, 0, IntPtr.Zero,
+        uint ntStatus = DriverStoreNative.DriverStoreOfflineDeleteDriverPackage(driverStoreFileName, 0, IntPtr.Zero,
             WinDir, Path.GetPathRoot(WinDir));
         if ((ntStatus & 0x80000000) != 0)
         {
-            throw new Win32Exception(Marshal.GetLastWin32Error());
+            throw new Win32Exception(NtStatusUtil.ConvertNtStatusToWin32Error(ntStatus));
         }
     }
 }
