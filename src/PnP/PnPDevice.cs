@@ -546,7 +546,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
         uint iFlags = PInvoke.DIGCF_ALLCLASSES;
 
-        if (_locationFlags.HasFlag(DeviceLocationFlags.Normal))
+        if (_locationFlags == DeviceLocationFlags.Normal)
         {
             iFlags |= PInvoke.DIGCF_PRESENT;
         }

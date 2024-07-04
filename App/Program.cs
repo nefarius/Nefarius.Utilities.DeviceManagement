@@ -3,6 +3,27 @@
 using Nefarius.Utilities.DeviceManagement.Drivers;
 using Nefarius.Utilities.DeviceManagement.PnP;
 
+Guid DeviceInterfaceGuid = Guid.Parse("{399ED672-E0BD-4FB3-AB0C-4955B56FB86A}");
+bool rebootRequired = false;
+int instance = 0;
+// uninstall live copies of drivers in use by connected or orphaned devices
+while (Devcon.FindByInterfaceGuid(DeviceInterfaceGuid, out PnPDevice dev, instance++, false))
+{
+    try
+    {
+        dev.Uninstall(out bool reboot);
+
+        if (reboot)
+        {
+            rebootRequired = true;
+        }
+    }
+    catch (Exception ex)
+    {
+        
+    }
+}
+
 DriverStore.RemoveDriver(@"C:\temp\nonexistent");
 
 const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
