@@ -26,6 +26,11 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     private readonly uint _instanceHandle;
 
     /// <summary>
+    ///     The <see cref="DeviceLocationFlags"/> used when creating this instance.
+    /// </summary>
+    private readonly DeviceLocationFlags _locationFlags;
+
+    /// <summary>
     ///     Creates a new <see cref="PnPDevice" /> based on the supplied instance ID to search in the device tree.
     /// </summary>
     /// <param name="instanceId">The instance ID to look for.</param>
@@ -34,6 +39,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
     {
         InstanceId = instanceId;
+        _locationFlags = flags;
         uint iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
 
         switch (flags)
@@ -538,11 +544,18 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         SetupApi.SP_DRVINFO_DATA driverInfoData = new();
         driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
 
+        uint iFlags = PInvoke.DIGCF_ALLCLASSES;
+
+        if (_locationFlags.HasFlag(DeviceLocationFlags.Normal))
+        {
+            iFlags |= PInvoke.DIGCF_PRESENT;
+        }
+
         HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
             null,
             null,
             HWND.Null,
-            PInvoke.DIGCF_ALLCLASSES | PInvoke.DIGCF_PRESENT
+            iFlags
         );
 
         if (hDevInfo.IsNull)
