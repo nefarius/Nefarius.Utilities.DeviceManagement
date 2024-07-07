@@ -1,4 +1,5 @@
 ﻿#nullable enable
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -12,34 +13,18 @@ namespace Nefarius.Utilities.DeviceManagement.Exceptions;
 ///     A Win32 API has failed.
 /// </summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class Win32Exception : Exception
 {
     /// <summary>
     ///     A Win32 API has failed.
     /// </summary>
     /// <param name="message">The error message.</param>
-    internal unsafe Win32Exception(string message) : base(message)
+    internal Win32Exception(string message) : base(message)
     {
         ErrorCode ??= Marshal.GetLastWin32Error();
-
-        const int bufLen = 1024;
-        char* buffer = stackalloc char[bufLen];
-
-        uint numChars = PInvoke.FormatMessage(
-            FORMAT_MESSAGE_OPTIONS.FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_OPTIONS.FORMAT_MESSAGE_IGNORE_INSERTS,
-            null,
-            (uint)ErrorCode,
-            0,
-            buffer,
-            bufLen,
-            null
-        );
-
-        if (numChars > 0)
-        {
-            ErrorMessage = new string(buffer).Trim('\r', '\n');
-        }
+        ErrorMessage = GetMessageFor(ErrorCode);
     }
 
     /// <summary>
@@ -61,4 +46,33 @@ public class Win32Exception : Exception
     ///     The Win32 error message.
     /// </summary>
     public string? ErrorMessage { get; }
+
+    /// <summary>
+    ///     Translates a Win32 error code to the user-readable message.
+    /// </summary>
+    /// <param name="errorCode">The Win32 error code.</param>
+    /// <returns>The message, if any, or null.</returns>
+    public static unsafe string? GetMessageFor(int? errorCode)
+    {
+        if (!errorCode.HasValue)
+        {
+            return null;
+        }
+
+        const int bufLen = 1024;
+        char* buffer = stackalloc char[bufLen];
+
+        uint numChars = PInvoke.FormatMessage(
+            FORMAT_MESSAGE_OPTIONS.FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_OPTIONS.FORMAT_MESSAGE_IGNORE_INSERTS,
+            null,
+            (uint)errorCode.Value,
+            0,
+            buffer,
+            bufLen,
+            null
+        );
+
+        return numChars > 0 ? new string(buffer).Trim('\r', '\n') : null;
+    }
 }
