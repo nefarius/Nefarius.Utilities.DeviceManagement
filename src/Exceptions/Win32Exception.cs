@@ -50,14 +50,11 @@ public class Win32Exception : Exception
     /// <summary>
     ///     Translates a Win32 error code to the user-readable message.
     /// </summary>
-    /// <param name="errorCode">The Win32 error code.</param>
+    /// <param name="errorCode">The Win32 error code. Gets fetched from <see cref="Marshal.GetLastWin32Error" /> if null.</param>
     /// <returns>The message, if any, or null.</returns>
-    public static unsafe string? GetMessageFor(int? errorCode)
+    public static unsafe string? GetMessageFor(int? errorCode = default)
     {
-        if (!errorCode.HasValue)
-        {
-            return null;
-        }
+        errorCode ??= Marshal.GetLastWin32Error();
 
         const int bufLen = 1024;
         char* buffer = stackalloc char[bufLen];
