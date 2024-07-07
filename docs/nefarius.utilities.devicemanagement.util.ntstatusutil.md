@@ -31,4 +31,4 @@ The converted Win32 error code.
 
 **Remarks:**
 
-https://stackoverflow.com/a/32205631
+Source: https://stackoverflow.com/a/32205631

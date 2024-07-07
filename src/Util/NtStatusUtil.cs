@@ -15,7 +15,7 @@ public static class NtStatusUtil
     /// <summary>
     ///     Converts an NTSTATUS value to a <see cref="WIN32_ERROR" />.
     /// </summary>
-    /// <remarks>https://stackoverflow.com/a/32205631</remarks>
+    /// <remarks>Source: https://stackoverflow.com/a/32205631</remarks>
     /// <param name="ntStatus">The NTSTATUS value to convert.</param>
     /// <returns>The converted Win32 error code.</returns>
     public static unsafe int ConvertNtStatusToWin32Error(uint ntStatus)
