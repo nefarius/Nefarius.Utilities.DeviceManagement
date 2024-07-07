@@ -53,3 +53,7 @@
 - [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)
 
 - [UsbPnPDevice](./nefarius.utilities.devicemanagement.pnp.usbpnpdevice.md)
+
+## Namespace Nefarius.Utilities.DeviceManagement.Util
+
+- [NtStatusUtil](./nefarius.utilities.devicemanagement.util.ntstatusutil.md)

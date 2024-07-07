@@ -116,3 +116,22 @@ public MethodBase TargetSite { get; }
 #### Property Value
 
 [MethodBase](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.methodbase)<br>
+
+## Methods
+
+### <a id="methods-getmessagefor"/>**GetMessageFor(Nullable&lt;Int32&gt;)**
+
+Translates a Win32 error code to the user-readable message.
+
+```csharp
+public static string GetMessageFor(Nullable<Int32> errorCode)
+```
+
+#### Parameters
+
+`errorCode` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The Win32 error code. Gets fetched from [Marshal.GetLastWin32Error()](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.getlastwin32error) if null.
+
+#### Returns
+
+The message, if any, or null.
