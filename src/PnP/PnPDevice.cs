@@ -1,4 +1,5 @@
 ﻿#nullable enable
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -26,7 +27,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     private readonly uint _instanceHandle;
 
     /// <summary>
-    ///     The <see cref="DeviceLocationFlags"/> used when creating this instance.
+    ///     The <see cref="DeviceLocationFlags" /> used when creating this instance.
     /// </summary>
     private readonly DeviceLocationFlags _locationFlags;
 
@@ -794,7 +795,8 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             return true;
         }
 
-        return string.Equals(DeviceId, other.DeviceId, StringComparison.InvariantCultureIgnoreCase);
+        // Instance ID distinguishes unique instances of devices, even of the same Hardware ID
+        return string.Equals(InstanceId, other.InstanceId, StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <inheritdoc />
