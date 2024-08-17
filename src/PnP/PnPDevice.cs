@@ -1,4 +1,5 @@
 ﻿#nullable enable
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -26,7 +27,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     private readonly uint _instanceHandle;
 
     /// <summary>
-    ///     The <see cref="DeviceLocationFlags"/> used when creating this instance.
+    ///     The <see cref="DeviceLocationFlags" /> used when creating this instance.
     /// </summary>
     private readonly DeviceLocationFlags _locationFlags;
 
@@ -102,7 +103,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <summary>
     ///     The instance ID of the device. Uniquely identifies devices of equal make and model on the same machine.
     /// </summary>
-    public  string InstanceId { get; }
+    public string InstanceId { get; }
 
     /// <summary>
     ///     The device ID. Typically built from the hardware ID of the same make and model of hardware.
