@@ -102,7 +102,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <summary>
     ///     The instance ID of the device. Uniquely identifies devices of equal make and model on the same machine.
     /// </summary>
-    public string InstanceId { get; }
+    public  string InstanceId { get; }
 
     /// <summary>
     ///     The device ID. Typically built from the hardware ID of the same make and model of hardware.
@@ -794,7 +794,8 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             return true;
         }
 
-        return string.Equals(DeviceId, other.DeviceId, StringComparison.InvariantCultureIgnoreCase);
+        // Instance ID distinguishes unique instances of devices, even of the same Hardware ID
+        return string.Equals(InstanceId, other.InstanceId, StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <inheritdoc />
