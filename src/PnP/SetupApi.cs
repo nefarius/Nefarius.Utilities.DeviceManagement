@@ -7,6 +7,8 @@ using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
+using FILETIME = Windows.Win32.Foundation.FILETIME;
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
