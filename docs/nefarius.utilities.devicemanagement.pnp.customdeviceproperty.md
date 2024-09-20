@@ -5,7 +5,7 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Describes a custom device property.
 
 ```csharp
-public class CustomDeviceProperty : DevicePropertyKey, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.DevicePropertyKey, Nefarius.Utilities.DeviceManagement, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class CustomDeviceProperty : DevicePropertyKey, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.DevicePropertyKey, Nefarius.Utilities.DeviceManagement, Version=4.0.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md) → [CustomDeviceProperty](./nefarius.utilities.devicemanagement.pnp.customdeviceproperty.md)<br>
