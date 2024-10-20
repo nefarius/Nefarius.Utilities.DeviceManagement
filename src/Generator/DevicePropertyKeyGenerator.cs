@@ -15,7 +15,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace DeviceManagementPropertiesGenerator;
 
 [Generator]
-public class DevicePropertyKeyGenerator : ISourceGenerator
+public class DevicePropertyKeyGenerator : IIncrementalGenerator
 {
     private static readonly IDictionary<DEVPROPTYPE, Type> NativeToManagedTypeMap =
         new Dictionary<DEVPROPTYPE, Type>
@@ -48,69 +48,67 @@ public class DevicePropertyKeyGenerator : ISourceGenerator
             // DEVPROP_TYPE_STRING_INDIRECT
         };
 
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-    }
-
-    public void Execute(GeneratorExecutionContext context)
-    {
-        string devpkeyHeader =
-            "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/devpkey.h";
-
-        WebClient wc = new();
-
-        string header = wc.DownloadString(devpkeyHeader);
-
-        Regex parseRegex = new(@"^DEFINE_DEVPROPKEY\((\w*), .*\/\/ (\w*)$", RegexOptions.Multiline);
-
-        MatchCollection matches = parseRegex.Matches(header);
-
-        Dictionary<string, Type> nameToManagedTypeMap = new();
-
-        foreach (Match match in matches)
-        {
-            string propName = match.Groups[1].Value;
-            string typeName = match.Groups[2].Value;
-
-            // handle special cases
-            switch (typeName)
+        context.RegisterSourceOutput(
+            context.CompilationProvider,
+            (sourceProductionContext, compilation) =>
             {
-                // combined type doesn't exist as constant
-                case "DEVPROP_TYPE_STRING_LIST":
-                    nameToManagedTypeMap.Add(propName, typeof(string[]));
-                    break;
-                // combined type doesn't exist as constant
-                case "DEVPROP_TYPE_BINARY":
-                    nameToManagedTypeMap.Add(propName, typeof(byte[]));
-                    break;
-                default:
-                    // exists as a comment but not as an actual constant
-                    if (Equals(typeName, "DEVPROP_TYPE_BOOL"))
+                string devpkeyHeader =
+                    "https://raw.githubusercontent.com/microsoft/win32metadata/main/generation/WinSDK/RecompiledIdlHeaders/shared/devpkey.h";
+
+                WebClient wc = new();
+
+                string header = wc.DownloadString(devpkeyHeader);
+
+                Regex parseRegex = new(@"^DEFINE_DEVPROPKEY\((\w*), .*\/\/ (\w*)$", RegexOptions.Multiline);
+
+                MatchCollection matches = parseRegex.Matches(header);
+
+                Dictionary<string, Type> nameToManagedTypeMap = new();
+
+                foreach (Match match in matches)
+                {
+                    string propName = match.Groups[1].Value;
+                    string typeName = match.Groups[2].Value;
+
+                    // handle special cases
+                    switch (typeName)
                     {
-                        typeName = "DEVPROP_TYPE_BOOLEAN";
+                        // combined type doesn't exist as constant
+                        case "DEVPROP_TYPE_STRING_LIST":
+                            nameToManagedTypeMap.Add(propName, typeof(string[]));
+                            break;
+                        // combined type doesn't exist as constant
+                        case "DEVPROP_TYPE_BINARY":
+                            nameToManagedTypeMap.Add(propName, typeof(byte[]));
+                            break;
+                        default:
+                            // exists as a comment but not as an actual constant
+                            if (Equals(typeName, "DEVPROP_TYPE_BOOL"))
+                            {
+                                typeName = "DEVPROP_TYPE_BOOLEAN";
+                            }
+
+                            DEVPROPTYPE nativeTypeValue = (DEVPROPTYPE)Enum.Parse(typeof(DEVPROPTYPE), typeName);
+
+                            // unsupported type hit
+                            if (!NativeToManagedTypeMap.TryGetValue(nativeTypeValue, out Type managedType))
+                            {
+                                continue;
+                            }
+
+                            nameToManagedTypeMap.Add(propName, managedType);
+                            break;
                     }
+                }
 
-                    DEVPROPTYPE nativeTypeValue = (DEVPROPTYPE)Enum.Parse(typeof(DEVPROPTYPE), typeName);
+                List<FieldInfo> allProperties = typeof(PInvoke)
+                    .GetFields(BindingFlags.Static | BindingFlags.NonPublic)
+                    .Where(info => info.FieldType == typeof(DEVPROPKEY))
+                    .ToList();
 
-                    // unsupported type hit
-                    if (!NativeToManagedTypeMap.ContainsKey(nativeTypeValue))
-                    {
-                        continue;
-                    }
-
-                    Type managedType = NativeToManagedTypeMap[nativeTypeValue];
-
-                    nameToManagedTypeMap.Add(propName, managedType);
-                    break;
-            }
-        }
-
-        List<FieldInfo> allProperties = typeof(PInvoke)
-            .GetFields(BindingFlags.Static | BindingFlags.NonPublic)
-            .Where(info => info.FieldType == typeof(DEVPROPKEY))
-            .ToList();
-
-        StringBuilder sb = new(@"using System;
+                StringBuilder sb = new(@"using System;
 using Windows.Win32;
 using Windows.Win32.Devices.Properties;
 
@@ -118,32 +116,33 @@ namespace Nefarius.Utilities.DeviceManagement.PnP
 {
     public partial class DevicePropertyKey
     {");
-        foreach (FieldInfo property in allProperties)
-        {
-            // strip prefix
-            string fieldName = property.Name.Replace("DEVPKEY_", string.Empty);
-            string propertyName = property.Name;
+                foreach (FieldInfo property in allProperties)
+                {
+                    // strip prefix
+                    string fieldName = property.Name.Replace("DEVPKEY_", string.Empty);
+                    string propertyName = property.Name;
 
-            // skip if we don't know the managed type
-            if (!nameToManagedTypeMap.ContainsKey(propertyName))
-            {
-                continue;
-            }
+                    // skip if we don't know the managed type
+                    if (!nameToManagedTypeMap.TryGetValue(propertyName, out Type managedType))
+                    {
+                        continue;
+                    }
 
-            Type managedType = nameToManagedTypeMap[propertyName];
-
-            sb.AppendLine($@"
+                    sb.AppendLine($@"
         /// <summary>
         ///     {propertyName}
         /// </summary>
         public static readonly DevicePropertyKey {fieldName} = new DevicePropertyKey(PInvoke.{propertyName}, typeof({managedType.Name}));");
-        }
+                }
 
-        sb.Append(@"
+                sb.Append(@"
     }
 }
 ");
 
-        context.AddSource("DevicePropertyKeysGenerated.g.cs", SourceText.From(sb.ToString(), Encoding.UTF8));
+                // Add the source code as a generated source
+                sourceProductionContext.AddSource("DevicePropertyKeysGenerated.g.cs",
+                    SourceText.From(sb.ToString(), Encoding.UTF8));
+            });
     }
 }

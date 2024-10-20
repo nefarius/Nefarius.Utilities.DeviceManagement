@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
+using Nefarius.Utilities.DeviceManagement.Exceptions;
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
