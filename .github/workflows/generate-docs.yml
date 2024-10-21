@@ -5,14 +5,14 @@ on:
     branches: [ "master" ]
     paths-ignore:
       - 'docs/**'
-  pull_request:
-    branches: [ "master" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: master
 
       - name: Setup .Net SDK
         uses: actions/setup-dotnet@v3
@@ -26,7 +26,7 @@ jobs:
         run: dotnet build -c Release
 
       - name: Generate API docs
-        run: xmldoc2md ./bin/netstandard2.0/Nefarius.Utilities.DeviceManagement.dll ./docs/
+        run: xmldoc2md ./bin/netstandard2.0/${{ github.event.repository.name }}.dll ./docs/
 
       - name: Check for changes
         id: check-for-changes
