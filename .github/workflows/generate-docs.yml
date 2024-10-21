@@ -3,6 +3,8 @@ name: Generate API Documentation
 on:
   push:
     branches: [ "master" ]
+    paths-ignore:
+      - 'docs/**'
   pull_request:
     branches: [ "master" ]
 
