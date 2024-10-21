@@ -21,8 +21,12 @@ public class ConfigManagerException : Exception
         Value = (uint)result;
     }
 
+    /// <inheritdoc />
+    public override string Message =>
+        Value == (uint)CONFIGRET.CR_SUCCESS ? base.Message : $"{base.Message} (CONFIGRET: {Value})";
+
     /// <summary>
     ///     The CONFIGRET value of the error.
     /// </summary>
-    public uint Value { get; }
+    public uint Value { get; } = (uint)CONFIGRET.CR_SUCCESS;
 }
