@@ -14,6 +14,8 @@
 
 - [DriverServiceNotFoundException](./nefarius.utilities.devicemanagement.exceptions.driverservicenotfoundexception.md)
 
+- [PnPDeviceNotFoundException](./nefarius.utilities.devicemanagement.exceptions.pnpdevicenotfoundexception.md)
+
 - [UsbPnPDeviceConversionException](./nefarius.utilities.devicemanagement.exceptions.usbpnpdeviceconversionexception.md)
 
 - [UsbPnPDeviceException](./nefarius.utilities.devicemanagement.exceptions.usbpnpdeviceexception.md)

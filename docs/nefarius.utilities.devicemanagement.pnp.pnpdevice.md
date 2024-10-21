@@ -189,7 +189,12 @@ The device interface path/ID/symbolic link name.
 
 #### Returns
 
-A [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md).
+A [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) or null if not found.
+
+#### Exceptions
+
+[ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+Interface lookup failed.
 
 ### <a id="methods-gethashcode"/>**GetHashCode()**
 
@@ -216,11 +221,12 @@ The device interface path/ID/symbolic link name.
 
 #### Returns
 
-The Instance ID.
+The Instance ID or null if not found.
 
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+Interface lookup failed.
 
 ### <a id="methods-getproperty"/>**GetProperty&lt;T&gt;(DevicePropertyKey)**
 
