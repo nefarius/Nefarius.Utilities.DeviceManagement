@@ -42,13 +42,13 @@ public class DeviceClassFilterTests
         // expect exactly one entry, our added service
         Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Is.Not.Null);
         Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite)!.Count(), Is.EqualTo(1));
-        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service01);
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Contains.Item(Service01));
 
         // add the same service again
         DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, Service01);
         // must not be added as duplicate
         Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite)!.Count(), Is.EqualTo(1));
-        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service01);
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Contains.Item(Service01));
 
         // add invalid service, has to throw exception
         Assert.Throws(typeof(DriverServiceNotFoundException),
@@ -58,21 +58,21 @@ public class DeviceClassFilterTests
         DeviceClassFilters.AddUpper(DeviceClassIds.XnaComposite, Service03);
         // expect to get 2 services now
         Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite)!.Count(), Is.EqualTo(2));
-        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service01);
-        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service03);
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Contains.Item(Service01));
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Contains.Item(Service03));
 
         // remove first service
         DeviceClassFilters.RemoveUpper(DeviceClassIds.XnaComposite, Service01);
         // expect to get one service now, excluding the removed one
         Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite)!.Count(), Is.EqualTo(1));
-        CollectionAssert.DoesNotContain(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service01);
-        CollectionAssert.Contains(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Service03);
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Does.Not.Contain(Service01));
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Contains.Item(Service03));
 
         // remove remaining service
         DeviceClassFilters.RemoveUpper(DeviceClassIds.XnaComposite, Service03);
         // expect not null, but empty
         Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Is.Not.Null);
-        CollectionAssert.IsEmpty(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite));
+        Assert.That(DeviceClassFilters.GetUpper(DeviceClassIds.XnaComposite), Is.Empty); 
 
         // remove entirely
         DeviceClassFilters.DeleteUpper(DeviceClassIds.XnaComposite);
