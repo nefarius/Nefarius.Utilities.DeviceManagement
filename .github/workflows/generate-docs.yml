@@ -1,0 +1,40 @@
+name: Generate API Documentation
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .Net SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.x
+
+      - name: Install XMLDoc2Markdown
+        run: dotnet tool install -g Nefarius.Tools.XMLDoc2Markdown
+
+      - name: Build
+        run: dotnet build -c Release
+
+      - name: Generate API docs
+        run: xmldoc2md .\bin\netstandard2.0\Nefarius.Utilities.DeviceManagement.dll .\docs\
+
+      - name: Check for changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git diff --cached --exit-code || git commit -m "Update API documentation"
+  
+      - name: Push changes
+        if: success() && steps.check-for-changes.outcome == 'success'
+        run: git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

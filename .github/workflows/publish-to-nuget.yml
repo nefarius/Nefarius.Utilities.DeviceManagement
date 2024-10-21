@@ -14,10 +14,9 @@ jobs:
           fetch-depth: 0
 
       - name: Setup .Net SDK
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.x
-          include-prerelease: false
 
       - name: Modify README.md for NuGet
         run: |
