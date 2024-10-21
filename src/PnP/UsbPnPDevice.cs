@@ -82,7 +82,7 @@ public class UsbPnPDevice : PnPDevice
                 out uint listLength,
                 PInvoke.GUID_DEVINTERFACE_USB_HUB,
                 hubInstanceId,
-                PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
+                CM_GET_DEVICE_INTERFACE_LIST_FLAGS.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
             );
 
             if (ret != CONFIGRET.CR_SUCCESS)
@@ -100,7 +100,7 @@ public class UsbPnPDevice : PnPDevice
                     hubInstanceId,
                     pListBuffer,
                     listLength,
-                    PInvoke.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
+                    CM_GET_DEVICE_INTERFACE_LIST_FLAGS.CM_GET_DEVICE_INTERFACE_LIST_PRESENT
                 );
 
                 if (ret != CONFIGRET.CR_SUCCESS)

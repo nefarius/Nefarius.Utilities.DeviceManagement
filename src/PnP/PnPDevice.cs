@@ -41,18 +41,18 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     {
         InstanceId = instanceId;
         _locationFlags = flags;
-        uint iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
+        CM_LOCATE_DEVNODE_FLAGS iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_NORMAL;
 
         switch (flags)
         {
             case DeviceLocationFlags.Normal:
-                iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
+                iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_NORMAL;
                 break;
             case DeviceLocationFlags.Phantom:
-                iFlags = PInvoke.CM_LOCATE_DEVNODE_PHANTOM;
+                iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_PHANTOM;
                 break;
             case DeviceLocationFlags.CancelRemove:
-                iFlags = PInvoke.CM_LOCATE_DEVNODE_CANCELREMOVE;
+                iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_CANCELREMOVE;
                 break;
         }
 
@@ -237,7 +237,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             null,
             null,
             HWND.Null,
-            PInvoke.DIGCF_ALLCLASSES | PInvoke.DIGCF_PRESENT
+            (uint)(SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_ALLCLASSES | SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT)
         );
 
         if (hDevInfo.IsNull)
@@ -299,7 +299,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                     hDevInfo,
                     &spDevinfoData,
                     IntPtr.Zero,
-                    PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
+                    (uint)DIINSTALLDEVICE_FLAGS.DIIDFLAG_INSTALLNULLDRIVER,
                     out rebootRequired
                 );
 
@@ -423,8 +423,8 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new Win32Exception("Failed to get the device install parameters");
             }
 
-            deviceInstallParams.Flags |= PInvoke.DI_ENUMSINGLEINF;
-            deviceInstallParams.FlagsEx |= PInvoke.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
+            deviceInstallParams.Flags |= (int)SETUP_DI_DEVICE_INSTALL_FLAGS.DI_ENUMSINGLEINF;
+            deviceInstallParams.FlagsEx |= (int)SETUP_DI_DEVICE_INSTALL_FLAGS_EX.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
             deviceInstallParams.DriverPath = infName;
 
             success = SetupApi.SetupDiSetDeviceInstallParams(
@@ -441,7 +441,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             success = SetupApi.SetupDiBuildDriverInfoList(
                 hDevInfo,
                 &devInfoData,
-                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+                SETUP_DI_DRIVER_TYPE.SPDIT_CLASSDRIVER
             );
 
             if (!success)
@@ -454,7 +454,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             success = SetupApi.SetupDiEnumDriverInfo(
                 hDevInfo,
                 &devInfoData,
-                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER,
+                SETUP_DI_DRIVER_TYPE.SPDIT_CLASSDRIVER,
                 0,
                 ref driverInfoData
             );
@@ -496,7 +496,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 SetupApi.SetupDiDestroyDriverInfoList(
                     hDevInfo,
                     &devInfoData,
-                    SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+                    SETUP_DI_DRIVER_TYPE.SPDIT_CLASSDRIVER
                 );
             }
 
@@ -545,11 +545,11 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         SetupApi.SP_DRVINFO_DATA driverInfoData = new();
         driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
 
-        uint iFlags = PInvoke.DIGCF_ALLCLASSES;
+        uint iFlags = (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_ALLCLASSES;
 
         if (_locationFlags == DeviceLocationFlags.Normal)
         {
-            iFlags |= PInvoke.DIGCF_PRESENT;
+            iFlags |= (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT;
         }
 
         HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(

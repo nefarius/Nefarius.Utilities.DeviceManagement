@@ -325,7 +325,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private LRESULT WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+    private unsafe LRESULT WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
     {
         switch (msg)
         {
