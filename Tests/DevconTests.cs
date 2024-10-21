@@ -1,7 +1,5 @@
 using Nefarius.Utilities.DeviceManagement.PnP;
 
-using NUnit.Framework.Legacy;
-
 #pragma warning disable CS1591
 
 namespace Tests;
@@ -23,7 +21,9 @@ public class DevconTests
         const string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
         Assert.Multiple(() =>
         {
-            Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId, out IEnumerable<string>? instances), Is.True);
+            Assert.That(
+                Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId,
+                    out IEnumerable<string>? instances), Is.True);
             Assert.That(instances.Count(), Is.EqualTo(1));
         });
 
@@ -39,9 +39,12 @@ public class DevconTests
     [Test]
     public void TestFindInDeviceClassByHardwareIdWithNonexistent()
     {
-        Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, "ROOT\\NOPE",
-            out IEnumerable<string>? instances), Is.False);
-        CollectionAssert.IsEmpty(instances);
+        Assert.Multiple(() =>
+        {
+            Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, "ROOT\\NOPE",
+                out IEnumerable<string>? instances), Is.False);
+            Assert.That(instances, Is.Empty);
+        });
     }
 
     /// <summary>
@@ -52,9 +55,12 @@ public class DevconTests
     {
         string partialHardwareId = @"BTHENUM\{1cb831ea-79cd-4508-b0fc-85f7c85ae8e0}";
 
-        Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.Bluetooth, partialHardwareId,
-            out IEnumerable<string>? instances, true, true), Is.True);
-        CollectionAssert.IsNotEmpty(instances);
+        Assert.Multiple(() =>
+        {
+            Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.Bluetooth, partialHardwareId,
+                out IEnumerable<string>? instances, true, true), Is.True);
+            Assert.That(instances, Is.Not.Empty);
+        });
     }
 
     /// <summary>
@@ -67,7 +73,6 @@ public class DevconTests
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
         Assert.Multiple(() =>
         {
-
             // 1st controller
             Assert.That(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out PnPDevice? device01), Is.True);
 
@@ -77,7 +82,6 @@ public class DevconTests
         });
         Assert.Multiple(() =>
         {
-
             // 2nd controller
             Assert.That(Devcon.FindByInterfaceGuid(xusbInterfaceGuid, out PnPDevice? device02, 1), Is.True);
 
