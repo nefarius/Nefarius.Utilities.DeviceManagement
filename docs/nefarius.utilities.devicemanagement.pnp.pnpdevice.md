@@ -361,6 +361,7 @@ public void Remove()
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+CM API failure occurred.
 
 **Remarks:**
 
@@ -400,7 +401,7 @@ public void Restart()
 
 **Remarks:**
 
-This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects. If
+This method removes and re-enumerates (adds) the device note, which might cause unintended side effects. If
  this is the behaviour you seek, consider using [PnPDevice.RemoveAndSetup()](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md#removeandsetup) instead. This method remains here for
  backwards compatibility.
 

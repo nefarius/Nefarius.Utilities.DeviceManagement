@@ -111,7 +111,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     force-closed.
     /// </summary>
     /// <remarks>
-    ///     This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects. If
+    ///     This method removes and re-enumerates (adds) the device note, which might cause unintended side effects. If
     ///     this is the behaviour you seek, consider using <see cref="RemoveAndSetup" /> instead. This method remains here for
     ///     backwards compatibility.
     /// </remarks>
@@ -145,7 +145,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <summary>
     ///     Attempts to remove this device node.
     /// </summary>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <exception cref="ConfigManagerException">CM API failure occurred.</exception>
     /// <remarks>
     ///     This call DOES NOT invoke device and driver uninstall routines, as soon as the device is re-enumerated, it
     ///     will reappear and become online.
