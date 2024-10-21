@@ -336,7 +336,7 @@ Returns false if the given predicate is true.
 
 #### Returns
 
-True if this devices originates from an emulator, false otherwise.
+True if this device originates from an emulator, false otherwise.
 
 **Remarks:**
 

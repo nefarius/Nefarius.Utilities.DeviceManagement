@@ -272,7 +272,7 @@ void Uninstall()
 
 #### Exceptions
 
-!:Win32Exception<br>
+[Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md)<br>
 
 [ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
 
@@ -298,7 +298,7 @@ Gets whether a reboot is required for the changes to take effect or not.
 
 #### Exceptions
 
-!:Win32Exception<br>
+[Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md)<br>
 
 [ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
 
