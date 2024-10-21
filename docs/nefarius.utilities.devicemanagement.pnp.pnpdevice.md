@@ -171,6 +171,17 @@ The instance ID of the device.
 
 A [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md).
 
+#### Exceptions
+
+[PnPDeviceNotFoundException](./nefarius.utilities.devicemanagement.exceptions.pnpdevicenotfoundexception.md)<br>
+The desired device instance was not found on the system.
+
+[ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+Device information lookup failed.
+
+[ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
+The supplied `flags` value was invalid.
+
 ### <a id="methods-getdevicebyinterfaceid"/>**GetDeviceByInterfaceId(String, DeviceLocationFlags)**
 
 Return device identified by instance ID/path (symbolic link).
@@ -306,7 +317,7 @@ public void InstallNullDriver()
 **Remarks:**
 
 This will tear down the current device stack (no matter how many open handles exist), remove the existing function
- driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+ driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
  for the change to take effect without requiring a reboot.
 
 ### <a id="methods-installnulldriver"/>**InstallNullDriver(ref Boolean)**
@@ -324,7 +335,7 @@ public void InstallNullDriver(ref Boolean rebootRequired)
 **Remarks:**
 
 This will tear down the current device stack (no matter how many open handles exist), remove the existing function
- driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+ driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
  for the change to take effect without requiring a reboot.
 
 ### <a id="methods-isvirtual"/>**IsVirtual(Func&lt;IPnPDevice, Boolean&gt;)**

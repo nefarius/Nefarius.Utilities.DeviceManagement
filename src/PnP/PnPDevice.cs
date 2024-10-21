@@ -228,7 +228,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     public void InstallNullDriver()
@@ -241,7 +241,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     public unsafe void InstallNullDriver(out bool rebootRequired)

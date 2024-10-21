@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 using Windows.Win32;
@@ -20,6 +21,9 @@ public partial class PnPDevice
     ///     <see cref="DeviceLocationFlags" />
     /// </param>
     /// <returns>A <see cref="PnPDevice" />.</returns>
+    /// <exception cref="PnPDeviceNotFoundException">The desired device instance was not found on the system.</exception>
+    /// <exception cref="ConfigManagerException">Device information lookup failed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags"/> value was invalid.</exception>
     public static PnPDevice GetDeviceByInstanceId(string instanceId,
         DeviceLocationFlags flags = DeviceLocationFlags.Normal)
     {
