@@ -24,7 +24,7 @@ jobs:
         run: dotnet build -c Release
 
       - name: Generate API docs
-        run: xmldoc2md .\bin\netstandard2.0\Nefarius.Utilities.DeviceManagement.dll .\docs\
+        run: xmldoc2md ./bin/netstandard2.0/Nefarius.Utilities.DeviceManagement.dll ./docs/
 
       - name: Check for changes
         run: |
