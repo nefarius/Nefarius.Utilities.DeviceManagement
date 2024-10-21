@@ -177,7 +177,25 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     root enumerated device.
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
-    /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
+    /// <returns>True if this device originates from an emulator, false otherwise.</returns>
+    /// <example>
+    /// bool isVirtualDevice = pnpDevice.IsVirtual(pDevice =&gt;
+    /// {
+    ///     List&lt;string&gt;? hardwareIds = pDevice.GetProperty&lt;string[]&gt;(DevicePropertyKey.Device_HardwareIds).ToList();
+    /// 
+    ///     // hardware IDs of root hubs/controllers that emit supported virtual devices as sources
+    ///     string[] excludedIds =
+    ///     {
+    /// 		@"ROOT\HIDGAMEMAP", // reWASD
+    /// 		@"ROOT\VHUSB3HC", // VirtualHere
+    /// 		@"Nefarius\ViGEmBus\Gen1", // ViGemBus v1 
+    /// 		@"Nefarius\ViGEmBus\Gen2", // ViGemBus v2 
+    /// 		@"Nefarius\VirtualPad" // VirtualPad
+    /// 	};
+    /// 
+    ///     return hardwareIds.Any(id =&gt; excludedIds.Contains(id.ToUpper()));
+    /// });
+    /// </example>
     public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
     {
         IPnPDevice device = this;
@@ -189,9 +207,14 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 return false;
             }
 
-            string parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
+            string? parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
 
-            if (parentId.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(parentId))
+            {
+                continue;
+            }
+
+            if (parentId!.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
             {
                 break;
             }
@@ -199,9 +222,6 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             device = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom);
         }
 
-        //
-        // TODO: test how others behave (reWASD, NVIDIA, ...)
-        // 
         return device is not null &&
                (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
