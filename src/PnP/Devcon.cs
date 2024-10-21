@@ -88,8 +88,10 @@ public static class Devcon
                 }
 
                 uint nBytes = (charsRequired + 1) * 2;
+#pragma warning disable CA2014
                 // ReSharper disable once StackAllocInsideLoop
                 char* ptrInstanceBuf = stackalloc char[(int)nBytes];
+#pragma warning restore CA2014
 
                 ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
 

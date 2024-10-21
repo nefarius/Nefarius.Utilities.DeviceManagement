@@ -673,7 +673,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new Win32Exception("Failed to get driver info details");
             }
 
-            // this is save to do if we do not read the Hardware IDs dynamic field
+            // this is safe to do if we do not read the Hardware IDs dynamic field
             drvInfoDetailData = Marshal.PtrToStructure<SetupApi.SP_DRVINFO_DETAIL_DATA>(drvInfoDetailDataBuffer);
             */
 
@@ -800,7 +800,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || (obj is PnPDevice other && Equals(other));
     }
