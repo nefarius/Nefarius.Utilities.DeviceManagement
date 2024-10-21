@@ -44,8 +44,12 @@ public class PnPDeviceTests
         const string path = @"\\?\usb#vid_08bb&pid_29c0#6&35844985&0&4#{a5dcbf10-6530-11d2-901f-00c04fb951ed}";
 
         PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
+        
+        Assert.That(device, Is.Not.Null);
 
         DriverMeta? meta = device.GetCurrentDriver();
+        
+        Assert.That(meta, Is.Not.Null);
     }
 
     [Test]
