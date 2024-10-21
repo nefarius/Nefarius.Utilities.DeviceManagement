@@ -36,25 +36,21 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <param name="instanceId">The instance ID to look for.</param>
     /// <param name="flags">The <see cref="DeviceLocationFlags" /> influencing search behavior.</param>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <exception cref="PnPDeviceNotFoundException">The desired device instance was not found on the system.</exception>
+    /// <exception cref="ConfigManagerException">Device information lookup failed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags"/> value was invalid.</exception>
     protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
     {
         InstanceId = instanceId;
         _locationFlags = flags;
-        CM_LOCATE_DEVNODE_FLAGS iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_NORMAL;
 
-        switch (flags)
+        CM_LOCATE_DEVNODE_FLAGS iFlags = flags switch
         {
-            case DeviceLocationFlags.Normal:
-                iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_NORMAL;
-                break;
-            case DeviceLocationFlags.Phantom:
-                iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_PHANTOM;
-                break;
-            case DeviceLocationFlags.CancelRemove:
-                iFlags = CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_CANCELREMOVE;
-                break;
-        }
+            DeviceLocationFlags.Normal => CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_NORMAL,
+            DeviceLocationFlags.Phantom => CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_PHANTOM,
+            DeviceLocationFlags.CancelRemove => CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_CANCELREMOVE,
+            _ => throw new ArgumentOutOfRangeException(nameof(flags), flags, null)
+        };
 
         fixed (char* pInstId = instanceId)
         {
@@ -66,7 +62,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
             if (ret == CONFIGRET.CR_NO_SUCH_DEVINST)
             {
-                throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
+                throw new PnPDeviceNotFoundException(instanceId);
             }
 
             if (ret != CONFIGRET.CR_SUCCESS)
@@ -81,7 +77,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new ConfigManagerException("Fetching device ID size failed.", ret);
             }
 
-            uint nBytes = (charsRequired + 1) * 2;
+            uint nBytes = (charsRequired + 1 /* NULL char */) * 2 /* sizeof(WCHAR) */;
             char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
             ret = PInvoke.CM_Get_Device_IDW(
