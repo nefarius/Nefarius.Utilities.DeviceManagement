@@ -29,6 +29,7 @@ jobs:
         run: xmldoc2md ./bin/netstandard2.0/Nefarius.Utilities.DeviceManagement.dll ./docs/
 
       - name: Check for changes
+        id: check-for-changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
