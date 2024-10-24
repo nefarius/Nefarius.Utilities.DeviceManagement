@@ -171,6 +171,17 @@ The instance ID of the device.
 
 A [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md).
 
+#### Exceptions
+
+[PnPDeviceNotFoundException](./nefarius.utilities.devicemanagement.exceptions.pnpdevicenotfoundexception.md)<br>
+The desired device instance was not found on the system.
+
+[ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+Device information lookup failed.
+
+[ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
+The supplied `flags` value was invalid.
+
 ### <a id="methods-getdevicebyinterfaceid"/>**GetDeviceByInterfaceId(String, DeviceLocationFlags)**
 
 Return device identified by instance ID/path (symbolic link).
@@ -189,7 +200,12 @@ The device interface path/ID/symbolic link name.
 
 #### Returns
 
-A [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md).
+A [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) or null if not found.
+
+#### Exceptions
+
+[ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+Interface lookup failed.
 
 ### <a id="methods-gethashcode"/>**GetHashCode()**
 
@@ -216,11 +232,12 @@ The device interface path/ID/symbolic link name.
 
 #### Returns
 
-The Instance ID.
+The Instance ID or null if not found.
 
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+Interface lookup failed.
 
 ### <a id="methods-getproperty"/>**GetProperty&lt;T&gt;(DevicePropertyKey)**
 
@@ -300,7 +317,7 @@ public void InstallNullDriver()
 **Remarks:**
 
 This will tear down the current device stack (no matter how many open handles exist), remove the existing function
- driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+ driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
  for the change to take effect without requiring a reboot.
 
 ### <a id="methods-installnulldriver"/>**InstallNullDriver(ref Boolean)**
@@ -318,7 +335,7 @@ public void InstallNullDriver(ref Boolean rebootRequired)
 **Remarks:**
 
 This will tear down the current device stack (no matter how many open handles exist), remove the existing function
- driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+ driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
  for the change to take effect without requiring a reboot.
 
 ### <a id="methods-isvirtual"/>**IsVirtual(Func&lt;IPnPDevice, Boolean&gt;)**
@@ -336,7 +353,7 @@ Returns false if the given predicate is true.
 
 #### Returns
 
-True if this devices originates from an emulator, false otherwise.
+True if this device originates from an emulator, false otherwise.
 
 **Remarks:**
 
@@ -355,6 +372,7 @@ public void Remove()
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+CM API failure occurred.
 
 **Remarks:**
 
@@ -394,7 +412,7 @@ public void Restart()
 
 **Remarks:**
 
-This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects. If
+This method removes and re-enumerates (adds) the device note, which might cause unintended side effects. If
  this is the behaviour you seek, consider using [PnPDevice.RemoveAndSetup()](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md#removeandsetup) instead. This method remains here for
  backwards compatibility.
 

@@ -69,7 +69,7 @@ public static class Devcon
             ref target,
             IntPtr.Zero,
             HWND.Null,
-            presentOnly ? PInvoke.DIGCF_PRESENT : 0
+            presentOnly ? (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT : 0
         );
 
         try
@@ -88,8 +88,10 @@ public static class Devcon
                 }
 
                 uint nBytes = (charsRequired + 1) * 2;
+#pragma warning disable CA2014
                 // ReSharper disable once StackAllocInsideLoop
                 char* ptrInstanceBuf = stackalloc char[(int)nBytes];
+#pragma warning restore CA2014
 
                 ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
 
@@ -162,11 +164,11 @@ public static class Devcon
                 da = new();
             int bufferSize = 0, memberIndex = 0;
 
-            int flags = (int)PInvoke.DIGCF_DEVICEINTERFACE;
+            int flags = (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_DEVICEINTERFACE;
 
             if (presentOnly)
             {
-                flags |= (int)PInvoke.DIGCF_PRESENT;
+                flags |= (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT;
             }
 
             deviceInfoSet = SetupApi.SetupDiGetClassDevs(ref target, IntPtr.Zero, HWND.Null, (uint)flags);
@@ -290,7 +292,7 @@ public static class Devcon
     /// <returns>True on success, false otherwise.</returns>
     public static bool Install(string fullInfPath, out bool rebootRequired)
     {
-        return SetupApi.DiInstallDriver(HWND.Null, fullInfPath, PInvoke.DIIRFLAG_FORCE_INF,
+        return SetupApi.DiInstallDriver(HWND.Null, fullInfPath, (uint)DIINSTALLDRIVER_FLAGS.DIIRFLAG_FORCE_INF,
             out rebootRequired);
     }
 
@@ -323,7 +325,7 @@ public static class Devcon
                     ref classGuid,
                     null,
                     HWND.Null,
-                    (int)PInvoke.DICD_GENERATE_ID,
+                    (int)SETUP_DI_DEVICE_CREATION_FLAGS.DICD_GENERATE_ID,
                     ref deviceInfoData
                 ))
             {
@@ -333,7 +335,7 @@ public static class Devcon
             if (!SetupApi.SetupDiSetDeviceRegistryProperty(
                     deviceInfoSet,
                     ref deviceInfoData,
-                    (int)PInvoke.SPDRP_HARDWAREID,
+                    (int)SETUP_DI_REGISTRY_PROPERTY.SPDRP_HARDWAREID,
                     node,
                     node.Length * 2
                 ))
@@ -342,7 +344,7 @@ public static class Devcon
             }
 
             if (!SetupApi.SetupDiCallClassInstaller(
-                    (int)PInvoke.DIF_REGISTERDEVICE,
+                    (int)DI_FUNCTION.DIF_REGISTERDEVICE,
                     deviceInfoSet,
                     ref deviceInfoData
                 ))
@@ -393,7 +395,7 @@ public static class Devcon
                 ref classGuid,
                 IntPtr.Zero,
                 HWND.Null,
-                (int)PInvoke.DIGCF_PRESENT | (int)PInvoke.DIGCF_DEVICEINTERFACE
+                (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT | (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_DEVICEINTERFACE
             );
 
             if (SetupApi.SetupDiOpenDeviceInfo(
@@ -410,9 +412,9 @@ public static class Devcon
                 };
 
                 props.ClassInstallHeader.cbSize = Marshal.SizeOf(props.ClassInstallHeader);
-                props.ClassInstallHeader.InstallFunction = (int)PInvoke.DIF_REMOVE;
+                props.ClassInstallHeader.InstallFunction = (int)DI_FUNCTION.DIF_REMOVE;
 
-                props.Scope = (int)PInvoke.DI_REMOVEDEVICE_GLOBAL;
+                props.Scope = (int)SETUP_DI_REMOVE_DEVICE_SCOPE.DI_REMOVEDEVICE_GLOBAL;
                 props.HwProfile = 0x00;
 
                 // Prepare class (un-)installer
@@ -424,7 +426,7 @@ public static class Devcon
                     ))
                 {
                     // Invoke class installer with uninstall action
-                    if (!SetupApi.SetupDiCallClassInstaller((int)PInvoke.DIF_REMOVE, deviceInfoSet,
+                    if (!SetupApi.SetupDiCallClassInstaller((int)DI_FUNCTION.DIF_REMOVE, deviceInfoSet,
                             ref deviceInfoData))
                     {
                         throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -448,8 +450,8 @@ public static class Devcon
                     int flags = Marshal.ReadInt32(installParams, Marshal.SizeOf(typeof(uint)));
 
                     // Test for restart/reboot flags being present
-                    rebootRequired = (flags & PInvoke.DI_NEEDRESTART) != 0 ||
-                                     (flags & PInvoke.DI_NEEDREBOOT) != 0;
+                    rebootRequired = (flags & (uint)SETUP_DI_DEVICE_INSTALL_FLAGS.DI_NEEDRESTART) != 0 ||
+                                     (flags & (uint)SETUP_DI_DEVICE_INSTALL_FLAGS.DI_NEEDREBOOT) != 0;
 
                     return true;
                 }
@@ -495,13 +497,13 @@ public static class Devcon
     public static bool RefreshPhantom()
     {
         if (PInvoke.CM_Locate_DevNode_Ex(out uint devRoot, null,
-                PInvoke.CM_LOCATE_DEVNODE_PHANTOM, 0) !=
+                (uint)CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_PHANTOM, 0) !=
             CONFIGRET.CR_SUCCESS)
         {
             return false;
         }
 
-        return PInvoke.CM_Reenumerate_DevNode_Ex(devRoot, PInvoke.CM_REENUMERATE_SYNCHRONOUS, 0) ==
+        return PInvoke.CM_Reenumerate_DevNode_Ex(devRoot, (uint)CM_REENUMERATE_FLAGS.CM_REENUMERATE_SYNCHRONOUS, 0) ==
                CONFIGRET.CR_SUCCESS;
     }
 
@@ -524,7 +526,7 @@ public static class Devcon
             HWND.Null,
             hardwareId,
             fullInfPath,
-            PInvoke.INSTALLFLAG_FORCE | PInvoke.INSTALLFLAG_NONINTERACTIVE,
+            UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_FORCE | UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_NONINTERACTIVE,
             &reboot
         );
 
@@ -551,7 +553,7 @@ public static class Devcon
             && !SetupApi.DiUninstallDriver(
                 HWND.Null,
                 fullInfPath,
-                PInvoke.DIURFLAG_NO_REMOVE_INF,
+                (uint)DIUNINSTALLDRIVER_FLAGS.DIURFLAG_NO_REMOVE_INF,
                 out _))
         {
             throw new Win32Exception(Marshal.GetLastWin32Error());

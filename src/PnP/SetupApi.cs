@@ -296,7 +296,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiBuildDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
         [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType
+        [In] SETUP_DI_DRIVER_TYPE driverType
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
@@ -304,7 +304,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiEnumDriverInfo(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType,
+        [In] SETUP_DI_DRIVER_TYPE driverType,
         [In] UInt32 memberIndex,
         [In] [Out] ref SP_DRVINFO_DATA driverInfoData
     );
@@ -360,7 +360,7 @@ internal static class SetupApi
     public static unsafe extern bool SetupDiDestroyDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
-        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType
+        [In] SETUP_DI_DRIVER_TYPE driverType
     );
     
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
@@ -368,7 +368,7 @@ internal static class SetupApi
     public static extern bool SetupDiDestroyDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
         [In] ref SP_DEVINFO_DATA deviceInfoData,
-        [In] SETUP_DI_BUILD_DRIVER_DRIVER_TYPE driverType
+        [In] SETUP_DI_DRIVER_TYPE driverType
     );
 
     #endregion

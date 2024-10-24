@@ -129,6 +129,14 @@ DEVPKEY_Device_ClassGuid
 public static DevicePropertyKey Device_ClassGuid;
 ```
 
+### <a id="fields-device_companionapps"/>**Device_CompanionApps**
+
+DEVPKEY_Device_CompanionApps
+
+```csharp
+public static DevicePropertyKey Device_CompanionApps;
+```
+
 ### <a id="fields-device_compatibleids"/>**Device_CompatibleIds**
 
 DEVPKEY_Device_CompatibleIds
@@ -679,6 +687,14 @@ DEVPKEY_Device_PresenceNotForDevice
 
 ```csharp
 public static DevicePropertyKey Device_PresenceNotForDevice;
+```
+
+### <a id="fields-device_primarycompanionapp"/>**Device_PrimaryCompanionApp**
+
+DEVPKEY_Device_PrimaryCompanionApp
+
+```csharp
+public static DevicePropertyKey Device_PrimaryCompanionApp;
 ```
 
 ### <a id="fields-device_problemcode"/>**Device_ProblemCode**

@@ -174,7 +174,7 @@ void InstallNullDriver()
 **Remarks:**
 
 This will tear down the current device stack (no matter how many open handles exist), remove the existing function
- driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+ driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
  for the change to take effect without requiring a reboot.
 
 ### <a id="methods-installnulldriver"/>**InstallNullDriver(ref Boolean)**
@@ -192,7 +192,7 @@ void InstallNullDriver(ref Boolean rebootRequired)
 **Remarks:**
 
 This will tear down the current device stack (no matter how many open handles exist), remove the existing function
- driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+ driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
  for the change to take effect without requiring a reboot.
 
 ### <a id="methods-isvirtual"/>**IsVirtual(Func&lt;IPnPDevice, Boolean&gt;)**
@@ -210,7 +210,7 @@ Returns false if the given predicate is true.
 
 #### Returns
 
-True if this devices originates from an emulator, false otherwise.
+True if this device originates from an emulator, false otherwise.
 
 **Remarks:**
 
@@ -272,7 +272,7 @@ void Uninstall()
 
 #### Exceptions
 
-!:Win32Exception<br>
+[Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md)<br>
 
 [ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
 
@@ -298,7 +298,7 @@ Gets whether a reboot is required for the changes to take effect or not.
 
 #### Exceptions
 
-!:Win32Exception<br>
+[Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md)<br>
 
 [ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
 

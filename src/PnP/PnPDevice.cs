@@ -36,25 +36,21 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <param name="instanceId">The instance ID to look for.</param>
     /// <param name="flags">The <see cref="DeviceLocationFlags" /> influencing search behavior.</param>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <exception cref="PnPDeviceNotFoundException">The desired device instance was not found on the system.</exception>
+    /// <exception cref="ConfigManagerException">Device information lookup failed.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags"/> value was invalid.</exception>
     protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
     {
         InstanceId = instanceId;
         _locationFlags = flags;
-        uint iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
 
-        switch (flags)
+        CM_LOCATE_DEVNODE_FLAGS iFlags = flags switch
         {
-            case DeviceLocationFlags.Normal:
-                iFlags = PInvoke.CM_LOCATE_DEVNODE_NORMAL;
-                break;
-            case DeviceLocationFlags.Phantom:
-                iFlags = PInvoke.CM_LOCATE_DEVNODE_PHANTOM;
-                break;
-            case DeviceLocationFlags.CancelRemove:
-                iFlags = PInvoke.CM_LOCATE_DEVNODE_CANCELREMOVE;
-                break;
-        }
+            DeviceLocationFlags.Normal => CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_NORMAL,
+            DeviceLocationFlags.Phantom => CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_PHANTOM,
+            DeviceLocationFlags.CancelRemove => CM_LOCATE_DEVNODE_FLAGS.CM_LOCATE_DEVNODE_CANCELREMOVE,
+            _ => throw new ArgumentOutOfRangeException(nameof(flags), flags, null)
+        };
 
         fixed (char* pInstId = instanceId)
         {
@@ -66,7 +62,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
             if (ret == CONFIGRET.CR_NO_SUCH_DEVINST)
             {
-                throw new ArgumentException("The supplied instance wasn't found.", nameof(instanceId));
+                throw new PnPDeviceNotFoundException(instanceId);
             }
 
             if (ret != CONFIGRET.CR_SUCCESS)
@@ -81,7 +77,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new ConfigManagerException("Fetching device ID size failed.", ret);
             }
 
-            uint nBytes = (charsRequired + 1) * 2;
+            uint nBytes = (charsRequired + 1 /* NULL char */) * 2 /* sizeof(WCHAR) */;
             char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
             ret = PInvoke.CM_Get_Device_IDW(
@@ -115,7 +111,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     force-closed.
     /// </summary>
     /// <remarks>
-    ///     This method removes and re-enumerates (adds) the device note, which might cause unintended side-effects. If
+    ///     This method removes and re-enumerates (adds) the device note, which might cause unintended side effects. If
     ///     this is the behaviour you seek, consider using <see cref="RemoveAndSetup" /> instead. This method remains here for
     ///     backwards compatibility.
     /// </remarks>
@@ -149,7 +145,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <summary>
     ///     Attempts to remove this device node.
     /// </summary>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <exception cref="ConfigManagerException">CM API failure occurred.</exception>
     /// <remarks>
     ///     This call DOES NOT invoke device and driver uninstall routines, as soon as the device is re-enumerated, it
     ///     will reappear and become online.
@@ -177,7 +173,25 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     root enumerated device.
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
-    /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
+    /// <returns>True if this device originates from an emulator, false otherwise.</returns>
+    /// <example>
+    /// bool isVirtualDevice = pnpDevice.IsVirtual(pDevice =&gt;
+    /// {
+    ///     List&lt;string&gt;? hardwareIds = pDevice.GetProperty&lt;string[]&gt;(DevicePropertyKey.Device_HardwareIds).ToList();
+    /// 
+    ///     // hardware IDs of root hubs/controllers that emit supported virtual devices as sources
+    ///     string[] excludedIds =
+    ///     {
+    /// 		@"ROOT\HIDGAMEMAP", // reWASD
+    /// 		@"ROOT\VHUSB3HC", // VirtualHere
+    /// 		@"Nefarius\ViGEmBus\Gen1", // ViGemBus v1 
+    /// 		@"Nefarius\ViGEmBus\Gen2", // ViGemBus v2 
+    /// 		@"Nefarius\VirtualPad" // VirtualPad
+    /// 	};
+    /// 
+    ///     return hardwareIds.Any(id =&gt; excludedIds.Contains(id.ToUpper()));
+    /// });
+    /// </example>
     public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
     {
         IPnPDevice device = this;
@@ -189,9 +203,14 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 return false;
             }
 
-            string parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
+            string? parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
 
-            if (parentId.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(parentId))
+            {
+                continue;
+            }
+
+            if (parentId!.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
             {
                 break;
             }
@@ -199,9 +218,6 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             device = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom);
         }
 
-        //
-        // TODO: test how others behave (reWASD, NVIDIA, ...)
-        // 
         return device is not null &&
                (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
                 || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
@@ -212,7 +228,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     public void InstallNullDriver()
@@ -225,7 +241,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     public unsafe void InstallNullDriver(out bool rebootRequired)
@@ -237,7 +253,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             null,
             null,
             HWND.Null,
-            PInvoke.DIGCF_ALLCLASSES | PInvoke.DIGCF_PRESENT
+            (uint)(SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_ALLCLASSES | SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT)
         );
 
         if (hDevInfo.IsNull)
@@ -299,7 +315,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                     hDevInfo,
                     &spDevinfoData,
                     IntPtr.Zero,
-                    PInvoke.DIIDFLAG_INSTALLNULLDRIVER,
+                    (uint)DIINSTALLDEVICE_FLAGS.DIIDFLAG_INSTALLNULLDRIVER,
                     out rebootRequired
                 );
 
@@ -423,8 +439,8 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new Win32Exception("Failed to get the device install parameters");
             }
 
-            deviceInstallParams.Flags |= PInvoke.DI_ENUMSINGLEINF;
-            deviceInstallParams.FlagsEx |= PInvoke.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
+            deviceInstallParams.Flags |= (int)SETUP_DI_DEVICE_INSTALL_FLAGS.DI_ENUMSINGLEINF;
+            deviceInstallParams.FlagsEx |= (int)SETUP_DI_DEVICE_INSTALL_FLAGS_EX.DI_FLAGSEX_ALLOWEXCLUDEDDRVS;
             deviceInstallParams.DriverPath = infName;
 
             success = SetupApi.SetupDiSetDeviceInstallParams(
@@ -441,7 +457,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             success = SetupApi.SetupDiBuildDriverInfoList(
                 hDevInfo,
                 &devInfoData,
-                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+                SETUP_DI_DRIVER_TYPE.SPDIT_CLASSDRIVER
             );
 
             if (!success)
@@ -454,7 +470,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             success = SetupApi.SetupDiEnumDriverInfo(
                 hDevInfo,
                 &devInfoData,
-                SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER,
+                SETUP_DI_DRIVER_TYPE.SPDIT_CLASSDRIVER,
                 0,
                 ref driverInfoData
             );
@@ -496,7 +512,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 SetupApi.SetupDiDestroyDriverInfoList(
                     hDevInfo,
                     &devInfoData,
-                    SETUP_DI_BUILD_DRIVER_DRIVER_TYPE.SPDIT_CLASSDRIVER
+                    SETUP_DI_DRIVER_TYPE.SPDIT_CLASSDRIVER
                 );
             }
 
@@ -545,11 +561,11 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
         SetupApi.SP_DRVINFO_DATA driverInfoData = new();
         driverInfoData.cbSize = Marshal.SizeOf(driverInfoData);
 
-        uint iFlags = PInvoke.DIGCF_ALLCLASSES;
+        uint iFlags = (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_ALLCLASSES;
 
         if (_locationFlags == DeviceLocationFlags.Normal)
         {
-            iFlags |= PInvoke.DIGCF_PRESENT;
+            iFlags |= (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT;
         }
 
         HDEVINFO hDevInfo = SetupApi.SetupDiGetClassDevs(
@@ -673,7 +689,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
                 throw new Win32Exception("Failed to get driver info details");
             }
 
-            // this is save to do if we do not read the Hardware IDs dynamic field
+            // this is safe to do if we do not read the Hardware IDs dynamic field
             drvInfoDetailData = Marshal.PtrToStructure<SetupApi.SP_DRVINFO_DETAIL_DATA>(drvInfoDetailDataBuffer);
             */
 
@@ -800,7 +816,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || (obj is PnPDevice other && Equals(other));
     }

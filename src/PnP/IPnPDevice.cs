@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
+using Nefarius.Utilities.DeviceManagement.Exceptions;
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
@@ -71,7 +73,7 @@ public interface IPnPDevice
     ///     root enumerated device.
     /// </remarks>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
-    /// <returns>True if this devices originates from an emulator, false otherwise.</returns>
+    /// <returns>True if this device originates from an emulator, false otherwise.</returns>
     bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default);
 
     /// <summary>
@@ -79,7 +81,7 @@ public interface IPnPDevice
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     void InstallNullDriver();
@@ -89,7 +91,7 @@ public interface IPnPDevice
     /// </summary>
     /// <remarks>
     ///     This will tear down the current device stack (no matter how many open handles exist), remove the existing function
-    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterwards
+    ///     driver and reboot the device in "raw" or "driverless" mode. Some USB devices may require a port-cycle afterward
     ///     for the change to take effect without requiring a reboot.
     /// </remarks>
     void InstallNullDriver(out bool rebootRequired);

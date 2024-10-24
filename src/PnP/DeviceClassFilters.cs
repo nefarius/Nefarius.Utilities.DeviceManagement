@@ -10,6 +10,7 @@ using Windows.Win32.Foundation;
 using Windows.Win32.Security;
 using Windows.Win32.Storage.FileSystem;
 using Windows.Win32.System.Registry;
+using Windows.Win32.System.Services;
 
 using Microsoft.Win32.SafeHandles;
 
@@ -139,21 +140,19 @@ public sealed class DeviceClassFilters
         const uint serviceFlags = (uint)FILE_ACCESS_RIGHTS.STANDARD_RIGHTS_REQUIRED | PInvoke.SC_MANAGER_CONNECT |
                                   PInvoke.SC_MANAGER_ENUMERATE_SERVICE;
 
-        SC_HANDLE serviceManager = PInvoke.OpenSCManager(null, "ServicesActive", serviceFlags);
+        using CloseServiceHandleSafeHandle? serviceManager = PInvoke.OpenSCManager(null, "ServicesActive", serviceFlags);
 
-        if (serviceManager.Value == 0)
+        if (serviceManager.IsInvalid)
         {
             throw new Win32Exception("Failed to open service controller");
         }
 
-        SC_HANDLE serviceHandle =
+        using CloseServiceHandleSafeHandle? serviceHandle =
             PInvoke.OpenService(serviceManager, service, serviceFlags);
 
-        if (serviceHandle.Value == 0)
+        if (serviceHandle.IsInvalid)
         {
             WIN32_ERROR error = (WIN32_ERROR)Marshal.GetLastWin32Error();
-
-            PInvoke.CloseServiceHandle(serviceManager);
 
             if (error == WIN32_ERROR.ERROR_SERVICE_DOES_NOT_EXIST)
             {
@@ -163,9 +162,6 @@ public sealed class DeviceClassFilters
 
             throw new Win32Exception("Failed to open service handle");
         }
-
-        PInvoke.CloseServiceHandle(serviceManager);
-        PInvoke.CloseServiceHandle(serviceHandle);
 
         using SafeRegistryHandle key = PInvoke.SetupDiOpenClassRegKey(classGuid, (uint)REG_SAM_FLAGS.KEY_ALL_ACCESS);
 
