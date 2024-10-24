@@ -30,7 +30,7 @@ public class PnPDeviceTests
     /// <summary>
     ///     Requires one emulated X360 controller.
     /// </summary>
-    //[Test]
+    [Test]
     public void TestPnPDeviceInstallNullDriver()
     {
         Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId),
