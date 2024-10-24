@@ -2,6 +2,8 @@
 using Nefarius.Utilities.DeviceManagement.Extensions;
 using Nefarius.Utilities.DeviceManagement.PnP;
 
+using Spectre.Console;
+
 namespace Tests;
 #pragma warning disable CS1591
 
@@ -11,7 +13,7 @@ public class PnPDeviceTests
     public void Setup()
     {
     }
-    
+
     /// <summary>
     ///     Requires one physical (or virtual) DualSense controller.
     /// </summary>
@@ -19,9 +21,9 @@ public class PnPDeviceTests
     public void TestPnPDeviceInstallCustomDriver()
     {
         const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
-        
+
         PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
-        
+
         device.InstallCustomDriver("winusb.inf");
     }
 
@@ -31,35 +33,47 @@ public class PnPDeviceTests
     [Test]
     public void TestPnPDeviceInstallNullDriver()
     {
-        Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId), Is.True);
+        Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId),
+            Is.True);
 
-        var device = PnPDevice.GetDeviceByInstanceId(instanceId);
-        
+        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+
         device.InstallNullDriver();
     }
-    
+
+    /// <summary>
+    ///     Tests grabbing driver metadata from the first found HID device.
+    /// </summary>
     [Test]
     public void TestGetDriverMeta()
     {
-        const string path = @"\\?\usb#vid_08bb&pid_29c0#6&35844985&0&4#{a5dcbf10-6530-11d2-901f-00c04fb951ed}";
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                Devcon.FindByInterfaceGuid(DeviceInterfaceIds.HidDevice, out string? path, out string? instanceId),
+                Is.True);
+            Assert.That(instanceId, Is.Not.Null.Or.Empty);
 
-        PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
-        
-        Assert.That(device, Is.Not.Null);
+            PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
+            Assert.That(device, Is.Not.Null);
 
-        DriverMeta? meta = device.GetCurrentDriver();
-        
-        Assert.That(meta, Is.Not.Null);
+            DriverMeta? meta = device.GetCurrentDriver();
+            Assert.That(meta, Is.Not.Null);
+        });
     }
 
     [Test]
     public void TestGetInstanceIdFromInterfaceId()
     {
+        AnsiConsole.MarkupLine("[yellow]Connect ONE Xbox Controller for this test![/]");
+
         // Requires one Xbox controller, either 360 or One or compatible
         Assert.Multiple(() =>
         {
             // 1st controller
-            Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId), Is.True);
+            Assert.That(
+                Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId),
+                Is.True);
 
             // compare IDs
             Assert.That(PnPDevice.GetInstanceIdFromInterfaceId(path), Is.EqualTo(instanceId).IgnoreCase);
@@ -72,19 +86,25 @@ public class PnPDeviceTests
     [Test]
     public void TestPnPDeviceIsVirtual()
     {
-        string hardwareId = "USB\\VID_045E&PID_028E";
+        AnsiConsole.MarkupLine("[yellow]Connect ONE VIRTUAL Xbox 360 Controller for this test![/]");
 
-        Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.XnaComposite, hardwareId,
-            out IEnumerable<string>? instances, true), Is.True);
+        const string hardwareId = "USB\\VID_045E&PID_028E";
 
-        List<string> list = instances.ToList();
+        Assert.Multiple(() =>
+        {
+            Assert.That(Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.XnaComposite, hardwareId,
+                out IEnumerable<string>? instances, true), Is.True);
 
-        Assert.That(list, Is.Not.Empty);
+            List<string> list = instances.ToList();
 
-        PnPDevice? device = list.Select(e => PnPDevice.GetDeviceByInstanceId(e)).FirstOrDefault(dev => dev.IsVirtual());
+            Assert.That(list, Is.Not.Empty);
 
-        Assert.That(device, Is.Not.Null);
+            PnPDevice? device = list.Select(e => PnPDevice.GetDeviceByInstanceId(e))
+                .FirstOrDefault(dev => dev.IsVirtual());
 
-        Assert.That(device!.IsVirtual(), Is.True);
+            Assert.That(device, Is.Not.Null);
+
+            Assert.That(device!.IsVirtual(), Is.True);
+        });
     }
 }

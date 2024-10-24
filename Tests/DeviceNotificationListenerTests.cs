@@ -1,5 +1,7 @@
 ﻿using Nefarius.Utilities.DeviceManagement.PnP;
 
+using Spectre.Console;
+
 namespace Tests;
 #pragma warning disable CS1591
 
@@ -40,6 +42,8 @@ public class DeviceNotificationListenerTests
 
             wait.Set();
         };
+        
+        AnsiConsole.MarkupLine("[yellow]Connect any HID device now within 10 seconds![/]");
 
         // plug in HID device now
         Assert.That(wait.WaitOne(waitTime), Is.True);
@@ -59,6 +63,8 @@ public class DeviceNotificationListenerTests
 
             wait.Set();
         };
+        
+        AnsiConsole.MarkupLine("[yellow]Unplug the HID device now within 10 seconds![/]");
 
         // unplug it now
         Assert.That(wait.WaitOne(waitTime), Is.True);

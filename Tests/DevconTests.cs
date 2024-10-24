@@ -1,5 +1,7 @@
 using Nefarius.Utilities.DeviceManagement.PnP;
 
+using Spectre.Console;
+
 #pragma warning disable CS1591
 
 namespace Tests;
@@ -36,6 +38,9 @@ public class DevconTests
         });
     }
 
+    /// <summary>
+    ///     Looks for nonexistent hardware ID.
+    /// </summary>
     [Test]
     public void TestFindInDeviceClassByHardwareIdWithNonexistent()
     {
@@ -69,6 +74,8 @@ public class DevconTests
     [Test]
     public void TestFindXusbByInterfaceGuid()
     {
+        AnsiConsole.MarkupLine("[yellow]Connect TWO Xbox Controllers for this test![/]");
+        
         // Requires two Xbox controllers, either 360 or One or mixed
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
         Assert.Multiple(() =>
