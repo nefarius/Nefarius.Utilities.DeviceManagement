@@ -28,7 +28,9 @@
         <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.151">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Windows.SDK.Win32Metadata" Version="62.0.23-preview" />
+        <PackageReference Include="Microsoft.Windows.SDK.Win32Metadata" Version="62.0.23-preview">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="MinVer" Version="6.0.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
