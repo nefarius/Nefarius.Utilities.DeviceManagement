@@ -161,5 +161,5 @@ This library benefits from these awesome projects ❤ (appearance in no special 
 - [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
 - [ViGEm.Management](https://github.com/ViGEm/ViGEm.Management)
 - [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
-- [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
 - [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
+- [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
