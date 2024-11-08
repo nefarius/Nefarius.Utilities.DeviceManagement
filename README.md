@@ -2,7 +2,7 @@
 
 [![.NET](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml/badge.svg)](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml) ![Requirements](https://img.shields.io/badge/Requires-.NET%20Standard%202.0-blue.svg) [![Nuget](https://img.shields.io/nuget/v/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/) [![Nuget](https://img.shields.io/nuget/dt/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
 
-Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.
+Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore Windows APIs.
 
 ## Features
 
