@@ -1,6 +1,9 @@
 # <img src="assets/NSS-128x128.png" align="left" />Nefarius.Utilities.DeviceManagement
 
-[![.NET](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml/badge.svg)](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml) ![Requirements](https://img.shields.io/badge/Requires-.NET%20Standard%202.0-blue.svg) [![Nuget](https://img.shields.io/nuget/v/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/) [![Nuget](https://img.shields.io/nuget/dt/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
+[![.NET](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml/badge.svg)](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml)
+![Requirements](https://img.shields.io/badge/Requires-.NET%20Standard%202.0-blue.svg)
+[![Nuget](https://img.shields.io/nuget/v/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
+[![Nuget](https://img.shields.io/nuget/dt/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
 
 Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore Windows APIs.
 
@@ -97,7 +100,7 @@ var instanceId = PnPDevice.GetInstanceIdFromInterfaceId(path);
 PnPDevice device = PnPDevice.GetDeviceByInterfaceId(path);
 ```
 
-### Add a driver service to a device class' upper filters 
+### Add a driver service to a device class' upper filters
 
 ```csharp
 string service = "HidHide";
@@ -151,12 +154,12 @@ if (Devcon.FindByInterfaceGuid(HostRadio.DeviceInterface, out PnPDevice radioDev
 
 This library benefits from these awesome projects ❤ (appearance in no special order):
 
-- [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
-- [ViGEm.Management](https://github.com/ViGEm/ViGEm.Management)
-- [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
-- [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
-- [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
-- [C#/Win32 P/Invoke Source Generator](https://github.com/microsoft/CsWin32)
+- [Manage Windows devices in .NET, can enumerate, start, stop, disable, enable, and remove devices](https://gist.github.com/jborean93/01ba060ac9043a7b997d396de7aa009e)
 - [Tooling to generate metadata for Win32 APIs in the Windows SDK.](https://github.com/microsoft/win32metadata)
 - [Disable or Enable Device with Hardware ID](https://gist.github.com/3735943886/f47c355738e3dd7975fe0aa1abd67445)
-- [Manage Windows devices in .NET, can enumerate, start, stop, disable, enable, and remove devices](https://gist.github.com/jborean93/01ba060ac9043a7b997d396de7aa009e)
+- [C#/Win32 P/Invoke Source Generator](https://github.com/microsoft/CsWin32)
+- [Driver Store Explorer [RAPR]](https://github.com/lostindark/DriverStoreExplorer)
+- [ViGEm.Management](https://github.com/ViGEm/ViGEm.Management)
+- [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
+- [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
+- [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
