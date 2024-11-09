@@ -100,7 +100,7 @@ public static class Devcon
                     throw new ConfigManagerException("Failed to get device ID.", ret);
                 }
 
-                string instanceId = new string(ptrInstanceBuf).ToUpper();
+                string instanceId = new string(ptrInstanceBuf).ToUpperInvariant();
 
                 PnPDevice device = PnPDevice.GetDeviceByInstanceId(
                     instanceId,
@@ -116,11 +116,11 @@ public static class Devcon
                     continue;
                 }
 
-                List<string> hardwareIds = property.Select(id => id.ToUpper()).ToList();
+                List<string> hardwareIds = property.Select(id => id.ToUpperInvariant()).ToList();
 
                 if (
                     /* partial match */
-                    (allowPartial && hardwareIds.Any(id => id.Contains(hardwareId.ToUpper()))) ||
+                    (allowPartial && hardwareIds.Any(id => id.Contains(hardwareId.ToUpperInvariant()))) ||
                     /* exact match */
                     (!allowPartial && hardwareIds.Contains(hardwareId, StringComparer.OrdinalIgnoreCase))
                 )
@@ -198,7 +198,7 @@ public static class Devcon
                     {
                         IntPtr pDevicePathName = detailDataBuffer + 4;
 
-                        path = (Marshal.PtrToStringAuto(pDevicePathName) ?? string.Empty).ToUpper();
+                        path = (Marshal.PtrToStringAuto(pDevicePathName) ?? string.Empty).ToUpperInvariant();
 
                         if (memberIndex == instance)
                         {
@@ -214,7 +214,7 @@ public static class Devcon
                             char* ptrInstanceBuf = stackalloc char[(int)nBytes];
 
                             PInvoke.CM_Get_Device_IDW(da.DevInst, ptrInstanceBuf, nBytes, 0);
-                            instanceId = new string(ptrInstanceBuf).ToUpper();
+                            instanceId = new string(ptrInstanceBuf).ToUpperInvariant();
 
                             return true;
                         }

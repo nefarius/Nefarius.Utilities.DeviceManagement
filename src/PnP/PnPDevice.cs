@@ -189,7 +189,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// 		@"Nefarius\VirtualPad" // VirtualPad
     /// 	};
     /// 
-    ///     return hardwareIds.Any(id =&gt; excludedIds.Contains(id.ToUpper()));
+    ///     return hardwareIds.Any(id =&gt; excludedIds.Contains(id.ToUpperInvariant()));
     /// });
     /// </example>
     public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
