@@ -107,4 +107,24 @@ public class PnPDeviceTests
             Assert.That(device!.IsVirtual(), Is.True);
         });
     }
+
+    /// <summary>
+    ///     https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/issues/85
+    /// </summary>
+    [Test]
+    public void TestPnPDeviceGetBooleanBluetoothProperty()
+    {
+        int instances = 0;
+
+        Guid bluetoothDeviceInterface = Guid.Parse("{00f40965-e89d-4487-9890-87c3abb211f4}");
+        while (Devcon.FindByInterfaceGuid(bluetoothDeviceInterface, out PnPDevice? device, instances++))
+        {
+            DevicePropertyKey? connectedProperty =
+                CustomDeviceProperty.CreateCustomDeviceProperty(Guid.Parse("{83DA6326-97A6-4088-9453-A1923F573B29}"),
+                    15, typeof(bool));
+            bool connected = device.GetProperty<bool>(connectedProperty);
+
+            Assert.That(connected, Is.True);
+        }
+    }
 }
