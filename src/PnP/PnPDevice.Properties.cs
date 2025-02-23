@@ -165,10 +165,16 @@ public partial class PnPDevice
             {
                 return (T)(object)Marshal.PtrToStructure<Guid>(buffer);
             }
+            
+            // BOOLEAN
+            if (managedType == typeof(bool))
+            {
+                return (T)(object)(Marshal.ReadByte(buffer) != 0);
+            }
 
             #endregion
 
-            throw new NotImplementedException("Type not supported.");
+            throw new NotImplementedException($"Type {managedType} not supported.");
         }
         finally
         {
@@ -260,18 +266,28 @@ public partial class PnPDevice
             return (T) (object) DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
         */
 
+        // Guid
         if (managedType == typeof(Guid))
         {
             Guid value = (Guid)(object)propertyValue;
             Marshal.StructureToPtr(value, buffer, false);
             propBufSize = (uint)Marshal.SizeOf(managedType);
         }
+        
+        // bool
+        if (managedType == typeof(bool))
+        {
+            byte value = (byte)(object)propertyValue;
+            propBufSize = (uint)Marshal.SizeOf(managedType);
+            buffer = Marshal.AllocHGlobal((int)propBufSize);
+            Marshal.WriteByte(buffer, value);
+        }
 
         #endregion
 
         if (buffer == IntPtr.Zero)
         {
-            throw new NotImplementedException("Type not supported.");
+            throw new NotImplementedException($"Type {managedType} not supported.");
         }
 
         try
