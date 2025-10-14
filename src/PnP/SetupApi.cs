@@ -141,7 +141,7 @@ internal static class SetupApi
     );
 
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
-    internal static unsafe extern HDEVINFO SetupDiCreateDeviceInfoList(
+    internal static extern unsafe HDEVINFO SetupDiCreateDeviceInfoList(
         Guid* classGuid,
         HWND hwndParent
     );
@@ -181,14 +181,14 @@ internal static class SetupApi
     [DllImport(nameof(SetupApi), SetLastError = true)]
     internal static extern bool SetupDiEnumDeviceInfo(
         HDEVINFO deviceInfoSet,
-        UInt32 memberIndex,
+        uint memberIndex,
         ref SP_DEVINFO_DATA deviceInfoData
     );
 
     [DllImport(nameof(SetupApi), SetLastError = true)]
     internal static extern unsafe bool SetupDiEnumDeviceInfo(
         HDEVINFO deviceInfoSet,
-        UInt32 memberIndex,
+        uint memberIndex,
         SP_DEVINFO_DATA* deviceInfoData
     );
 
@@ -197,7 +197,7 @@ internal static class SetupApi
         ref Guid classGuid,
         IntPtr enumerator,
         HWND hwndParent,
-        UInt32 flags
+        uint flags
     );
 
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
@@ -205,7 +205,7 @@ internal static class SetupApi
         Guid* classGuid,
         string enumerator,
         HWND hwndParent,
-        UInt32 flags
+        uint flags
     );
 
     [DllImport(nameof(SetupApi), SetLastError = true, CharSet = CharSet.Unicode)]
@@ -268,24 +268,24 @@ internal static class SetupApi
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiOpenDeviceInfo(
+    public static extern unsafe bool SetupDiOpenDeviceInfo(
         [In] HDEVINFO deviceInfoSet,
         [In] [MarshalAs(UnmanagedType.LPWStr)] string deviceInstanceId,
         [In] [Optional] IntPtr parent,
-        [In] UInt32 openFlags,
+        [In] uint openFlags,
         [Out] [Optional] SP_DEVINFO_DATA* deviceInfoData
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiSetSelectedDevice(
+    public static extern unsafe bool SetupDiSetSelectedDevice(
         [In] HDEVINFO deviceInfoSet,
         [In] SP_DEVINFO_DATA* deviceInfoData
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiSetDeviceInstallParams(
+    public static extern unsafe bool SetupDiSetDeviceInstallParams(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] ref SP_DEVINSTALL_PARAMS deviceInstallParams
@@ -293,7 +293,7 @@ internal static class SetupApi
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiBuildDriverInfoList(
+    public static extern unsafe bool SetupDiBuildDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
         [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
         [In] SETUP_DI_DRIVER_TYPE driverType
@@ -301,17 +301,17 @@ internal static class SetupApi
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiEnumDriverInfo(
+    public static extern unsafe bool SetupDiEnumDriverInfo(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] SETUP_DI_DRIVER_TYPE driverType,
-        [In] UInt32 memberIndex,
+        [In] uint memberIndex,
         [In] [Out] ref SP_DRVINFO_DATA driverInfoData
     );
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiSetSelectedDriver(
+    public static extern unsafe bool SetupDiSetSelectedDriver(
         [In] HDEVINFO deviceInfoSet,
         [In] [Out] SP_DEVINFO_DATA* deviceInfoData,
         [In] [Out] ref SP_DRVINFO_DATA driverInfoData
@@ -319,21 +319,21 @@ internal static class SetupApi
 
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiGetDeviceProperty(
+    public static extern unsafe bool SetupDiGetDeviceProperty(
         [In] HDEVINFO deviceInfoSet,
         [In] SP_DEVINFO_DATA* deviceInfoData,
         [In] DEVPROPKEY* propertyKey,
         [Out] out DEVPROPTYPE propertyType,
         [Out] [Optional] StringBuilder propertyBuffer,
-        [In] UInt32 propertyBufferSize,
+        [In] uint propertyBufferSize,
         [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
-        out UInt32 requiredSize,
-        [In] UInt32 flags
+        out uint requiredSize,
+        [In] uint flags
     );
-    
+
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiGetDriverInfoDetail(
+    public static extern unsafe bool SetupDiGetDriverInfoDetail(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] ref SP_DRVINFO_DATA driverInfoData,
@@ -342,10 +342,10 @@ internal static class SetupApi
         [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
         out uint requiredSize
     );
-    
+
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiGetDriverInfoDetail(
+    public static extern unsafe bool SetupDiGetDriverInfoDetail(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] ref SP_DRVINFO_DATA driverInfoData,
@@ -354,15 +354,15 @@ internal static class SetupApi
         [Out] [Optional] [SuppressMessage("ReSharper", "OptionalParameterRefOut")]
         out uint requiredSize
     );
-    
+
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static unsafe extern bool SetupDiDestroyDriverInfoList(
+    public static extern unsafe bool SetupDiDestroyDriverInfoList(
         [In] HDEVINFO deviceInfoSet,
         [In] [Optional] SP_DEVINFO_DATA* deviceInfoData,
         [In] SETUP_DI_DRIVER_TYPE driverType
     );
-    
+
     [DllImport(nameof(SetupApi), CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetupDiDestroyDriverInfoList(
@@ -419,7 +419,7 @@ internal static class SetupApi
         [In] uint flags,
         [Out] out bool needReboot
     );
-    
+
     [DllImport("newdev.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     internal static extern bool DiUninstallDevice(
         [In] [Optional] HWND hwndParent,

@@ -30,7 +30,7 @@ public class UsbPnPDevice : PnPDevice
             throw new UsbPnPDeviceConversionException("This device is not a USB device.");
         }
 
-        Port = GetProperty<UInt32>(DevicePropertyKey.Device_Address);
+        Port = GetProperty<uint>(DevicePropertyKey.Device_Address);
     }
 
     /// <summary>

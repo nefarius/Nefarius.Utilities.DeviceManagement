@@ -269,7 +269,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         ListenerItem listenerItem = (ListenerItem)parameter;
         string className = GenerateRandomString(); // random string to avoid conflicts
         string windowName = GenerateRandomString();
-        using FreeLibrarySafeHandle hInst = PInvoke.GetModuleHandle((string)null);
+        using FreeLibrarySafeHandle hInst = PInvoke.GetModuleHandle(null);
 
         WNDCLASSEXW windowClass = new()
         {

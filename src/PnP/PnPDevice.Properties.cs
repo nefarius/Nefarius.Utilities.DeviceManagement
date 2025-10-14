@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -166,7 +165,7 @@ public partial class PnPDevice
             {
                 return (T)(object)Marshal.PtrToStructure<Guid>(buffer);
             }
-            
+
             // BOOLEAN
             if (managedType == typeof(bool))
             {
@@ -274,7 +273,7 @@ public partial class PnPDevice
             Marshal.StructureToPtr(value, buffer, false);
             propBufSize = (uint)Marshal.SizeOf(managedType);
         }
-        
+
         // bool
         if (managedType == typeof(bool))
         {

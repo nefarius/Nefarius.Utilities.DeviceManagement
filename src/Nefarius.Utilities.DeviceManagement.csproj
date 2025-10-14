@@ -9,19 +9,20 @@
         <PackageProjectUrl>https://github.com/nefarius/Nefarius.Utilities.DeviceManagement</PackageProjectUrl>
         <Description>Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore native APIs on Windows.</Description>
         <NoWarn>CA1416</NoWarn>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <Compile Remove="Generator\**" />
-        <Compile Remove="Tests\**" />
-        <EmbeddedResource Remove="Generator\**" />
-        <EmbeddedResource Remove="Tests\**" />
-        <None Remove="Generator\**" />
-        <None Remove="Tests\**" />
+        <Compile Remove="Generator\**"/>
+        <Compile Remove="Tests\**"/>
+        <EmbeddedResource Remove="Generator\**"/>
+        <EmbeddedResource Remove="Tests\**"/>
+        <None Remove="Generator\**"/>
+        <None Remove="Tests\**"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -35,22 +36,22 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="MinVer" Version="6.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Memory" Version="4.6.3" />
+        <PackageReference Include="System.Memory" Version="4.6.3"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' Or '$(TargetFramework)' == 'netstandard2.1'">
-        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="Generator\DeviceManagementPropertiesGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="Generator\DeviceManagementPropertiesGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
 </Project>

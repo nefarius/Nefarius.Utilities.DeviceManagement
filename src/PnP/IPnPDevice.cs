@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -124,7 +123,7 @@ public interface IPnPDevice
     ///     Gets whether a reboot is required for the changes to take effect or not.
     /// </param>
     void InstallCustomDriver(string infName, out bool rebootRequired);
-    
+
     /// <summary>
     ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
     ///     driver to the best available compatible candidate on next device boot.
@@ -137,7 +136,7 @@ public interface IPnPDevice
     /// <exception cref="Win32Exception"></exception>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     void Uninstall();
-    
+
     /// <summary>
     ///     Uninstalls this device instance. Unlike <see cref="Remove" /> this call will unload and revert the device function
     ///     driver to the best available compatible candidate on next device boot.

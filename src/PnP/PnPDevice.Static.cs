@@ -1,10 +1,8 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
-using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
@@ -24,7 +22,7 @@ public partial class PnPDevice
     /// <returns>A <see cref="PnPDevice" />.</returns>
     /// <exception cref="PnPDeviceNotFoundException">The desired device instance was not found on the system.</exception>
     /// <exception cref="ConfigManagerException">Device information lookup failed.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags"/> value was invalid.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags" /> value was invalid.</exception>
     public static PnPDevice GetDeviceByInstanceId(string instanceId,
         DeviceLocationFlags flags = DeviceLocationFlags.Normal)
     {

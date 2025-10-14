@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -8,7 +6,6 @@ using System.Text;
 
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
-using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
@@ -38,7 +35,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <param name="flags">The <see cref="DeviceLocationFlags" /> influencing search behavior.</param>
     /// <exception cref="PnPDeviceNotFoundException">The desired device instance was not found on the system.</exception>
     /// <exception cref="ConfigManagerException">Device information lookup failed.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags"/> value was invalid.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">The supplied <paramref name="flags" /> value was invalid.</exception>
     protected unsafe PnPDevice(string instanceId, DeviceLocationFlags flags)
     {
         InstanceId = instanceId;
@@ -175,22 +172,21 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
     /// <returns>True if this device originates from an emulator, false otherwise.</returns>
     /// <example>
-    /// bool isVirtualDevice = pnpDevice.IsVirtual(pDevice =&gt;
-    /// {
-    ///     List&lt;string&gt;? hardwareIds = pDevice.GetProperty&lt;string[]&gt;(DevicePropertyKey.Device_HardwareIds).ToList();
-    /// 
+    ///     bool isVirtualDevice = pnpDevice.IsVirtual(pDevice =&gt;
+    ///     {
+    ///     List&lt;string&gt;? hardwareIds = pDevice.GetProperty&lt;string[]&gt;
+    ///     (DevicePropertyKey.Device_HardwareIds).ToList();
     ///     // hardware IDs of root hubs/controllers that emit supported virtual devices as sources
     ///     string[] excludedIds =
     ///     {
-    /// 		@"ROOT\HIDGAMEMAP", // reWASD
-    /// 		@"ROOT\VHUSB3HC", // VirtualHere
-    /// 		@"Nefarius\ViGEmBus\Gen1", // ViGemBus v1 
-    /// 		@"Nefarius\ViGEmBus\Gen2", // ViGemBus v2 
-    /// 		@"Nefarius\VirtualPad" // VirtualPad
-    /// 	};
-    /// 
+    ///     @"ROOT\HIDGAMEMAP", // reWASD
+    ///     @"ROOT\VHUSB3HC", // VirtualHere
+    ///     @"Nefarius\ViGEmBus\Gen1", // ViGemBus v1
+    ///     @"Nefarius\ViGEmBus\Gen2", // ViGemBus v2
+    ///     @"Nefarius\VirtualPad" // VirtualPad
+    ///     };
     ///     return hardwareIds.Any(id =&gt; excludedIds.Contains(id.ToUpperInvariant()));
-    /// });
+    ///     });
     /// </example>
     public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
     {
@@ -263,7 +259,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
 
         try
         {
-            for (UInt32 devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
+            for (uint devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
             {
                 DEVPROPKEY instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
 
@@ -580,7 +576,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
             throw new Win32Exception("Failed to get devices for all classes");
         }
 
-        for (UInt32 devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
+        for (uint devIndex = 0; SetupApi.SetupDiEnumDeviceInfo(hDevInfo, devIndex, &spDevinfoData); devIndex++)
         {
             DEVPROPKEY instanceProp = DevicePropertyKey.Device_InstanceId.ToCsWin32Type();
 

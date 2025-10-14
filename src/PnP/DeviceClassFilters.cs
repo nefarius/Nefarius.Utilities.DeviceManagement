@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,10 +6,8 @@ using System.Runtime.InteropServices;
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
-using Windows.Win32.Security;
 using Windows.Win32.Storage.FileSystem;
 using Windows.Win32.System.Registry;
-using Windows.Win32.System.Services;
 
 using Microsoft.Win32.SafeHandles;
 
@@ -140,7 +137,8 @@ public sealed class DeviceClassFilters
         const uint serviceFlags = (uint)FILE_ACCESS_RIGHTS.STANDARD_RIGHTS_REQUIRED | PInvoke.SC_MANAGER_CONNECT |
                                   PInvoke.SC_MANAGER_ENUMERATE_SERVICE;
 
-        using CloseServiceHandleSafeHandle? serviceManager = PInvoke.OpenSCManager(null, "ServicesActive", serviceFlags);
+        using CloseServiceHandleSafeHandle?
+            serviceManager = PInvoke.OpenSCManager(null, "ServicesActive", serviceFlags);
 
         if (serviceManager.IsInvalid)
         {

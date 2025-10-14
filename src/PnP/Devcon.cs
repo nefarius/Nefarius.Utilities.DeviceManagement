@@ -395,7 +395,8 @@ public static class Devcon
                 ref classGuid,
                 IntPtr.Zero,
                 HWND.Null,
-                (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT | (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_DEVICEINTERFACE
+                (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT |
+                (int)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_DEVICEINTERFACE
             );
 
             if (SetupApi.SetupDiOpenDeviceInfo(
@@ -526,7 +527,8 @@ public static class Devcon
             HWND.Null,
             hardwareId,
             fullInfPath,
-            UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_FORCE | UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_NONINTERACTIVE,
+            UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_FORCE |
+            UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_NONINTERACTIVE,
             &reboot
         );
 

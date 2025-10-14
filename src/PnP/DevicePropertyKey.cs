@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
