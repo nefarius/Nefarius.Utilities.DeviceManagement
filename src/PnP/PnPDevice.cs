@@ -344,7 +344,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     are found. This method can only succeed if <see cref="InstallNullDriver()" /> is called prior.
     /// </remarks>
     /// <param name="infName">
-    ///     The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+    ///     The INF file name as found in <c>C:\Windows\INF</c> directory. It must be the name only, not a relative
     ///     or absolute path.
     /// </param>
     public void InstallCustomDriver(string infName)
@@ -360,7 +360,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     are found. This method can only succeed if <see cref="InstallNullDriver()" /> is called prior.
     /// </remarks>
     /// <param name="infName">
-    ///     The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+    ///     The INF file name as found in <c>C:\Windows\INF</c> directory. It must be the name only, not a relative
     ///     or absolute path.
     /// </param>
     /// <param name="rebootRequired">
@@ -730,10 +730,10 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     }
 
     /// <summary>
-    ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.
+    ///     Attempts to restart this device by removing it from the device tree and causing re-enumeration afterward.
     /// </summary>
-    /// <remarks>Device restart may fail if it has open handles that currently can not be force-closed.</remarks>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <remarks>Device restart may fail if it has open handles that currently cannot be force-closed.</remarks>
+    /// <exception cref="ConfigManagerException">CM API failure occurred.</exception>
     public unsafe void RemoveAndSetup()
     {
         CONFIGRET ret = PInvoke.CM_Query_And_Remove_SubTree(
@@ -763,7 +763,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <summary>
     ///     Disables this device instance node.
     /// </summary>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <exception cref="ConfigManagerException">CM API failure occurred.</exception>
     public void Disable()
     {
         CONFIGRET ret = PInvoke.CM_Disable_DevNode(_instanceHandle, PInvoke.CM_DISABLE_UI_NOT_OK);
@@ -777,7 +777,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <summary>
     ///     Enables this device instance node.
     /// </summary>
-    /// <exception cref="ConfigManagerException"></exception>
+    /// <exception cref="ConfigManagerException">CM API failure occurred.</exception>
     public void Enable()
     {
         CONFIGRET ret = PInvoke.CM_Enable_DevNode(_instanceHandle, 0);
