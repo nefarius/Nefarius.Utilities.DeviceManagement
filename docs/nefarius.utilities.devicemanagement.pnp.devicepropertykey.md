@@ -1631,4 +1631,4 @@ internal DEVPROPKEY ToCsWin32Type()
 
 #### Returns
 
-[DEVPROPKEY](./windows.win32.devices.properties.devpropkey.md)
+[DEVPROPKEY](./windows.win32.foundation.devpropkey.md)

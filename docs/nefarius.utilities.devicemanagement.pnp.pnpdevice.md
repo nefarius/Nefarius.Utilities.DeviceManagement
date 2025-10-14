@@ -403,7 +403,7 @@ This method can cause unintended side-effects, see remarks for details.
 
 ---
 
-Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
+Attempts to restart this device. Device restart may fail if it has open handles that currently cannot be
  force-closed.
 
 ```csharp
