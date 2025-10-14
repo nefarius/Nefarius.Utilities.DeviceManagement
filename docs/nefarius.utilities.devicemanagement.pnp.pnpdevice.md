@@ -413,7 +413,7 @@ public void Restart()
 **Remarks:**
 
 This method removes and re-enumerates (adds) the device note, which might cause unintended side effects. If
- this is the behaviour you seek, consider using [PnPDevice.RemoveAndSetup()](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md#removeandsetup) instead. This method remains here for
+ this is the behavior you seek, consider using [PnPDevice.RemoveAndSetup()](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md#removeandsetup) instead. This method remains here for
  backwards compatibility.
 
 ### <a id="methods-setproperty"/>**SetProperty&lt;T&gt;(DevicePropertyKey, T)**
