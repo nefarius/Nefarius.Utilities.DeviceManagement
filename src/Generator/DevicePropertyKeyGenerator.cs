@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 using Windows.Win32;
 using Windows.Win32.Devices.Properties;
+using Windows.Win32.Foundation;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;

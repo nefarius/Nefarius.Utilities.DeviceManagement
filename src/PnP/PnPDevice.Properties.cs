@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Windows.Win32;
 using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Devices.Properties;
+using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.Util;
