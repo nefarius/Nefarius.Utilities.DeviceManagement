@@ -3,7 +3,7 @@
     <PropertyGroup>
         <!-- Copyright information -->
         <Authors>Benjamin Höglinger-Stelzer</Authors>
-        <Copyright>Copyright © Benjamin Höglinger-Stelzer 2022-2024</Copyright>
+        <Copyright>Copyright © Benjamin Höglinger-Stelzer 2022-2025</Copyright>
 
         <!-- Package Icon -->
         <PackageIcon>NSS-128x128.png</PackageIcon>
