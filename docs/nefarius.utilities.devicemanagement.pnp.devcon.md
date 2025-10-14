@@ -53,10 +53,10 @@ public static void DeleteDriver(string oemInfName, string fullInfPath, bool forc
 The OEM INF name (name and extension only).
 
 `fullInfPath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The fully qualified absolute path to the INF to remove from driver store.
+The fully qualified absolute path to the INF to remove from the driver store.
 
 `forceDelete` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-Remove driver store copy, if true.
+Remove the driver store copy, if true.
 
 ### <a id="methods-find"/>**Find(Guid, ref String, ref String, Int32)**
 
@@ -226,7 +226,7 @@ True if found, false otherwise.
 
 ### <a id="methods-install"/>**Install(String, ref Boolean)**
 
-Invokes the installation of a driver via provided .INF file.
+Invokes the installation of a driver via provided `.INF` file.
 
 ```csharp
 public static bool Install(string fullInfPath, ref Boolean rebootRequired)
@@ -258,7 +258,7 @@ True on success, false otherwise.
 
 ### <a id="methods-refreshphantom"/>**RefreshPhantom()**
 
-Instructs the system to re-enumerate hardware devices including disconnected ones.
+Instructs the system to re-enumerate hardware devices, including disconnected ones.
 
 ```csharp
 public static bool RefreshPhantom()
@@ -305,7 +305,7 @@ The device class GUID.
 The instance ID.
 
 `rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
-True if a reboot is required to complete the uninstall action, false otherwise.
+True if a reboot is required to complete the uninstallation action, false otherwise.
 
 #### Returns
 
