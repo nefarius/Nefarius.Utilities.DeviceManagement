@@ -107,7 +107,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     public string DeviceId { get; }
 
     /// <summary>
-    ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
+    ///     Attempts to restart this device. Device restart may fail if it has open handles that currently cannot be
     ///     force-closed.
     /// </summary>
     /// <remarks>
