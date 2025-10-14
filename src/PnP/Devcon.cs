@@ -109,7 +109,7 @@ public static class Devcon
                         : DeviceLocationFlags.Phantom
                 );
 
-                string[] property = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+                string[]? property = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
 
                 if (property is null)
                 {
@@ -285,7 +285,7 @@ public static class Devcon
     }
 
     /// <summary>
-    ///     Invokes the installation of a driver via provided .INF file.
+    ///     Invokes the installation of a driver via provided <c>.INF</c> file.
     /// </summary>
     /// <param name="fullInfPath">An absolute path to the .INF file to install.</param>
     /// <param name="rebootRequired">True if a machine reboot is required, false otherwise.</param>
@@ -379,7 +379,7 @@ public static class Devcon
     /// </summary>
     /// <param name="classGuid">The device class GUID.</param>
     /// <param name="instanceId">The instance ID.</param>
-    /// <param name="rebootRequired">True if a reboot is required to complete the uninstall action, false otherwise.</param>
+    /// <param name="rebootRequired">True if a reboot is required to complete the uninstallation action, false otherwise.</param>
     /// <returns>True on success, false otherwise.</returns>
     public static unsafe bool Remove(Guid classGuid, string instanceId, out bool rebootRequired)
     {
@@ -492,7 +492,7 @@ public static class Devcon
     }
 
     /// <summary>
-    ///     Instructs the system to re-enumerate hardware devices including disconnected ones.
+    ///     Instructs the system to re-enumerate hardware devices, including disconnected ones.
     /// </summary>
     /// <returns>True on success, false otherwise.</returns>
     public static bool RefreshPhantom()
@@ -541,8 +541,8 @@ public static class Devcon
     ///     Uninstalls a driver identified via a given INF and optionally removes it from the driver store as well.
     /// </summary>
     /// <param name="oemInfName">The OEM INF name (name and extension only).</param>
-    /// <param name="fullInfPath">The fully qualified absolute path to the INF to remove from driver store.</param>
-    /// <param name="forceDelete">Remove driver store copy, if true.</param>
+    /// <param name="fullInfPath">The fully qualified absolute path to the INF to remove from the driver store.</param>
+    /// <param name="forceDelete">Remove the driver store copy, if true.</param>
     public static void DeleteDriver(string oemInfName, string fullInfPath = default, bool forceDelete = false)
     {
         if (string.IsNullOrEmpty(oemInfName))

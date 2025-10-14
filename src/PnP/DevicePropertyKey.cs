@@ -65,7 +65,7 @@ public partial class DevicePropertyKey : IEquatable<DevicePropertyKey>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return ReferenceEquals(this, obj) || (obj is DevicePropertyKey other && Equals(other));
     }
