@@ -110,6 +110,7 @@ public void Disable()
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+CM API failure occurred.
 
 ### <a id="methods-enable"/>**Enable()**
 
@@ -122,6 +123,7 @@ public void Enable()
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+CM API failure occurred.
 
 ### <a id="methods-equals"/>**Equals(PnPDevice)**
 
@@ -276,7 +278,7 @@ public void InstallCustomDriver(string infName)
 #### Parameters
 
 `infName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+The INF file name as found in `C:\Windows\INF` directory. It must be the name only, not a relative
  or absolute path.
 
 **Remarks:**
@@ -295,7 +297,7 @@ public void InstallCustomDriver(string infName, ref Boolean rebootRequired)
 #### Parameters
 
 `infName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
+The INF file name as found in `C:\Windows\INF` directory. It must be the name only, not a relative
  or absolute path.
 
 `rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
@@ -381,7 +383,7 @@ This call DOES NOT invoke device and driver uninstall routines, as soon as the d
 
 ### <a id="methods-removeandsetup"/>**RemoveAndSetup()**
 
-Attempts to restart this device by removing it from the device tree and causing re-enumeration afterwards.
+Attempts to restart this device by removing it from the device tree and causing re-enumeration afterward.
 
 ```csharp
 public void RemoveAndSetup()
@@ -390,10 +392,11 @@ public void RemoveAndSetup()
 #### Exceptions
 
 [ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+CM API failure occurred.
 
 **Remarks:**
 
-Device restart may fail if it has open handles that currently can not be force-closed.
+Device restart may fail if it has open handles that currently cannot be force-closed.
 
 ### <a id="methods-restart"/>**Restart()**
 
