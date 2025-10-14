@@ -109,7 +109,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </summary>
     /// <remarks>
     ///     This method removes and re-enumerates (adds) the device note, which might cause unintended side effects. If
-    ///     this is the behaviour you seek, consider using <see cref="RemoveAndSetup" /> instead. This method remains here for
+    ///     this is the behavior you seek, consider using <see cref="RemoveAndSetup" /> instead. This method remains here for
     ///     backwards compatibility.
     /// </remarks>
     [Obsolete("This method can cause unintended side-effects, see remarks for details.")]
@@ -172,6 +172,7 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// <param name="excludeIfMatches">Returns false if the given predicate is true.</param>
     /// <returns>True if this device originates from an emulator, false otherwise.</returns>
     /// <example>
+    ///     <code>
     ///     bool isVirtualDevice = pnpDevice.IsVirtual(pDevice =&gt;
     ///     {
     ///     List&lt;string&gt;? hardwareIds = pDevice.GetProperty&lt;string[]&gt;
@@ -187,8 +188,9 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     ///     };
     ///     return hardwareIds.Any(id =&gt; excludedIds.Contains(id.ToUpperInvariant()));
     ///     });
+    /// </code>
     /// </example>
-    public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = default)
+    public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = null)
     {
         IPnPDevice device = this;
 
