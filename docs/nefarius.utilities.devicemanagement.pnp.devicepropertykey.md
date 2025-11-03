@@ -201,14 +201,6 @@ DEVPKEY_Device_DependencyProviders
 public static DevicePropertyKey Device_DependencyProviders;
 ```
 
-### <a id="fields-device_devicedesc"/>**Device_DeviceDesc**
-
-DEVPKEY_Device_DeviceDesc
-
-```csharp
-public static DevicePropertyKey Device_DeviceDesc;
-```
-
 ### <a id="fields-device_devnodestatus"/>**Device_DevNodeStatus**
 
 DEVPKEY_Device_DevNodeStatus
@@ -417,14 +409,6 @@ DEVPKEY_Device_FirstInstallDate
 public static DevicePropertyKey Device_FirstInstallDate;
 ```
 
-### <a id="fields-device_friendlyname"/>**Device_FriendlyName**
-
-DEVPKEY_Device_FriendlyName
-
-```csharp
-public static DevicePropertyKey Device_FriendlyName;
-```
-
 ### <a id="fields-device_friendlynameattributes"/>**Device_FriendlyNameAttributes**
 
 DEVPKEY_Device_FriendlyNameAttributes
@@ -545,14 +529,6 @@ DEVPKEY_Device_LegacyBusType
 public static DevicePropertyKey Device_LegacyBusType;
 ```
 
-### <a id="fields-device_locationinfo"/>**Device_LocationInfo**
-
-DEVPKEY_Device_LocationInfo
-
-```csharp
-public static DevicePropertyKey Device_LocationInfo;
-```
-
 ### <a id="fields-device_locationpaths"/>**Device_LocationPaths**
 
 DEVPKEY_Device_LocationPaths
@@ -567,14 +543,6 @@ DEVPKEY_Device_LowerFilters
 
 ```csharp
 public static DevicePropertyKey Device_LowerFilters;
-```
-
-### <a id="fields-device_manufacturer"/>**Device_Manufacturer**
-
-DEVPKEY_Device_Manufacturer
-
-```csharp
-public static DevicePropertyKey Device_Manufacturer;
 ```
 
 ### <a id="fields-device_manufacturerattributes"/>**Device_ManufacturerAttributes**
