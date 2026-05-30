@@ -131,11 +131,8 @@ public class UsbPnPDevice : PnPDevice
                 BOOL success = PInvoke.DeviceIoControl(
                     hubHandle,
                     PInvoke.IOCTL_USB_HUB_CYCLE_PORT,
-                    &parameters,
-                    (uint)size,
-                    &parameters,
-                    (uint)size,
-                    null,
+                    new ReadOnlySpan<byte>((byte*)&parameters, size),
+                    new Span<byte>((byte*)&parameters, size),
                     null
                 );
 

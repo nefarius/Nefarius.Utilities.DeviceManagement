@@ -174,9 +174,9 @@ public sealed class DeviceClassFilters
         WIN32_ERROR status = PInvoke.RegQueryValueEx(
             key,
             filter,
-            &type,
+            out type,
             null,
-            &sizeRequired
+            ref sizeRequired
         );
 
         // value exists
@@ -187,9 +187,9 @@ public sealed class DeviceClassFilters
             status = PInvoke.RegQueryValueEx(
                 key,
                 filter,
-                &type,
-                buffer,
-                &sizeRequired
+                out type,
+                new Span<byte>(buffer, (int)sizeRequired),
+                ref sizeRequired
             );
 
             if (status != WIN32_ERROR.ERROR_SUCCESS)
@@ -268,9 +268,9 @@ public sealed class DeviceClassFilters
         WIN32_ERROR status = PInvoke.RegQueryValueEx(
             key,
             filter,
-            &type,
+            out type,
             null,
-            &sizeRequired
+            ref sizeRequired
         );
 
         // value exists
@@ -281,9 +281,9 @@ public sealed class DeviceClassFilters
             status = PInvoke.RegQueryValueEx(
                 key,
                 filter,
-                &type,
-                buffer,
-                &sizeRequired
+                out type,
+                new Span<byte>(buffer, (int)sizeRequired),
+                ref sizeRequired
             );
 
             if (status != WIN32_ERROR.ERROR_SUCCESS)
@@ -341,9 +341,9 @@ public sealed class DeviceClassFilters
         WIN32_ERROR status = PInvoke.RegQueryValueEx(
             key,
             filter,
-            &type,
+            out type,
             null,
-            &sizeRequired
+            ref sizeRequired
         );
 
         switch (status)
@@ -356,9 +356,9 @@ public sealed class DeviceClassFilters
                     status = PInvoke.RegQueryValueEx(
                         key,
                         filter,
-                        &type,
-                        buffer,
-                        &sizeRequired
+                        out type,
+                        new Span<byte>(buffer, (int)sizeRequired),
+                        ref sizeRequired
                     );
 
                     if (status != WIN32_ERROR.ERROR_SUCCESS)

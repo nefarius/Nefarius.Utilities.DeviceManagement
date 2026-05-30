@@ -84,7 +84,7 @@ public partial class PnPDevice
             symbolicLink,
             property,
             out _,
-            (byte*)buffer,
+            new Span<byte>((byte*)buffer, (int)sizeRequired),
             ref sizeRequired,
             0
         );

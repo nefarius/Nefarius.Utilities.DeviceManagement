@@ -521,15 +521,13 @@ public static class Devcon
     public static unsafe bool Update(string hardwareId, string fullInfPath,
         out bool rebootRequired)
     {
-        BOOL reboot = false;
-
         BOOL ret = PInvoke.UpdateDriverForPlugAndPlayDevices(
             HWND.Null,
             hardwareId,
             fullInfPath,
             UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_FORCE |
             UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS.INSTALLFLAG_NONINTERACTIVE,
-            &reboot
+            out BOOL reboot
         );
 
         rebootRequired = reboot > 0;
