@@ -8,7 +8,8 @@ Utility class to adjust class filter settings.
 public sealed class DeviceClassFilters
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DeviceClassFilters](./nefarius.utilities.devicemanagement.pnp.deviceclassfilters.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DeviceClassFilters](./nefarius.utilities.devicemanagement.pnp.deviceclassfilters.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 ## Methods
 
@@ -22,10 +23,10 @@ public static void AddLower(Guid classGuid, string service)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to modify.
 
-`service` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`service` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to add.
 
 #### Exceptions
@@ -49,10 +50,10 @@ public static void AddUpper(Guid classGuid, string service)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to modify.
 
-`service` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`service` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to add.
 
 #### Exceptions
@@ -76,7 +77,7 @@ public static void DeleteLower(Guid classGuid)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to delete the value for.
 
 #### Exceptions
@@ -97,7 +98,7 @@ public static void DeleteUpper(Guid classGuid)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to delete the value for.
 
 #### Exceptions
@@ -118,7 +119,7 @@ public static IEnumerable<String> GetLower(Guid classGuid)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to query.
 
 #### Returns
@@ -139,7 +140,7 @@ public static IEnumerable<String> GetUpper(Guid classGuid)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to query.
 
 #### Returns
@@ -160,10 +161,10 @@ public static void RemoveLower(Guid classGuid, string service)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to modify.
 
-`service` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`service` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to add.
 
 #### Exceptions
@@ -185,10 +186,10 @@ public static void RemoveUpper(Guid classGuid, string service)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID to modify.
 
-`service` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`service` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to add.
 
 #### Exceptions

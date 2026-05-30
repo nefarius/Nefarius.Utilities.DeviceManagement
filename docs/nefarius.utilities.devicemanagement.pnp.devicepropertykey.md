@@ -5,11 +5,11 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Describes a unified device property.
 
 ```csharp
-public class DevicePropertyKey : System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.DevicePropertyKey, Nefarius.Utilities.DeviceManagement, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class DevicePropertyKey : System.IEquatable<Nefarius.Utilities.DeviceManagement.PnP.DevicePropertyKey>
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)<br>
-Implements [IEquatable&lt;DevicePropertyKey&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)<br>
+Implements [IEquatable](https://learn.microsoft.com/dotnet/api/system.iequatable-1)<[DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)>
 
 **Remarks:**
 
@@ -159,6 +159,22 @@ DEVPKEY_Device_ConfigurationId
 
 ```csharp
 public static DevicePropertyKey Device_ConfigurationId;
+```
+
+### <a id="fields-device_containercategories"/>**Device_ContainerCategories**
+
+DEVPKEY_Device_ContainerCategories
+
+```csharp
+public static DevicePropertyKey Device_ContainerCategories;
+```
+
+### <a id="fields-device_containericon"/>**Device_ContainerIcon**
+
+DEVPKEY_Device_ContainerIcon
+
+```csharp
+public static DevicePropertyKey Device_ContainerIcon;
 ```
 
 ### <a id="fields-device_containerid"/>**Device_ContainerId**
@@ -1517,7 +1533,7 @@ public static DevicePropertyKey NAME;
 
 ### <a id="properties-categoryguid"/>**CategoryGuid**
 
-The [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid) for teh category this property belongs to.
+The [Guid](https://learn.microsoft.com/dotnet/api/system.guid) for teh category this property belongs to.
 
 ```csharp
 public Guid CategoryGuid { get; }
@@ -1525,7 +1541,7 @@ public Guid CategoryGuid { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-propertyidentifier"/>**PropertyIdentifier**
 
@@ -1537,7 +1553,7 @@ public uint PropertyIdentifier { get; }
 
 #### Property Value
 
-[UInt32](https://docs.microsoft.com/en-us/dotnet/api/system.uint32)<br>
+[UInt32](https://learn.microsoft.com/dotnet/api/system.uint32)<br>
 
 ### <a id="properties-propertytype"/>**PropertyType**
 
@@ -1549,7 +1565,7 @@ public Type PropertyType { get; }
 
 #### Property Value
 
-[Type](https://docs.microsoft.com/en-us/dotnet/api/system.type)<br>
+[Type](https://learn.microsoft.com/dotnet/api/system.type)<br>
 
 ## Methods
 
@@ -1565,7 +1581,7 @@ public bool Equals(DevicePropertyKey other)
 
 #### Returns
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)
+[Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ### <a id="methods-equals"/>**Equals(Object)**
 
@@ -1575,11 +1591,11 @@ public bool Equals(object obj)
 
 #### Parameters
 
-`obj` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
+`obj` [Object](https://learn.microsoft.com/dotnet/api/system.object)<br>
 
 #### Returns
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)
+[Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ### <a id="methods-gethashcode"/>**GetHashCode()**
 
@@ -1589,7 +1605,7 @@ public int GetHashCode()
 
 #### Returns
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)
+[Int32](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ### <a id="methods-tocswin32type"/>**ToCsWin32Type()**
 

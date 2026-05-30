@@ -8,7 +8,8 @@ Helper methods for [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevi
 public static class PnPDeviceExtensions
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PnPDeviceExtensions](./nefarius.utilities.devicemanagement.extensions.pnpdeviceextensions.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [PnPDeviceExtensions](./nefarius.utilities.devicemanagement.extensions.pnpdeviceextensions.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md), [ExtensionAttribute](https://learn.microsoft.com/dotnet/api/system.runtime.compilerservices.extensionattribute)
 
 ## Methods
 
@@ -31,7 +32,7 @@ The [DriverMeta](./nefarius.utilities.devicemanagement.drivers.drivermeta.md) in
 
 #### Exceptions
 
-[InvalidOperationException](https://docs.microsoft.com/en-us/dotnet/api/system.invalidoperationexception)<br>
+[InvalidOperationException](https://learn.microsoft.com/dotnet/api/system.invalidoperationexception)<br>
 Thrown if registry access failed.
 
 ### <a id="methods-tousbpnpdevice"/>**ToUsbPnPDevice(PnPDevice)**

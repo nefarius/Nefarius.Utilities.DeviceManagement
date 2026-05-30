@@ -8,7 +8,7 @@ Utility methods for handling NTSTATUS values.
 public static class NtStatusUtil
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [NtStatusUtil](./nefarius.utilities.devicemanagement.util.ntstatusutil.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [NtStatusUtil](./nefarius.utilities.devicemanagement.util.ntstatusutil.md)
 
 ## Methods
 
@@ -22,7 +22,7 @@ public static int ConvertNtStatusToWin32Error(uint ntStatus)
 
 #### Parameters
 
-`ntStatus` [UInt32](https://docs.microsoft.com/en-us/dotnet/api/system.uint32)<br>
+`ntStatus` [UInt32](https://learn.microsoft.com/dotnet/api/system.uint32)<br>
 The NTSTATUS value to convert.
 
 #### Returns

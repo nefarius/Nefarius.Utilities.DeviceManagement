@@ -8,7 +8,8 @@ Driver Store enumeration and manipulation utility.
 public static class DriverStore
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DriverStore](./nefarius.utilities.devicemanagement.drivers.driverstore.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DriverStore](./nefarius.utilities.devicemanagement.drivers.driverstore.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 ## Properties
 
@@ -22,7 +23,7 @@ public static IEnumerable<String> ExistingDrivers { get; }
 
 #### Property Value
 
-[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[String](https://learn.microsoft.com/dotnet/api/system.string)><br>
 
 ## Methods
 
@@ -36,5 +37,5 @@ public static void RemoveDriver(string driverStoreFileName)
 
 #### Parameters
 
-`driverStoreFileName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`driverStoreFileName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The absolute package path to remove.

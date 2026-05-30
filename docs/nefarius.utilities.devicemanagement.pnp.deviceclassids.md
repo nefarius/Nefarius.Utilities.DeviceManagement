@@ -2,13 +2,13 @@
 
 Namespace: Nefarius.Utilities.DeviceManagement.PnP
 
-Provides common device class [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)s.
+Provides common device class [Guid](https://learn.microsoft.com/dotnet/api/system.guid)s.
 
 ```csharp
 public static class DeviceClassIds
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DeviceClassIds](./nefarius.utilities.devicemanagement.pnp.deviceclassids.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DeviceClassIds](./nefarius.utilities.devicemanagement.pnp.deviceclassids.md)
 
 ## Properties
 
@@ -22,7 +22,7 @@ public static Guid Bluetooth { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-humaninterfacedevices"/>**HumanInterfaceDevices**
 
@@ -34,7 +34,7 @@ public static Guid HumanInterfaceDevices { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-system"/>**System**
 
@@ -46,7 +46,7 @@ public static Guid System { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-usb"/>**Usb**
 
@@ -58,7 +58,7 @@ public static Guid Usb { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-xboxcomposite"/>**XboxComposite**
 
@@ -70,7 +70,7 @@ public static Guid XboxComposite { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-xnacomposite"/>**XnaComposite**
 
@@ -82,4 +82,4 @@ public static Guid XnaComposite { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>

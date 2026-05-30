@@ -8,7 +8,8 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 public static class Devcon
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Devcon](./nefarius.utilities.devicemanagement.pnp.devcon.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [Devcon](./nefarius.utilities.devicemanagement.pnp.devcon.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 **Remarks:**
 
@@ -26,13 +27,13 @@ public static bool Create(string className, Guid classGuid, string node)
 
 #### Parameters
 
-`className` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`className` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The device class name.
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The GUID of the device class.
 
-`node` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`node` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The node path terminated by two null characters.
 
 #### Returns
@@ -49,13 +50,13 @@ public static void DeleteDriver(string oemInfName, string fullInfPath, bool forc
 
 #### Parameters
 
-`oemInfName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`oemInfName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The OEM INF name (name and extension only).
 
-`fullInfPath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`fullInfPath` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The fully qualified absolute path to the INF to remove from the driver store.
 
-`forceDelete` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+`forceDelete` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
 Remove the driver store copy, if true.
 
 ### <a id="methods-find"/>**Find(Guid, ref String, ref String, Int32)**
@@ -74,16 +75,16 @@ public static bool Find(Guid target, ref String path, ref String instanceId, int
 
 #### Parameters
 
-`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The class GUID to enumerate.
 
-`path` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
+`path` [String&](https://learn.microsoft.com/dotnet/api/system.string&)<br>
 The device path of the enumerated device.
 
-`instanceId` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
+`instanceId` [String&](https://learn.microsoft.com/dotnet/api/system.string&)<br>
 The instance ID of the enumerated device.
 
-`instance` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`instance` [Int32](https://learn.microsoft.com/dotnet/api/system.int32)<br>
 Optional instance ID (zero-based) specifying the device to process on multiple matches.
 
 #### Returns
@@ -105,19 +106,19 @@ public static bool FindByInterfaceGuid(Guid target, ref String path, ref String 
 
 #### Parameters
 
-`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The interface GUID to enumerate.
 
-`path` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
+`path` [String&](https://learn.microsoft.com/dotnet/api/system.string&)<br>
 The device path of the enumerated device.
 
-`instanceId` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
+`instanceId` [String&](https://learn.microsoft.com/dotnet/api/system.string&)<br>
 The instance ID of the enumerated device.
 
-`instance` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`instance` [Int32](https://learn.microsoft.com/dotnet/api/system.int32)<br>
 Optional instance ID (zero-based) specifying the device to process on multiple matches.
 
-`presentOnly` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+`presentOnly` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
 Only enumerate currently connected devices by default, set to False to also include phantom
  devices.
 
@@ -135,16 +136,16 @@ public static bool FindByInterfaceGuid(Guid target, ref PnPDevice device, int in
 
 #### Parameters
 
-`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The interface GUID to enumerate.
 
 `device` [PnPDevice&](./nefarius.utilities.devicemanagement.pnp.pnpdevice&.md)<br>
 The [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) wrapper object.
 
-`instance` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`instance` [Int32](https://learn.microsoft.com/dotnet/api/system.int32)<br>
 Optional instance ID (zero-based) specifying the device to process on multiple matches.
 
-`presentOnly` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+`presentOnly` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
 Only enumerate currently connected devices by default, set to False to also include phantom
  devices.
 
@@ -162,10 +163,10 @@ public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId)
 
 #### Parameters
 
-`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`hardwareId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`hardwareId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The hardware ID to search for.
 
 #### Returns
@@ -182,13 +183,13 @@ public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
 
 #### Parameters
 
-`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`hardwareId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`hardwareId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The hardware ID to search for.
 
-`instanceIds` [IEnumerable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1&)<br>
+`instanceIds` [IEnumerable`1&](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable`1[[system.string, system.private.corelib, version=9.0.0.0, culture=neutral, publickeytoken=7cec85d7bea7798e]]&)<br>
 A list of instances found for the given search criteria.
 
 #### Returns
@@ -205,19 +206,19 @@ public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
 
 #### Parameters
 
-`target` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`hardwareId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`hardwareId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The hardware ID to search for.
 
-`instanceIds` [IEnumerable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1&)<br>
+`instanceIds` [IEnumerable`1&](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable`1[[system.string, system.private.corelib, version=9.0.0.0, culture=neutral, publickeytoken=7cec85d7bea7798e]]&)<br>
 A list of instances found for the given search criteria.
 
-`presentOnly` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+`presentOnly` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
 True to filter currently plugged in devices, false to get all matching devices.
 
-`allowPartial` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+`allowPartial` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
 True to match substrings, false to match the exact ID value.
 
 #### Returns
@@ -234,10 +235,10 @@ public static bool Install(string fullInfPath, ref Boolean rebootRequired)
 
 #### Parameters
 
-`fullInfPath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`fullInfPath` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 An absolute path to the .INF file to install.
 
-`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+`rebootRequired` [Boolean&](https://learn.microsoft.com/dotnet/api/system.boolean&)<br>
 True if a machine reboot is required, false otherwise.
 
 #### Returns
@@ -278,10 +279,10 @@ public static bool Remove(Guid classGuid, string instanceId)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`instanceId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`instanceId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The instance ID.
 
 #### Returns
@@ -298,13 +299,13 @@ public static bool Remove(Guid classGuid, string instanceId, ref Boolean rebootR
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`instanceId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`instanceId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The instance ID.
 
-`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+`rebootRequired` [Boolean&](https://learn.microsoft.com/dotnet/api/system.boolean&)<br>
 True if a reboot is required to complete the uninstallation action, false otherwise.
 
 #### Returns
@@ -321,13 +322,13 @@ public static bool Update(string hardwareId, string fullInfPath, ref Boolean reb
 
 #### Parameters
 
-`hardwareId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`hardwareId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 A string that supplies the hardware identifier to match existing devices on the computer.
 
-`fullInfPath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`fullInfPath` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 A string that supplies the full path file name of an INF file.
 
-`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+`rebootRequired` [Boolean&](https://learn.microsoft.com/dotnet/api/system.boolean&)<br>
 A variable that indicates whether a restart is required and who should prompt for it.
 
 #### Returns

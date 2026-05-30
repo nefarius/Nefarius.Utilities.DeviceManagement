@@ -8,8 +8,9 @@ A driver service wasn't found on the local machine.
 public class DriverServiceNotFoundException : Win32Exception, System.Runtime.Serialization.ISerializable
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Exception](https://docs.microsoft.com/en-us/dotnet/api/system.exception) → [Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md) → [DriverServiceNotFoundException](./nefarius.utilities.devicemanagement.exceptions.driverservicenotfoundexception.md)<br>
-Implements [ISerializable](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.serialization.iserializable)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [Exception](https://learn.microsoft.com/dotnet/api/system.exception) → [Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md) → [DriverServiceNotFoundException](./nefarius.utilities.devicemanagement.exceptions.driverservicenotfoundexception.md)<br>
+Implements [ISerializable](https://learn.microsoft.com/dotnet/api/system.runtime.serialization.iserializable)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 ## Properties
 
@@ -21,7 +22,7 @@ public IDictionary Data { get; }
 
 #### Property Value
 
-[IDictionary](https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary)<br>
+[IDictionary](https://learn.microsoft.com/dotnet/api/system.collections.idictionary)<br>
 
 ### <a id="properties-errorcode"/>**ErrorCode**
 
@@ -33,7 +34,7 @@ public Nullable<Int32> ErrorCode { get; }
 
 #### Property Value
 
-[Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+[Nullable](https://learn.microsoft.com/dotnet/api/system.nullable-1)<[Int32](https://learn.microsoft.com/dotnet/api/system.int32)><br>
 
 ### <a id="properties-errormessage"/>**ErrorMessage**
 
@@ -45,7 +46,7 @@ public string ErrorMessage { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-helplink"/>**HelpLink**
 
@@ -55,7 +56,7 @@ public string HelpLink { get; set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-hresult"/>**HResult**
 
@@ -65,7 +66,7 @@ public int HResult { get; set; }
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/dotnet/api/system.int32)<br>
 
 ### <a id="properties-innerexception"/>**InnerException**
 
@@ -75,7 +76,7 @@ public Exception InnerException { get; }
 
 #### Property Value
 
-[Exception](https://docs.microsoft.com/en-us/dotnet/api/system.exception)<br>
+[Exception](https://learn.microsoft.com/dotnet/api/system.exception)<br>
 
 ### <a id="properties-message"/>**Message**
 
@@ -85,7 +86,7 @@ public string Message { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-source"/>**Source**
 
@@ -95,7 +96,7 @@ public string Source { get; set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-stacktrace"/>**StackTrace**
 
@@ -105,7 +106,7 @@ public string StackTrace { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-targetsite"/>**TargetSite**
 
@@ -115,4 +116,4 @@ public MethodBase TargetSite { get; }
 
 #### Property Value
 
-[MethodBase](https://docs.microsoft.com/en-us/dotnet/api/system.reflection.methodbase)<br>
+[MethodBase](https://learn.microsoft.com/dotnet/api/system.reflection.methodbase)<br>

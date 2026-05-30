@@ -8,7 +8,8 @@ Driver meta data fetched from the registry.
 public sealed class DriverMeta
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DriverMeta](./nefarius.utilities.devicemanagement.drivers.drivermeta.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DriverMeta](./nefarius.utilities.devicemanagement.drivers.drivermeta.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 ## Properties
 
@@ -22,7 +23,7 @@ public DateTime DriverDate { get; internal set; }
 
 #### Property Value
 
-[DateTime](https://docs.microsoft.com/en-us/dotnet/api/system.datetime)<br>
+[DateTime](https://learn.microsoft.com/dotnet/api/system.datetime)<br>
 
 ### <a id="properties-driverdescription"/>**DriverDescription**
 
@@ -34,7 +35,7 @@ public string DriverDescription { get; internal set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-driverversion"/>**DriverVersion**
 
@@ -46,7 +47,7 @@ public Version DriverVersion { get; internal set; }
 
 #### Property Value
 
-[Version](https://docs.microsoft.com/en-us/dotnet/api/system.version)<br>
+[Version](https://learn.microsoft.com/dotnet/api/system.version)<br>
 
 ### <a id="properties-infpath"/>**InfPath**
 
@@ -58,7 +59,7 @@ public string InfPath { get; internal set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-infsection"/>**InfSection**
 
@@ -70,7 +71,7 @@ public string InfSection { get; internal set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-matchingdeviceid"/>**MatchingDeviceId**
 
@@ -82,7 +83,7 @@ public string MatchingDeviceId { get; internal set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-providername"/>**ProviderName**
 
@@ -94,4 +95,4 @@ public string ProviderName { get; internal set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>

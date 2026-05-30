@@ -8,6 +8,8 @@ Describes an instance of a PNP device.
 public interface IPnPDevice
 ```
 
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md)
+
 ## Properties
 
 ### <a id="properties-children"/>**Children**
@@ -20,7 +22,7 @@ public abstract IEnumerable<IPnPDevice> Children { get; }
 
 #### Property Value
 
-[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)><br>
 
 ### <a id="properties-compatibleids"/>**CompatibleIds**
 
@@ -32,7 +34,7 @@ public abstract IEnumerable<String> CompatibleIds { get; }
 
 #### Property Value
 
-[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[String](https://learn.microsoft.com/dotnet/api/system.string)><br>
 
 ### <a id="properties-deviceid"/>**DeviceId**
 
@@ -44,7 +46,7 @@ public abstract string DeviceId { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-hardwareids"/>**HardwareIds**
 
@@ -56,7 +58,7 @@ public abstract IEnumerable<String> HardwareIds { get; }
 
 #### Property Value
 
-[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[String](https://learn.microsoft.com/dotnet/api/system.string)><br>
 
 ### <a id="properties-instanceid"/>**InstanceId**
 
@@ -68,7 +70,7 @@ public abstract string InstanceId { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-parent"/>**Parent**
 
@@ -92,7 +94,7 @@ public abstract IEnumerable<IPnPDevice> Siblings { get; }
 
 #### Property Value
 
-[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)><br>
 
 ## Methods
 
@@ -132,7 +134,7 @@ void InstallCustomDriver(string infName)
 
 #### Parameters
 
-`infName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`infName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
  or absolute path.
 
@@ -151,11 +153,11 @@ void InstallCustomDriver(string infName, ref Boolean rebootRequired)
 
 #### Parameters
 
-`infName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`infName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The INF file name as found in C:\Windows\INF directory. It must be the name only, not a relative
  or absolute path.
 
-`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+`rebootRequired` [Boolean&](https://learn.microsoft.com/dotnet/api/system.boolean&)<br>
 Gets whether a reboot is required for the changes to take effect or not.
 
 **Remarks:**
@@ -187,7 +189,7 @@ void InstallNullDriver(ref Boolean rebootRequired)
 
 #### Parameters
 
-`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+`rebootRequired` [Boolean&](https://learn.microsoft.com/dotnet/api/system.boolean&)<br>
 
 **Remarks:**
 
@@ -205,7 +207,7 @@ bool IsVirtual(Func<IPnPDevice, Boolean> excludeIfMatches)
 
 #### Parameters
 
-`excludeIfMatches` [Func&lt;IPnPDevice, Boolean&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.func-2)<br>
+`excludeIfMatches` [Func](https://learn.microsoft.com/dotnet/api/system.func-2)<[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)><br>
 Returns false if the given predicate is true.
 
 #### Returns
@@ -274,7 +276,7 @@ void Uninstall()
 
 [Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md)<br>
 
-[ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
+[ArgumentOutOfRangeException](https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception)<br>
 
 **Remarks:**
 
@@ -293,14 +295,14 @@ void Uninstall(ref Boolean rebootRequired)
 
 #### Parameters
 
-`rebootRequired` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
+`rebootRequired` [Boolean&](https://learn.microsoft.com/dotnet/api/system.boolean&)<br>
 Gets whether a reboot is required for the changes to take effect or not.
 
 #### Exceptions
 
 [Win32Exception](./nefarius.utilities.devicemanagement.exceptions.win32exception.md)<br>
 
-[ArgumentOutOfRangeException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentoutofrangeexception)<br>
+[ArgumentOutOfRangeException](https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception)<br>
 
 **Remarks:**
 

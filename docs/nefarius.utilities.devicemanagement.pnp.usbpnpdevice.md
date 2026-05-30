@@ -5,11 +5,11 @@ Namespace: Nefarius.Utilities.DeviceManagement.PnP
 Describes an instance of a USB PNP device.
 
 ```csharp
-public class UsbPnPDevice : PnPDevice, IPnPDevice, System.IEquatable`1[[Nefarius.Utilities.DeviceManagement.PnP.PnPDevice, Nefarius.Utilities.DeviceManagement, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class UsbPnPDevice : PnPDevice, IPnPDevice, System.IEquatable<Nefarius.Utilities.DeviceManagement.PnP.PnPDevice>
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) → [UsbPnPDevice](./nefarius.utilities.devicemanagement.pnp.usbpnpdevice.md)<br>
-Implements [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), [IEquatable&lt;PnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md) → [UsbPnPDevice](./nefarius.utilities.devicemanagement.pnp.usbpnpdevice.md)<br>
+Implements [IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md), [IEquatable](https://learn.microsoft.com/dotnet/api/system.iequatable-1)<[PnPDevice](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md)>
 
 ## Properties
 
@@ -23,7 +23,7 @@ public IEnumerable<IPnPDevice> Children { get; }
 
 #### Property Value
 
-[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)><br>
 
 ### <a id="properties-compatibleids"/>**CompatibleIds**
 
@@ -35,7 +35,7 @@ public IEnumerable<String> CompatibleIds { get; }
 
 #### Property Value
 
-[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[String](https://learn.microsoft.com/dotnet/api/system.string)><br>
 
 ### <a id="properties-deviceid"/>**DeviceId**
 
@@ -47,7 +47,7 @@ public string DeviceId { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-hardwareids"/>**HardwareIds**
 
@@ -59,7 +59,7 @@ public IEnumerable<String> HardwareIds { get; }
 
 #### Property Value
 
-[IEnumerable&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[String](https://learn.microsoft.com/dotnet/api/system.string)><br>
 
 ### <a id="properties-instanceid"/>**InstanceId**
 
@@ -71,7 +71,7 @@ public string InstanceId { get; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ### <a id="properties-parent"/>**Parent**
 
@@ -95,7 +95,7 @@ public uint Port { get; }
 
 #### Property Value
 
-[UInt32](https://docs.microsoft.com/en-us/dotnet/api/system.uint32)<br>
+[UInt32](https://learn.microsoft.com/dotnet/api/system.uint32)<br>
 
 ### <a id="properties-siblings"/>**Siblings**
 
@@ -107,7 +107,7 @@ public IEnumerable<IPnPDevice> Siblings { get; }
 
 #### Property Value
 
-[IEnumerable&lt;IPnPDevice&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1)<br>
+[IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)<[IPnPDevice](./nefarius.utilities.devicemanagement.pnp.ipnpdevice.md)><br>
 
 ## Methods
 

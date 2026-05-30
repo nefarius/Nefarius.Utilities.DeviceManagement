@@ -2,13 +2,13 @@
 
 Namespace: Nefarius.Utilities.DeviceManagement.PnP
 
-Provides common device interface [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)s.
+Provides common device interface [Guid](https://learn.microsoft.com/dotnet/api/system.guid)s.
 
 ```csharp
 public static class DeviceInterfaceIds
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DeviceInterfaceIds](./nefarius.utilities.devicemanagement.pnp.deviceinterfaceids.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DeviceInterfaceIds](./nefarius.utilities.devicemanagement.pnp.deviceinterfaceids.md)
 
 ## Properties
 
@@ -22,7 +22,7 @@ public static Guid HidDevice { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-usbdevice"/>**UsbDevice**
 
@@ -34,7 +34,7 @@ public static Guid UsbDevice { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-usbhostcontroller"/>**UsbHostController**
 
@@ -46,7 +46,7 @@ public static Guid UsbHostController { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-usbhub"/>**UsbHub**
 
@@ -58,7 +58,7 @@ public static Guid UsbHub { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-xusbdevice"/>**XUsbDevice**
 
@@ -70,4 +70,4 @@ public static Guid XUsbDevice { get; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>

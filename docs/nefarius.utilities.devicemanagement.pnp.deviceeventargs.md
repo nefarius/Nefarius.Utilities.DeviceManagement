@@ -8,13 +8,14 @@ Device change event arguments.
 public class DeviceEventArgs
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 ## Properties
 
 ### <a id="properties-interfaceguid"/>**InterfaceGuid**
 
-The [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid) of the device interface.
+The [Guid](https://learn.microsoft.com/dotnet/api/system.guid) of the device interface.
 
 ```csharp
 public Guid InterfaceGuid { get; set; }
@@ -22,7 +23,7 @@ public Guid InterfaceGuid { get; set; }
 
 #### Property Value
 
-[Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+[Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 
 ### <a id="properties-symlink"/>**SymLink**
 
@@ -34,7 +35,7 @@ public string SymLink { get; set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 
 ## Constructors
 

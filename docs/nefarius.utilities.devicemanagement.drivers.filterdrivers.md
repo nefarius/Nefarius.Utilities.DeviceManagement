@@ -8,7 +8,8 @@ Utility class to simplify interaction with filter driver entries.
 public static class FilterDrivers
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [FilterDrivers](./nefarius.utilities.devicemanagement.drivers.filterdrivers.md)
+Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [FilterDrivers](./nefarius.utilities.devicemanagement.drivers.filterdrivers.md)<br>
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
 
 ## Methods
 
@@ -22,10 +23,10 @@ public static void AddDeviceClassLowerFilter(Guid classGuid, string serviceName)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`serviceName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`serviceName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to add.
 
 ### <a id="methods-adddeviceclassupperfilter"/>**AddDeviceClassUpperFilter(Guid, String)**
@@ -38,10 +39,10 @@ public static void AddDeviceClassUpperFilter(Guid classGuid, string serviceName)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`serviceName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`serviceName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to add.
 
 ### <a id="methods-getdeviceclasslowerfilters"/>**GetDeviceClassLowerFilters(Guid)**
@@ -54,7 +55,7 @@ public static IEnumerable<String> GetDeviceClassLowerFilters(Guid classGuid)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
 #### Returns
@@ -71,7 +72,7 @@ public static IEnumerable<String> GetDeviceClassUpperFilters(Guid classGuid)
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
 #### Returns
@@ -88,10 +89,10 @@ public static void RemoveDeviceClassLowerFilter(Guid classGuid, string serviceNa
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`serviceName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`serviceName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to remove.
 
 ### <a id="methods-removedeviceclassupperfilter"/>**RemoveDeviceClassUpperFilter(Guid, String)**
@@ -104,8 +105,8 @@ public static void RemoveDeviceClassUpperFilter(Guid classGuid, string serviceNa
 
 #### Parameters
 
-`classGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`classGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device class GUID.
 
-`serviceName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`serviceName` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The driver service name to remove.

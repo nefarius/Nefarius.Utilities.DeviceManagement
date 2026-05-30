@@ -8,6 +8,8 @@ Utility class to listen for system-wide device arrivals and removals based on a 
 public interface IDeviceNotificationListener
 ```
 
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md)
+
 **Remarks:**
 
 Original source: https://gist.github.com/emoacht/73eff195317e387f4cda
@@ -24,10 +26,10 @@ void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Nullable<Guid> inter
 
 #### Parameters
 
-`handler` [Action&lt;DeviceEventArgs&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.action-1)<br>
+`handler` [Action](https://learn.microsoft.com/dotnet/api/system.action-1)<[DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)><br>
 The event handler to invoke.
 
-`interfaceGuid` [Nullable&lt;Guid&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`interfaceGuid` [Nullable](https://learn.microsoft.com/dotnet/api/system.nullable-1)<[Guid](https://learn.microsoft.com/dotnet/api/system.guid)><br>
 The interface GUID to get notified for or null to get notified for all listening GUIDs.
 
 ### <a id="methods-registerdeviceremoved"/>**RegisterDeviceRemoved(Action&lt;DeviceEventArgs&gt;, Nullable&lt;Guid&gt;)**
@@ -40,15 +42,15 @@ void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Nullable<Guid> inter
 
 #### Parameters
 
-`handler` [Action&lt;DeviceEventArgs&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.action-1)<br>
+`handler` [Action](https://learn.microsoft.com/dotnet/api/system.action-1)<[DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)><br>
 The event handler to invoke.
 
-`interfaceGuid` [Nullable&lt;Guid&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`interfaceGuid` [Nullable](https://learn.microsoft.com/dotnet/api/system.nullable-1)<[Guid](https://learn.microsoft.com/dotnet/api/system.guid)><br>
 The interface GUID to get notified for or null to get notified for all listening GUIDs.
 
 ### <a id="methods-startlisten"/>**StartListen(Guid)**
 
-Start listening for device arrivals/removals using the provided [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid). Call this after you've
+Start listening for device arrivals/removals using the provided [Guid](https://learn.microsoft.com/dotnet/api/system.guid). Call this after you've
  subscribed to [IDeviceNotificationListener.DeviceArrived](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md#devicearrived) and [IDeviceNotificationListener.DeviceRemoved](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md#deviceremoved) events.
 
 ```csharp
@@ -57,13 +59,13 @@ void StartListen(Guid interfaceGuid)
 
 #### Parameters
 
-`interfaceGuid` [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid)<br>
+`interfaceGuid` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
 The device interface GUID to listen for.
 
 ### <a id="methods-stoplisten"/>**StopListen(Nullable&lt;Guid&gt;)**
 
 Stop listening. The events [IDeviceNotificationListener.DeviceArrived](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md#devicearrived) and [IDeviceNotificationListener.DeviceRemoved](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md#deviceremoved) will not get invoked
- anymore after this call. If no [Guid](https://docs.microsoft.com/en-us/dotnet/api/system.guid) is specified, all currently registered interfaces will get
+ anymore after this call. If no [Guid](https://learn.microsoft.com/dotnet/api/system.guid) is specified, all currently registered interfaces will get
  unsubscribed.
 
 ```csharp
@@ -72,7 +74,7 @@ void StopListen(Nullable<Guid> interfaceGuid)
 
 #### Parameters
 
-`interfaceGuid` [Nullable&lt;Guid&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`interfaceGuid` [Nullable](https://learn.microsoft.com/dotnet/api/system.nullable-1)<[Guid](https://learn.microsoft.com/dotnet/api/system.guid)><br>
 
 ### <a id="methods-unregisterdevicearrived"/>**UnregisterDeviceArrived(Action&lt;DeviceEventArgs&gt;)**
 
@@ -84,7 +86,7 @@ void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
 
 #### Parameters
 
-`handler` [Action&lt;DeviceEventArgs&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.action-1)<br>
+`handler` [Action](https://learn.microsoft.com/dotnet/api/system.action-1)<[DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)><br>
 The event handler to unsubscribe.
 
 ### <a id="methods-unregisterdeviceremoved"/>**UnregisterDeviceRemoved(Action&lt;DeviceEventArgs&gt;)**
@@ -97,7 +99,7 @@ void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
 
 #### Parameters
 
-`handler` [Action&lt;DeviceEventArgs&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.action-1)<br>
+`handler` [Action](https://learn.microsoft.com/dotnet/api/system.action-1)<[DeviceEventArgs](./nefarius.utilities.devicemanagement.pnp.deviceeventargs.md)><br>
 The event handler to unsubscribe.
 
 ## Events
