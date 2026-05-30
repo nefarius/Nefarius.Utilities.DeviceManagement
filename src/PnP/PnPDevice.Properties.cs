@@ -348,7 +348,7 @@ public partial class PnPDevice
             _instanceHandle,
             propertyKey,
             out propertyType,
-            (byte*)valueBuffer.ToPointer(),
+            new Span<byte>((byte*)valueBuffer.ToPointer(), (int)valueBufferSize),
             ref valueBufferSize,
             0
         );
