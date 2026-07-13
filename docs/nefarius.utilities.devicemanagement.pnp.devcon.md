@@ -189,7 +189,7 @@ The device class GUID.
 `hardwareId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The hardware ID to search for.
 
-`instanceIds` [IEnumerable`1&](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable`1[[system.string, system.private.corelib, version=9.0.0.0, culture=neutral, publickeytoken=7cec85d7bea7798e]]&)<br>
+`instanceIds` [IEnumerable`1&](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable`1[[system.string, system.private.corelib, version=10.0.0.0, culture=neutral, publickeytoken=7cec85d7bea7798e]]&)<br>
 A list of instances found for the given search criteria.
 
 #### Returns
@@ -212,7 +212,7 @@ The device class GUID.
 `hardwareId` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
 The hardware ID to search for.
 
-`instanceIds` [IEnumerable`1&](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable`1[[system.string, system.private.corelib, version=9.0.0.0, culture=neutral, publickeytoken=7cec85d7bea7798e]]&)<br>
+`instanceIds` [IEnumerable`1&](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable`1[[system.string, system.private.corelib, version=10.0.0.0, culture=neutral, publickeytoken=7cec85d7bea7798e]]&)<br>
 A list of instances found for the given search criteria.
 
 `presentOnly` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
