@@ -69,7 +69,7 @@ public class PnPDeviceTests
             PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
             Assert.That(device, Is.Not.Null);
 
-            DriverMeta? meta = device.GetCurrentDriver();
+            DriverMeta? meta = device!.GetCurrentDriver();
             Assert.That(meta, Is.Not.Null);
         });
     }

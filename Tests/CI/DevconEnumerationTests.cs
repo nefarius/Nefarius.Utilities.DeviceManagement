@@ -21,19 +21,14 @@ public class DevconEnumerationTests
     }
 
     [Test]
-    public void FindByInterfaceGuid_UsbHostController_FindsAtLeastOne()
+    public void GetInstanceIdFromInterfaceId_HidDevice_RoundTrips()
     {
-        // Prefer host controllers over GUID_DEVINTERFACE_USB_DEVICE: GitHub-hosted Windows VMs
-        // often expose a virtual XHCI controller without any USB device interfaces.
+        // HID interfaces are present on GitHub-hosted Windows runners; USB host/device
+        // interfaces are not reliably exposed in those VMs.
         Assert.That(
-            Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbHostController, out string? path,
-                out string? instanceId),
+            Devcon.FindByInterfaceGuid(DeviceInterfaceIds.HidDevice, out string? path, out string? instanceId),
             Is.True);
 
-        Assert.Multiple(() =>
-        {
-            Assert.That(path, Is.Not.Null.And.Not.Empty);
-            Assert.That(instanceId, Is.Not.Null.And.Not.Empty);
-        });
+        Assert.That(PnPDevice.GetInstanceIdFromInterfaceId(path), Is.EqualTo(instanceId).IgnoreCase);
     }
 }

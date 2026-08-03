@@ -15,14 +15,17 @@ public class DevconTests
     [Category(TestCategories.CI)]
     public void TestFindInDeviceClassByHardwareId()
     {
-        // Discover a present HID device — available on GitHub-hosted Windows runners and typical PCs.
-        // Do not hard-code ACPI/HPET IDs; cloud VMs often lack them.
+        // Discover a present HID interface device. Use its reported class GUID — interface
+        // devices are not always under DeviceClassIds.HumanInterfaceDevices on cloud VMs.
         Assert.That(
             Devcon.FindByInterfaceGuid(DeviceInterfaceIds.HidDevice, out _, out string? instanceId),
             Is.True,
             "Expected at least one HID device interface.");
 
         PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        Guid classGuid = device.GetProperty<Guid>(DevicePropertyKey.Device_ClassGuid);
+        Assert.That(classGuid, Is.Not.EqualTo(Guid.Empty));
+
         string[]? hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
         Assert.That(hardwareIds, Is.Not.Null.And.Not.Empty);
 
@@ -31,7 +34,7 @@ public class DevconTests
         Assert.Multiple(() =>
         {
             Assert.That(
-                Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.HumanInterfaceDevices, hardwareId,
+                Devcon.FindInDeviceClassByHardwareId(classGuid, hardwareId,
                     out IEnumerable<string>? instances, presentOnly: true), Is.True);
             Assert.That(instances.Any(id => id.Equals(instanceId, StringComparison.OrdinalIgnoreCase)), Is.True);
         });
