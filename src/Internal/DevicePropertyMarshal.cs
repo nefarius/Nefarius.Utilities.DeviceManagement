@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using Nefarius.Utilities.DeviceManagement.Util;
@@ -22,7 +23,7 @@ internal static class DevicePropertyMarshal
 
         if (managedType == typeof(string[]))
         {
-            return Marshal.PtrToStringUni(buffer, (int)size / 2).TrimEnd('\0').Split('\0');
+            return buffer.MultiSzPointerToStringArray((int)size).ToArray();
         }
 
         if (managedType == typeof(sbyte))

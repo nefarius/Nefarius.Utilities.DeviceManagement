@@ -51,9 +51,15 @@ public class DevicePropertyMarshalTests
     [Test]
     public void Write_UnsupportedType_Throws()
     {
-        Assert.That(
-            () => DevicePropertyMarshal.Write(1.5f, typeof(float), out _),
-            Throws.TypeOf<NotImplementedException>());
+        Assert.Multiple(() =>
+        {
+            Assert.That(
+                () => DevicePropertyMarshal.Write(1.5f, typeof(float), out _),
+                Throws.TypeOf<NotImplementedException>());
+            Assert.That(
+                () => DevicePropertyMarshal.Read(IntPtr.Zero, 0, typeof(float)),
+                Throws.TypeOf<NotImplementedException>());
+        });
     }
 
     private static void RoundTrip(object value, Type managedType)

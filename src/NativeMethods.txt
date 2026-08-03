@@ -31,6 +31,7 @@ DIINSTALLDRIVER_FLAGS
 DIUNINSTALLDRIVER_FLAGS
 DI_FUNCTION
 DefWindowProc
+DestroyWindow
 DeviceIoControl
 DispatchMessage
 FILETIME
@@ -72,6 +73,7 @@ SetLastError
 SetupDiOpenClassRegKey
 TranslateMessage
 UPDATEDRIVERFORPLUGANDPLAYDEVICES_FLAGS
+UnregisterClass
 UnregisterDeviceNotification
 UpdateDriverForPlugAndPlayDevices
 WIN32_ERROR

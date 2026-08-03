@@ -38,6 +38,9 @@ dotnet test Tests/Tests.csproj -c Release --filter "Category=Unit|Category=CI"
 Some usage examples of the core library features are presented below. Samples assume:
 
 ```csharp
+using System;
+using System.Linq;
+using System.Threading;
 using Nefarius.Utilities.DeviceManagement.Drivers;
 using Nefarius.Utilities.DeviceManagement.Extensions;
 using Nefarius.Utilities.DeviceManagement.PnP;
@@ -150,11 +153,12 @@ Devcon.Refresh();
 ### Cycle hub port a given USB device is attached to
 
 ```csharp
-if (Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbDevice, out PnPDevice device))
-{
-    UsbPnPDevice usbDevice = device.ToUsbPnPDevice();
-    usbDevice.CyclePort();
-}
+// replace with the instance ID of the USB device you want to power-cycle
+const string instanceId = @"USB\VID_054C&PID_0CE6\0000000000000000";
+
+PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+UsbPnPDevice usbDevice = device.ToUsbPnPDevice();
+usbDevice.CyclePort();
 ```
 
 ## Sources & 3rd party credits

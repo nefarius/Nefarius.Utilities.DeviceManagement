@@ -185,15 +185,14 @@ public sealed class DeviceClassFilters
         {
             List<string> elements = ReadMultiSzValue(key, filter, ref type, sizeRequired);
             IReadOnlyList<string> updated = FilterServiceList.Add(elements, service);
-            WriteMultiSzValue(key, filter, type, updated);
+            WriteMultiSzValue(key, filter, updated);
             return;
         }
 
         if (status == WIN32_ERROR.ERROR_FILE_NOT_FOUND)
         {
-            type = REG_VALUE_TYPE.REG_MULTI_SZ;
             IReadOnlyList<string> updated = FilterServiceList.Add(null, service);
-            WriteMultiSzValue(key, filter, type, updated);
+            WriteMultiSzValue(key, filter, updated);
             return;
         }
 
@@ -225,7 +224,7 @@ public sealed class DeviceClassFilters
         {
             List<string> elements = ReadMultiSzValue(key, filter, ref type, sizeRequired);
             IReadOnlyList<string> updated = FilterServiceList.Remove(elements, service);
-            WriteMultiSzValue(key, filter, type, updated);
+            WriteMultiSzValue(key, filter, updated);
             return;
         }
 
@@ -313,7 +312,7 @@ public sealed class DeviceClassFilters
 
             if (status != WIN32_ERROR.ERROR_SUCCESS)
             {
-                throw new Win32Exception("Failed to query value");
+                throw new Win32Exception("Failed to query value", (int)status);
             }
 
             return buffer.MultiSzPointerToStringArray((int)sizeRequired).ToList();
@@ -327,7 +326,6 @@ public sealed class DeviceClassFilters
     private static unsafe void WriteMultiSzValue(
         SafeRegistryHandle key,
         string filter,
-        REG_VALUE_TYPE type,
         IReadOnlyList<string> values)
     {
         IntPtr rawBuffer = values.StringArrayToMultiSzPointer(out int length);
@@ -337,13 +335,13 @@ public sealed class DeviceClassFilters
             WIN32_ERROR status = PInvoke.RegSetValueEx(
                 key,
                 filter,
-                type,
+                REG_VALUE_TYPE.REG_MULTI_SZ,
                 new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
             );
 
             if (status != WIN32_ERROR.ERROR_SUCCESS)
             {
-                throw new Win32Exception("Failed to write value");
+                throw new Win32Exception("Failed to write value", (int)status);
             }
         }
         finally
