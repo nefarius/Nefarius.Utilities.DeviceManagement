@@ -15,14 +15,25 @@ public class DevconTests
     [Category(TestCategories.CI)]
     public void TestFindInDeviceClassByHardwareId()
     {
-        // High precision event timer — typically present on Windows PCs / CI agents
-        const string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
+        // Discover a present HID device — available on GitHub-hosted Windows runners and typical PCs.
+        // Do not hard-code ACPI/HPET IDs; cloud VMs often lack them.
+        Assert.That(
+            Devcon.FindByInterfaceGuid(DeviceInterfaceIds.HidDevice, out _, out string? instanceId),
+            Is.True,
+            "Expected at least one HID device interface.");
+
+        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        string[]? hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+        Assert.That(hardwareIds, Is.Not.Null.And.Not.Empty);
+
+        string hardwareId = hardwareIds![0];
+
         Assert.Multiple(() =>
         {
             Assert.That(
-                Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId,
-                    out IEnumerable<string>? instances), Is.True);
-            Assert.That(instances.Count(), Is.EqualTo(1));
+                Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.HumanInterfaceDevices, hardwareId,
+                    out IEnumerable<string>? instances, presentOnly: true), Is.True);
+            Assert.That(instances.Any(id => id.Equals(instanceId, StringComparison.OrdinalIgnoreCase)), Is.True);
         });
 
         // not a class GUID

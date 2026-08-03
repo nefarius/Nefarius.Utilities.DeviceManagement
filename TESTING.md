@@ -17,7 +17,7 @@ A bare `dotnet test` also skips `[Explicit]` tests, so Hardware / Destructive / 
 | Category | Purpose | Runs on GitHub-hosted CI |
 |----------|---------|--------------------------|
 | `Unit` | Pure helpers and fakes (no live PnP required for matching/filter/virtual logic) | Yes (`windows-latest`) |
-| `CI` | Live Windows, non-destructive, always-available devices (HID, HPET, Driver Store read) | Yes (`windows-latest`) |
+| `CI` | Live Windows, non-destructive, always-available devices (HID, USB host controller, Driver Store read) | Yes (`windows-latest`) |
 | `Hardware` | Special devices/drivers (Xbox, DualSense, BthPS3, Bluetooth props, HidHide, USBPcap) | No — Explicit |
 | `Interactive` | Human plug/unplug within a timeout | No — Explicit |
 | `Destructive` | Null/custom driver install, class filter mutation | No — Explicit |

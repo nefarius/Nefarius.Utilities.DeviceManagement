@@ -21,11 +21,13 @@ public class DevconEnumerationTests
     }
 
     [Test]
-    public void FindByInterfaceGuid_UsbDevice_FindsAtLeastOne()
+    public void FindByInterfaceGuid_UsbHostController_FindsAtLeastOne()
     {
-        // GitHub-hosted Windows runners and typical PCs expose at least one USB device interface
+        // Prefer host controllers over GUID_DEVINTERFACE_USB_DEVICE: GitHub-hosted Windows VMs
+        // often expose a virtual XHCI controller without any USB device interfaces.
         Assert.That(
-            Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbDevice, out string? path, out string? instanceId),
+            Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbHostController, out string? path,
+                out string? instanceId),
             Is.True);
 
         Assert.Multiple(() =>
