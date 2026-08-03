@@ -29,11 +29,12 @@ internal static class FilterServiceList
     /// </summary>
     public static IReadOnlyList<string> Remove(IEnumerable<string>? existing, string service)
     {
-        List<string> elements = (existing ?? Enumerable.Empty<string>()).ToList();
+        List<string> elements = (existing ?? Enumerable.Empty<string>())
+            .Where(e => !string.IsNullOrWhiteSpace(e))
+            .ToList();
         elements.RemoveAll(e => e.Equals(service, StringComparison.OrdinalIgnoreCase));
 
         return elements
-            .Where(e => !string.IsNullOrWhiteSpace(e))
             .Distinct()
             .ToList();
     }

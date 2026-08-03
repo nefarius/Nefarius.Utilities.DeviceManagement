@@ -43,4 +43,12 @@ public class HardwareIdMatcherTests
     {
         Assert.That(HardwareIdMatcher.Matches(null!, "A", allowPartial: false), Is.False);
     }
+
+    [Test]
+    public void NullElements_AreIgnored()
+    {
+        string?[] ids = { null, @"USB\VID_045E&PID_028E", null };
+
+        Assert.That(HardwareIdMatcher.Matches(ids!, @"USB\VID_045E&PID_028E", allowPartial: false), Is.True);
+    }
 }

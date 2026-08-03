@@ -27,7 +27,10 @@ internal static class HardwareIdMatcher
             return false;
         }
 
-        List<string> ids = hardwareIds.Select(id => id.ToUpperInvariant()).ToList();
+        List<string> ids = hardwareIds
+            .Where(id => !string.IsNullOrEmpty(id))
+            .Select(id => id.ToUpperInvariant())
+            .ToList();
         string normalizedNeedle = needle.ToUpperInvariant();
 
         if (allowPartial)

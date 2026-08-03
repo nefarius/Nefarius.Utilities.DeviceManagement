@@ -53,4 +53,13 @@ public class FilterServiceListTests
 
         Assert.That(result, Is.EqualTo(new[] { "HidHide" }));
     }
+
+    [Test]
+    public void Remove_NullAndWhitespaceEntries_DoNotThrow()
+    {
+        IReadOnlyList<string> result =
+            FilterServiceList.Remove(new[] { null, "HidHide", " ", "USBPcap" }!, "hidhide");
+
+        Assert.That(result, Is.EqualTo(new[] { "USBPcap" }));
+    }
 }

@@ -51,13 +51,9 @@ internal static class VirtualDeviceEvaluator
 
             string? parentId = getParentInstanceId(current);
 
-            if (string.IsNullOrEmpty(parentId))
-            {
-                // Preserve historical behavior: retry getParent until a value appears.
-                continue;
-            }
-
-            if (parentId!.Equals(TreeRootParentId, StringComparison.OrdinalIgnoreCase))
+            // Null/empty parent ends the walk; evaluate the last known node.
+            if (string.IsNullOrEmpty(parentId) ||
+                parentId!.Equals(TreeRootParentId, StringComparison.OrdinalIgnoreCase))
             {
                 break;
             }

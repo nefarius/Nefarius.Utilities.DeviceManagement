@@ -36,6 +36,12 @@ internal sealed class RealDeviceManagementNative : IDeviceManagementNative
             presentOnly ? (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT : 0
         );
 
+        // SetupDiGetClassDevs returns INVALID_HANDLE_VALUE (HDEVINFO.Null), not NULL, on failure.
+        if (deviceInfoSet == HDEVINFO.Null)
+        {
+            throw new Win32Exception("Failed to get device information set");
+        }
+
         try
         {
             for (
@@ -51,13 +57,14 @@ internal sealed class RealDeviceManagementNative : IDeviceManagementNative
                     throw new ConfigManagerException("Failed to get device ID size.", ret);
                 }
 
-                uint nBytes = (charsRequired + 1) * 2;
+                // CM_Get_Device_ID_Size excludes the terminating NUL; BufferLen is in characters.
+                uint charsWithNull = charsRequired + 1;
 #pragma warning disable CA2014
                 // ReSharper disable once StackAllocInsideLoop
-                char* ptrInstanceBuf = stackalloc char[(int)nBytes];
+                char* ptrInstanceBuf = stackalloc char[(int)charsWithNull];
 #pragma warning restore CA2014
 
-                ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
+                ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsWithNull, 0);
 
                 if (ret != CONFIGRET.CR_SUCCESS)
                 {
@@ -69,7 +76,7 @@ internal sealed class RealDeviceManagementNative : IDeviceManagementNative
         }
         finally
         {
-            if (deviceInfoSet != IntPtr.Zero)
+            if (deviceInfoSet != HDEVINFO.Null)
             {
                 SetupApi.SetupDiDestroyDeviceInfoList(deviceInfoSet);
             }
@@ -81,12 +88,23 @@ internal sealed class RealDeviceManagementNative : IDeviceManagementNative
     /// <inheritdoc />
     public string[]? GetHardwareIds(string instanceId, bool presentOnly)
     {
-        PnPDevice device = PnPDevice.GetDeviceByInstanceId(
-            instanceId,
-            presentOnly ? DeviceLocationFlags.Normal : DeviceLocationFlags.Phantom
-        );
+        try
+        {
+            PnPDevice device = PnPDevice.GetDeviceByInstanceId(
+                instanceId,
+                presentOnly ? DeviceLocationFlags.Normal : DeviceLocationFlags.Phantom
+            );
 
-        return device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+            return device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+        }
+        catch (PnPDeviceNotFoundException)
+        {
+            return null;
+        }
+        catch (ConfigManagerException)
+        {
+            return null;
+        }
     }
 
     /// <inheritdoc />

@@ -73,4 +73,14 @@ public class VirtualDeviceEvaluatorTests
 
         Assert.That(result, Is.False);
     }
+
+    [Test]
+    public void Walk_MissingParent_EvaluatesLastKnownNode()
+    {
+        bool result = VirtualDeviceEvaluator.WalkAndEvaluate(
+            @"ROOT\SYSTEM\0001",
+            _ => null);
+
+        Assert.That(result, Is.True);
+    }
 }

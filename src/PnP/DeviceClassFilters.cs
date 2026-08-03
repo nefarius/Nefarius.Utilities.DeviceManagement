@@ -203,16 +203,23 @@ public sealed class DeviceClassFilters
 
             IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
 
-            status = PInvoke.RegSetValueEx(
-                key,
-                filter,
-                type,
-                new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
-            );
-
-            if (status != WIN32_ERROR.ERROR_SUCCESS)
+            try
             {
-                throw new Win32Exception("Failed to write value");
+                status = PInvoke.RegSetValueEx(
+                    key,
+                    filter,
+                    type,
+                    new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
+                );
+
+                if (status != WIN32_ERROR.ERROR_SUCCESS)
+                {
+                    throw new Win32Exception("Failed to write value");
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(rawBuffer);
             }
 
             return;
@@ -225,16 +232,23 @@ public sealed class DeviceClassFilters
 
             IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
 
-            status = PInvoke.RegSetValueEx(
-                key,
-                filter,
-                type,
-                new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
-            );
-
-            if (status != WIN32_ERROR.ERROR_SUCCESS)
+            try
             {
-                throw new Win32Exception("Failed to write value");
+                status = PInvoke.RegSetValueEx(
+                    key,
+                    filter,
+                    type,
+                    new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
+                );
+
+                if (status != WIN32_ERROR.ERROR_SUCCESS)
+                {
+                    throw new Win32Exception("Failed to write value");
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(rawBuffer);
             }
 
             return;
@@ -286,16 +300,23 @@ public sealed class DeviceClassFilters
 
             IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
 
-            status = PInvoke.RegSetValueEx(
-                key,
-                filter,
-                type,
-                new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
-            );
-
-            if (status != WIN32_ERROR.ERROR_SUCCESS)
+            try
             {
-                throw new Win32Exception("Failed to write value");
+                status = PInvoke.RegSetValueEx(
+                    key,
+                    filter,
+                    type,
+                    new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
+                );
+
+                if (status != WIN32_ERROR.ERROR_SUCCESS)
+                {
+                    throw new Win32Exception("Failed to write value");
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(rawBuffer);
             }
 
             return;
