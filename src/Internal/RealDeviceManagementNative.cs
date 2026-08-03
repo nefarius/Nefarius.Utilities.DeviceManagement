@@ -59,19 +59,19 @@ internal sealed class RealDeviceManagementNative : IDeviceManagementNative
 
                 // CM_Get_Device_ID_Size excludes the terminating NUL; BufferLen is in characters.
                 uint charsWithNull = charsRequired + 1;
-#pragma warning disable CA2014
-                // ReSharper disable once StackAllocInsideLoop
-                char* ptrInstanceBuf = stackalloc char[(int)charsWithNull];
-#pragma warning restore CA2014
+                char[] instanceBuffer = new char[checked((int)charsWithNull)];
 
-                ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsWithNull, 0);
+                fixed (char* ptrInstanceBuf = instanceBuffer)
+                {
+                    ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsWithNull, 0);
+                }
 
                 if (ret != CONFIGRET.CR_SUCCESS)
                 {
                     throw new ConfigManagerException("Failed to get device ID.", ret);
                 }
 
-                instanceIds.Add(new string(ptrInstanceBuf).ToUpperInvariant());
+                instanceIds.Add(new string(instanceBuffer, 0, checked((int)charsRequired)).ToUpperInvariant());
             }
         }
         finally
