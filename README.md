@@ -1,7 +1,7 @@
 # <img src="assets/NSS-128x128.png" align="left" />Nefarius.Utilities.DeviceManagement
 
 [![.NET](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml/badge.svg)](https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/actions/workflows/build.yml)
-![Requirements](https://img.shields.io/badge/Requires-.NET%20Standard%202.0-blue.svg)
+![Requirements](https://img.shields.io/badge/Requires-.NET%20Standard%202.0%2B-blue.svg)
 [![Nuget](https://img.shields.io/nuget/v/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
 [![Nuget](https://img.shields.io/nuget/dt/Nefarius.Utilities.DeviceManagement)](https://www.nuget.org/packages/Nefarius.Utilities.DeviceManagement/)
 
@@ -35,7 +35,13 @@ dotnet test Tests/Tests.csproj -c Release --filter "Category=Unit|Category=CI"
 
 ## Examples
 
-Some usage examples of the core library features are presented below.
+Some usage examples of the core library features are presented below. Samples assume:
+
+```csharp
+using Nefarius.Utilities.DeviceManagement.Drivers;
+using Nefarius.Utilities.DeviceManagement.Extensions;
+using Nefarius.Utilities.DeviceManagement.PnP;
+```
 
 ### Enumerate all USB devices
 
@@ -144,11 +150,10 @@ Devcon.Refresh();
 ### Cycle hub port a given USB device is attached to
 
 ```csharp
-if (Devcon.FindByInterfaceGuid(HostRadio.DeviceInterface, out PnPDevice radioDevice))
+if (Devcon.FindByInterfaceGuid(DeviceInterfaceIds.UsbDevice, out PnPDevice device))
 {
-    UsbPnPDevice? usbHostRadio = radioDevice.ToUsbPnPDevice();
-
-    usbHostRadio.CyclePort();
+    UsbPnPDevice usbDevice = device.ToUsbPnPDevice();
+    usbDevice.CyclePort();
 }
 ```
 

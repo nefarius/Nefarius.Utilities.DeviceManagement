@@ -127,9 +127,11 @@ public static class Devcon
                     ref bufferSize,
                     ref da
                 );
-                {
-                    IntPtr detailDataBuffer = Marshal.AllocHGlobal(bufferSize);
 
+                IntPtr detailDataBuffer = Marshal.AllocHGlobal(bufferSize);
+
+                try
+                {
                     Marshal.WriteInt32(detailDataBuffer,
                         IntPtr.Size == 4 ? 4 + Marshal.SystemDefaultCharSize : 8);
 
@@ -160,10 +162,10 @@ public static class Devcon
                             return true;
                         }
                     }
-                    else
-                    {
-                        Marshal.FreeHGlobal(detailDataBuffer);
-                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(detailDataBuffer);
                 }
 
                 memberIndex++;
@@ -197,6 +199,12 @@ public static class Devcon
     {
         bool ret = FindByInterfaceGuid(target, out _, out string instanceId, instance, presentOnly);
 
+        if (!ret)
+        {
+            device = null!;
+            return false;
+        }
+
         device = PnPDevice.GetDeviceByInstanceId(
             instanceId,
             presentOnly
@@ -204,17 +212,17 @@ public static class Devcon
                 : DeviceLocationFlags.Phantom
         );
 
-        return ret;
+        return true;
     }
 
     /// <summary>
     ///     Searches for devices matching the provided interface GUID and returns the device path and instance ID.
     /// </summary>
-    /// <param name="target">The class GUID to enumerate.</param>
+    /// <param name="target">The interface GUID to enumerate.</param>
     /// <param name="path">The device path of the enumerated device.</param>
     /// <param name="instanceId">The instance ID of the enumerated device.</param>
     /// <param name="instance">Optional instance ID (zero-based) specifying the device to process on multiple matches.</param>
-    /// <returns>True if at least one device was found with the provided class, false otherwise.</returns>
+    /// <returns>True if at least one device was found with the provided interface, false otherwise.</returns>
     /// <remarks>
     ///     This is here for backwards compatibility, please use
     ///     <see cref="FindByInterfaceGuid(System.Guid,out string,out string,int,bool)" /> instead.
@@ -305,7 +313,7 @@ public static class Devcon
     }
 
     /// <summary>
-    ///     Removed a device node identified by class GUID, path and instance ID.
+    ///     Removes a device node identified by class GUID and instance ID.
     /// </summary>
     /// <param name="classGuid">The device class GUID.</param>
     /// <param name="instanceId">The instance ID.</param>
@@ -316,7 +324,7 @@ public static class Devcon
     }
 
     /// <summary>
-    ///     Removed a device node identified by interface GUID and instance ID.
+    ///     Removes a device node identified by class GUID and instance ID.
     /// </summary>
     /// <param name="classGuid">The device class GUID.</param>
     /// <param name="instanceId">The instance ID.</param>

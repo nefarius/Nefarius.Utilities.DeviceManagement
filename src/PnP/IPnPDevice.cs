@@ -52,6 +52,11 @@ public interface IPnPDevice
     ///     Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
     ///     force-closed.
     /// </summary>
+    /// <remarks>
+    ///     This method removes and re-enumerates (adds) the device node, which might cause unintended side effects. If
+    ///     this is the behavior you seek, consider using <see cref="PnPDevice.RemoveAndSetup" /> instead.
+    /// </remarks>
+    [Obsolete("This method can cause unintended side-effects, see remarks for details.")]
     void Restart();
 
     /// <summary>

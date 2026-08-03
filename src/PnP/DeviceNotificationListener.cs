@@ -10,6 +10,8 @@ using Windows.Win32;
 using Windows.Win32.Foundation;
 using Windows.Win32.UI.WindowsAndMessaging;
 
+using Nefarius.Utilities.DeviceManagement.Exceptions;
+
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 /// <summary>
@@ -20,9 +22,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 {
     private readonly List<DeviceEventRegistration> _arrivedRegistrations = new();
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly object _sync = new();
 
     private readonly List<ListenerItem> _listeners = new();
     private readonly List<DeviceEventRegistration> _removedRegistrations = new();
+    private bool _disposed;
 
     /// <summary>
     ///     Gets invoked when a new device has arrived (plugged in).
@@ -76,11 +80,21 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
     private void Dispose(bool disposing)
     {
-        if (disposing)
+        if (!disposing || _disposed)
+        {
+            return;
+        }
+
+        StopListen();
+
+        lock (_sync)
         {
             _arrivedRegistrations.Clear();
             _removedRegistrations.Clear();
         }
+
+        _cancellationTokenSource.Dispose();
+        _disposed = true;
     }
 
     private class ListenerItem
@@ -106,12 +120,15 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
     public void RegisterDeviceArrived(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
     {
-        if (_arrivedRegistrations.All(i => i.Handler != handler))
+        lock (_sync)
         {
-            _arrivedRegistrations.Add(new DeviceEventRegistration
+            if (_arrivedRegistrations.All(i => i.Handler != handler))
             {
-                Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
-            });
+                _arrivedRegistrations.Add(new DeviceEventRegistration
+                {
+                    Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
+                });
+            }
         }
     }
 
@@ -121,12 +138,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="handler">The event handler to unsubscribe.</param>
     public void UnregisterDeviceArrived(Action<DeviceEventArgs> handler)
     {
-        foreach (DeviceEventRegistration arrivedRegistration in _arrivedRegistrations.ToList())
+        lock (_sync)
         {
-            if (arrivedRegistration.Handler == handler)
-            {
-                _arrivedRegistrations.Remove(arrivedRegistration);
-            }
+            _arrivedRegistrations.RemoveAll(i => i.Handler == handler);
         }
     }
 
@@ -137,12 +151,15 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="interfaceGuid">The interface GUID to get notified for or null to get notified for all listening GUIDs.</param>
     public void RegisterDeviceRemoved(Action<DeviceEventArgs> handler, Guid? interfaceGuid = null)
     {
-        if (_removedRegistrations.All(i => i.Handler != handler))
+        lock (_sync)
         {
-            _removedRegistrations.Add(new DeviceEventRegistration
+            if (_removedRegistrations.All(i => i.Handler != handler))
             {
-                Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
-            });
+                _removedRegistrations.Add(new DeviceEventRegistration
+                {
+                    Handler = handler, InterfaceGuid = interfaceGuid ?? Guid.Empty
+                });
+            }
         }
     }
 
@@ -152,12 +169,9 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="handler">The event handler to unsubscribe.</param>
     public void UnregisterDeviceRemoved(Action<DeviceEventArgs> handler)
     {
-        foreach (DeviceEventRegistration removedRegistration in _removedRegistrations.ToList())
+        lock (_sync)
         {
-            if (removedRegistration.Handler == handler)
-            {
-                _removedRegistrations.Remove(removedRegistration);
-            }
+            _removedRegistrations.RemoveAll(i => i.Handler == handler);
         }
     }
 
@@ -220,7 +234,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         DeviceArrived?.Invoke(args);
 
-        foreach (DeviceEventRegistration arrivedRegistration in _arrivedRegistrations)
+        List<DeviceEventRegistration> snapshot;
+        lock (_sync)
+        {
+            snapshot = _arrivedRegistrations.ToList();
+        }
+
+        foreach (DeviceEventRegistration arrivedRegistration in snapshot)
         {
             if (arrivedRegistration.InterfaceGuid == args.InterfaceGuid ||
                 arrivedRegistration.InterfaceGuid == Guid.Empty)
@@ -234,7 +254,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     {
         DeviceRemoved?.Invoke(args);
 
-        foreach (DeviceEventRegistration removedRegistration in _removedRegistrations)
+        List<DeviceEventRegistration> snapshot;
+        lock (_sync)
+        {
+            snapshot = _removedRegistrations.ToList();
+        }
+
+        foreach (DeviceEventRegistration removedRegistration in snapshot)
         {
             if (removedRegistration.InterfaceGuid == args.InterfaceGuid ||
                 removedRegistration.InterfaceGuid == Guid.Empty)
@@ -255,8 +281,18 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// <param name="interfaceGuid">The device interface GUID to listen for.</param>
     public void StartListen(Guid interfaceGuid)
     {
-        if (_listeners.All(i => i.InterfaceGuid != interfaceGuid))
+        if (_disposed)
         {
+            throw new ObjectDisposedException(nameof(DeviceNotificationListener));
+        }
+
+        lock (_sync)
+        {
+            if (_listeners.Any(i => i.InterfaceGuid == interfaceGuid))
+            {
+                return;
+            }
+
             Thread listenerThread = new(Start);
             ListenerItem listenerItem = new() { InterfaceGuid = interfaceGuid, Thread = listenerThread };
             _listeners.Add(listenerItem);
@@ -287,7 +323,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             windowClass.lpszClassName = pClassName;
 
-            PInvoke.RegisterClassEx(windowClass);
+            ushort atom = PInvoke.RegisterClassEx(windowClass);
+            if (atom == 0)
+            {
+                throw new Win32Exception("Failed to register device notification window class.");
+            }
 
             listenerItem.WindowHandle = PInvoke.CreateWindowEx(
                 0,
@@ -299,6 +339,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 HMENU.Null,
                 new HMODULE(hInst.DangerousGetHandle())
             );
+
+            if (listenerItem.WindowHandle.IsNull)
+            {
+                throw new Win32Exception("Failed to create device notification message window.");
+            }
         }
 
         MessagePump();
@@ -311,15 +356,42 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
     /// </summary>
     public void StopListen(Guid? interfaceGuid = null)
     {
-        _cancellationTokenSource.Cancel();
-
-        foreach (ListenerItem listenerItem in _listeners.ToList())
+        if (_disposed)
         {
-            if (interfaceGuid == null || listenerItem.InterfaceGuid == interfaceGuid)
+            return;
+        }
+
+        List<ListenerItem> toStop;
+        lock (_sync)
+        {
+            toStop = _listeners
+                .Where(i => interfaceGuid == null || i.InterfaceGuid == interfaceGuid)
+                .ToList();
+        }
+
+        if (toStop.Count == 0)
+        {
+            return;
+        }
+
+        // Shared CTS: cancelling stops every listener's message pump.
+        if (!_cancellationTokenSource.IsCancellationRequested)
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
+        foreach (ListenerItem listenerItem in toStop)
+        {
+            UnregisterUsbDeviceNotification(listenerItem.NotificationHandle);
+            if (!listenerItem.WindowHandle.IsNull)
             {
-                UnregisterUsbDeviceNotification(listenerItem.NotificationHandle);
                 PInvoke.PostMessage(listenerItem.WindowHandle, PInvoke.WM_QUIT, new WPARAM(0), new LPARAM(0));
-                listenerItem.Thread.Join(TimeSpan.FromSeconds(3));
+            }
+
+            listenerItem.Thread.Join(TimeSpan.FromSeconds(3));
+
+            lock (_sync)
+            {
                 _listeners.Remove(listenerItem);
             }
         }
@@ -361,7 +433,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
     private unsafe void RegisterUsbDeviceNotification(Guid interfaceGuid, HANDLE windowHandle)
     {
-        ListenerItem listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
+        ListenerItem listenerItem;
+        lock (_sync)
+        {
+            listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
+        }
 
         DEV_BROADCAST_DEVICEINTERFACE dbcc = new()
         {

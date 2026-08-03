@@ -9,7 +9,7 @@ using Windows.Win32.Devices.Properties;
 using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
-using Nefarius.Utilities.DeviceManagement.Util;
+using Nefarius.Utilities.DeviceManagement.Internal;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
@@ -106,75 +106,7 @@ public partial class PnPDevice
                 );
             }
 
-            #region Don't look, nasty trickery
-
-            /*
-             * Handle some native to managed conversions
-             */
-
-            // Regular strings
-            if (managedType == typeof(string))
-            {
-                string? value = Marshal.PtrToStringUni(buffer);
-                return (T)Convert.ChangeType(value, typeof(T));
-            }
-
-            // Double-null-terminated string to list
-            if (managedType == typeof(string[]))
-            {
-                return (T)(object)Marshal.PtrToStringUni(buffer, (int)size / 2).TrimEnd('\0').Split('\0')
-                    .ToArray();
-            }
-
-            // Byte & SByte
-            if (managedType == typeof(sbyte)
-                || managedType == typeof(byte))
-            {
-                return (T)(object)Marshal.ReadByte(buffer);
-            }
-
-            // (U)Int16
-            if (managedType == typeof(short)
-                || managedType == typeof(ushort))
-            {
-                return (T)(object)(ushort)Marshal.ReadInt16(buffer);
-            }
-
-            // (U)Int32
-            if (managedType == typeof(int)
-                || managedType == typeof(uint))
-            {
-                return (T)Convert.ChangeType(Marshal.ReadInt32(buffer), managedType);
-            }
-
-            // (U)Int64
-            if (managedType == typeof(long)
-                || managedType == typeof(ulong))
-            {
-                return (T)(object)(ulong)Marshal.ReadInt64(buffer);
-            }
-
-            // FILETIME/DateTimeOffset
-            if (managedType == typeof(DateTimeOffset))
-            {
-                return (T)(object)DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
-            }
-
-            // GUID
-            if (managedType == typeof(Guid))
-            {
-                return (T)(object)Marshal.PtrToStructure<Guid>(buffer);
-            }
-
-            // BOOLEAN
-            if (managedType == typeof(bool))
-            {
-                return (T)(object)(Marshal.ReadByte(buffer) != 0);
-            }
-
-            #endregion
-
-            throw new NotImplementedException($"Type {managedType} not supported.");
+            return (T)DevicePropertyMarshal.Read(buffer, size, managedType);
         }
         finally
         {
@@ -204,91 +136,7 @@ public partial class PnPDevice
 
         DEVPROPTYPE nativePropType = NativeToManagedTypeMap.FirstOrDefault(t => t.Value == managedType).Key;
 
-        uint propBufSize = 0;
-
-        IntPtr buffer = IntPtr.Zero;
-
-        #region Don't look, nasty trickery
-
-        /*
-         * Handle some native to managed conversions
-         */
-
-        // Regular strings
-        if (managedType == typeof(string))
-        {
-            string value = (string)(object)propertyValue;
-            buffer = Marshal.StringToHGlobalUni(value);
-            propBufSize = (uint)((value.Length + 1) * 2);
-        }
-
-        // Double-null-terminated string to list
-        if (managedType == typeof(string[]))
-        {
-            string[] value = (string[])(object)propertyValue;
-            buffer = value.StringArrayToMultiSzPointer(out int length);
-            propBufSize = (uint)length;
-        }
-
-        // Byte & SByte
-        if (managedType == typeof(sbyte)
-            || managedType == typeof(byte))
-        {
-            byte value = (byte)(object)propertyValue;
-            propBufSize = (uint)Marshal.SizeOf(managedType);
-            buffer = Marshal.AllocHGlobal((int)propBufSize);
-            Marshal.WriteByte(buffer, value);
-        }
-
-        /*
-        // (U)Int16
-        if (managedType == typeof(short)
-            || managedType == typeof(ushort))
-            return (T) (object) (ushort) Marshal.ReadInt16(buffer);
-        */
-        // (U)Int32
-        if (managedType == typeof(int)
-            || managedType == typeof(uint))
-        {
-            uint value = (uint)(object)propertyValue;
-            propBufSize = (uint)Marshal.SizeOf(managedType);
-            buffer = Marshal.AllocHGlobal((int)propBufSize);
-            Marshal.WriteInt32(buffer, (int)value);
-        }
-        /*
-        // (U)Int64
-        if (managedType == typeof(long)
-            || managedType == typeof(ulong))
-            return (T) (object) (ulong) Marshal.ReadInt64(buffer);
-
-        // FILETIME/DateTimeOffset
-        if (managedType == typeof(DateTimeOffset))
-            return (T) (object) DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
-        */
-
-        // Guid
-        if (managedType == typeof(Guid))
-        {
-            Guid value = (Guid)(object)propertyValue;
-            Marshal.StructureToPtr(value, buffer, false);
-            propBufSize = (uint)Marshal.SizeOf(managedType);
-        }
-
-        // bool
-        if (managedType == typeof(bool))
-        {
-            byte value = (byte)(object)propertyValue;
-            propBufSize = (uint)Marshal.SizeOf(managedType);
-            buffer = Marshal.AllocHGlobal((int)propBufSize);
-            Marshal.WriteByte(buffer, value);
-        }
-
-        #endregion
-
-        if (buffer == IntPtr.Zero)
-        {
-            throw new NotImplementedException($"Type {managedType} not supported.");
-        }
+        IntPtr buffer = DevicePropertyMarshal.Write(propertyValue!, managedType, out uint propBufSize);
 
         try
         {

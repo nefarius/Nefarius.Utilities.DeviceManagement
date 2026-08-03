@@ -108,9 +108,10 @@ public class UsbPnPDevice : PnPDevice
                     throw new ConfigManagerException("Failed to get device interface list.", ret);
                 }
 
-                string hubPath = listBuffer.ToString();
+                int nullIndex = listBuffer.IndexOf('\0');
+                string hubPath = (nullIndex >= 0 ? listBuffer.Slice(0, nullIndex) : listBuffer).ToString();
 
-                if (hubPath is null)
+                if (string.IsNullOrEmpty(hubPath))
                 {
                     throw new UsbPnPDeviceRestartException("Failed to get device interface path.");
                 }
