@@ -12,6 +12,7 @@ using Windows.Win32.System.Registry;
 using Microsoft.Win32.SafeHandles;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Nefarius.Utilities.DeviceManagement.Internal;
 using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
@@ -198,15 +199,9 @@ public sealed class DeviceClassFilters
             }
 
             List<string> elements = ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired).ToList();
+            IReadOnlyList<string> updated = FilterServiceList.Add(elements, service);
 
-            elements.Add(service);
-
-            IntPtr rawBuffer = elements
-                // strip empty entries
-                .Where(e => !string.IsNullOrWhiteSpace(e))
-                // remove duplicates
-                .Distinct()
-                .StringArrayToMultiSzPointer(out int length);
+            IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
 
             status = PInvoke.RegSetValueEx(
                 key,
@@ -226,14 +221,9 @@ public sealed class DeviceClassFilters
         if (status == WIN32_ERROR.ERROR_FILE_NOT_FOUND)
         {
             type = REG_VALUE_TYPE.REG_MULTI_SZ;
-            List<string> elements = new() { service };
+            IReadOnlyList<string> updated = FilterServiceList.Add(null, service);
 
-            IntPtr rawBuffer = elements
-                // strip empty entries
-                .Where(e => !string.IsNullOrWhiteSpace(e))
-                // remove duplicates
-                .Distinct()
-                .StringArrayToMultiSzPointer(out int length);
+            IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
 
             status = PInvoke.RegSetValueEx(
                 key,
@@ -292,15 +282,9 @@ public sealed class DeviceClassFilters
             }
 
             List<string> elements = ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired).ToList();
+            IReadOnlyList<string> updated = FilterServiceList.Remove(elements, service);
 
-            elements.RemoveAll(e => e.Equals(service, StringComparison.OrdinalIgnoreCase));
-
-            IntPtr rawBuffer = elements
-                // strip empty entries
-                .Where(e => !string.IsNullOrWhiteSpace(e))
-                // remove duplicates
-                .Distinct()
-                .StringArrayToMultiSzPointer(out int length);
+            IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
 
             status = PInvoke.RegSetValueEx(
                 key,

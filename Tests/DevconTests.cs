@@ -8,18 +8,14 @@ namespace Tests;
 
 public class DevconTests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     /// <summary>
     ///     Tests <see cref="Devcon.FindInDeviceClassByHardwareId(System.Guid,string)" />.
     /// </summary>
     [Test]
+    [Category(TestCategories.CI)]
     public void TestFindInDeviceClassByHardwareId()
     {
-        // High precision event timer
+        // High precision event timer — typically present on Windows PCs / CI agents
         const string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
         Assert.Multiple(() =>
         {
@@ -42,6 +38,7 @@ public class DevconTests
     ///     Looks for nonexistent hardware ID.
     /// </summary>
     [Test]
+    [Category(TestCategories.CI)]
     public void TestFindInDeviceClassByHardwareIdWithNonexistent()
     {
         Assert.Multiple(() =>
@@ -56,6 +53,8 @@ public class DevconTests
     ///     Requires BthPS3 being installed for this test to work.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestFindInDeviceClassByHardwareIdWithPartial()
     {
         string partialHardwareId = @"BTHENUM\{1cb831ea-79cd-4508-b0fc-85f7c85ae8e0}";
@@ -72,10 +71,12 @@ public class DevconTests
     ///     Requires two Xbox controllers, either 360 or One or mixed, connected for this test to work.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestFindXusbByInterfaceGuid()
     {
         AnsiConsole.MarkupLine("[yellow]Connect TWO Xbox Controllers for this test![/]");
-        
+
         // Requires two Xbox controllers, either 360 or One or mixed
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
         Assert.Multiple(() =>

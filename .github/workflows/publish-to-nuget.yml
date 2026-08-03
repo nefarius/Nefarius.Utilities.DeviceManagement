@@ -6,7 +6,36 @@ on:
       - v*
 
 jobs:
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .Net SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+
+      - name: Test Unit and CI suites
+        run: >
+          dotnet test Tests/Tests.csproj -c Release
+          --filter "Category=Unit|Category=CI"
+          --logger "trx;LogFileName=test-results.trx"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-test-results-windows
+          path: TestResults/
+
   deploy:
+    needs: test-windows
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

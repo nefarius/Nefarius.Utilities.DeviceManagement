@@ -25,6 +25,14 @@ Managed wrappers around SetupAPI, Cfgmgr32, NewDev and DrvStore Windows APIs.
 
 [Link to API docs](docs/index.md).
 
+## Testing
+
+See [TESTING.md](TESTING.md) for Unit/CI filters, hardware lab prerequisites, and how tests run in GitHub Actions.
+
+```powershell
+dotnet test Tests/Tests.csproj -c Release --filter "Category=Unit|Category=CI"
+```
+
 ## Examples
 
 Some usage examples of the core library features are presented below.

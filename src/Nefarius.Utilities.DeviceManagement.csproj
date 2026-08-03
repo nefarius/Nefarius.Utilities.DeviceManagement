@@ -54,4 +54,8 @@
         <ProjectReference Include="Generator\DeviceManagementPropertiesGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Tests"/>
+    </ItemGroup>
+
 </Project>

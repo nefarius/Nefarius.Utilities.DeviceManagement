@@ -7,15 +7,13 @@ namespace Tests;
 
 public class DeviceNotificationListenerTests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     /// <summary>
     ///     Tests detection of device arrival and removal
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Interactive)]
+    [Category(TestCategories.Hardware)]
     public void TestDeviceNotificationListener()
     {
         TimeSpan waitTime = TimeSpan.FromSeconds(10);
@@ -42,7 +40,7 @@ public class DeviceNotificationListenerTests
 
             wait.Set();
         };
-        
+
         AnsiConsole.MarkupLine("[yellow]Connect any HID device now within 10 seconds![/]");
 
         // plug in HID device now
@@ -63,7 +61,7 @@ public class DeviceNotificationListenerTests
 
             wait.Set();
         };
-        
+
         AnsiConsole.MarkupLine("[yellow]Unplug the HID device now within 10 seconds![/]");
 
         // unplug it now
