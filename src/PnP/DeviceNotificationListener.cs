@@ -366,7 +366,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
             // Root the WNDPROC for the lifetime of the registered class; an ephemeral
             // lambda can be collected while native code still holds the function pointer.
             listenerItem.WindowProc = (wnd, msg, wParam, lParam) =>
-                WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam);
+                WndProc2(listenerItem, wnd, msg, wParam, lParam);
 
             WNDCLASSEXW windowClass = new()
             {
@@ -607,18 +607,18 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private unsafe LRESULT WndProc2(Guid interfaceGuid, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
+    private unsafe LRESULT WndProc2(ListenerItem listenerItem, HWND hwnd, uint msg, WPARAM wParam, LPARAM lParam)
     {
         switch (msg)
         {
             case PInvoke.WM_CREATE:
                 {
-                    RegisterUsbDeviceNotification(interfaceGuid, new HANDLE(hwnd.Value));
+                    RegisterUsbDeviceNotification(listenerItem, new HANDLE(hwnd.Value));
                     break;
                 }
             case PInvoke.WM_DEVICECHANGE:
                 {
-                    return WndProc(interfaceGuid, hwnd, msg, wParam, lParam);
+                    return WndProc(listenerItem.InterfaceGuid, hwnd, msg, wParam, lParam);
                 }
         }
 
@@ -641,19 +641,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private unsafe void RegisterUsbDeviceNotification(Guid interfaceGuid, HANDLE windowHandle)
+    private unsafe void RegisterUsbDeviceNotification(ListenerItem listenerItem, HANDLE windowHandle)
     {
-        ListenerItem listenerItem;
-        lock (_sync)
-        {
-            listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid && !i.IsStopping);
-        }
-
         DEV_BROADCAST_DEVICEINTERFACE dbcc = new()
         {
             dbcc_size = (uint)Marshal.SizeOf(typeof(DEV_BROADCAST_DEVICEINTERFACE)),
             dbcc_devicetype = DEV_BROADCAST_HDR_DEVICE_TYPE.DBT_DEVTYP_DEVICEINTERFACE,
-            dbcc_classguid = interfaceGuid
+            dbcc_classguid = listenerItem.InterfaceGuid
         };
 
         IntPtr notificationFilter = Marshal.AllocHGlobal(Marshal.SizeOf(dbcc));
@@ -667,9 +661,19 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
             );
 
+            bool assignHandle;
             lock (_sync)
             {
-                listenerItem.NotificationHandle = notificationHandle;
+                assignHandle = !listenerItem.IsStopping;
+                if (assignHandle)
+                {
+                    listenerItem.NotificationHandle = notificationHandle;
+                }
+            }
+
+            if (!assignHandle && !notificationHandle.IsNull)
+            {
+                PInvoke.UnregisterDeviceNotification(notificationHandle);
             }
         }
         finally
