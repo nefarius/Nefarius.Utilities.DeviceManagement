@@ -115,6 +115,15 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         public Exception? StartupException { get; set; }
         public string? ClassName { get; set; }
         public HMODULE ModuleHandle { get; set; }
+        /// <summary>
+        ///     Keeps the native window procedure reachable until the window class is unregistered.
+        /// </summary>
+        public WNDPROC? WindowProc { get; set; }
+        /// <summary>
+        ///     True after <see cref="Thread.Join(TimeSpan)" /> timed out; excluded from active GUID checks
+        ///     so a replacement listener may start while this thread still winds down.
+        /// </summary>
+        public bool IsStopping { get; set; }
     }
 
     private class DeviceEventRegistration
@@ -312,7 +321,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 throw new ObjectDisposedException(nameof(DeviceNotificationListener));
             }
 
-            if (_listeners.Any(i => i.InterfaceGuid == interfaceGuid))
+            if (_listeners.Any(i => i.InterfaceGuid == interfaceGuid && !i.IsStopping))
             {
                 return;
             }
@@ -354,6 +363,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
             moduleHandle = PInvoke.GetModuleHandle(null);
             HMODULE hModule = (HMODULE)moduleHandle.DangerousGetHandle();
 
+            // Root the WNDPROC for the lifetime of the registered class; an ephemeral
+            // lambda can be collected while native code still holds the function pointer.
+            listenerItem.WindowProc = (wnd, msg, wParam, lParam) =>
+                WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam);
+
             WNDCLASSEXW windowClass = new()
             {
                 cbSize = (uint)Marshal.SizeOf<WNDCLASSEXW>(),
@@ -361,8 +375,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 cbClsExtra = 0,
                 cbWndExtra = 0,
                 hInstance = hModule,
-                lpfnWndProc = (wnd, msg, wParam, lParam) =>
-                    WndProc2(listenerItem.InterfaceGuid, wnd, msg, wParam, lParam)
+                lpfnWndProc = listenerItem.WindowProc
             };
 
             fixed (char* pClassName = className)
@@ -449,29 +462,45 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 // Normal shutdown (or pump exit): release window/class on this thread.
                 CleanupListenerResources(listenerItem, moduleHandle, classRegistered, className,
                     listenerItem.WindowHandle);
+
+                // Timed-out stops leave the item registered as IsStopping; finish cleanup here.
+                bool disposeManaged = false;
+                lock (_sync)
+                {
+                    if (listenerItem.IsStopping)
+                    {
+                        _listeners.Remove(listenerItem);
+                        disposeManaged = true;
+                    }
+                }
+
+                if (disposeManaged)
+                {
+                    listenerItem.Cancellation.Dispose();
+                    listenerItem.StartupCompleted.Dispose();
+                }
             }
 
             moduleHandle?.Dispose();
         }
     }
 
-    private static unsafe void CleanupListenerResources(
+    private unsafe void CleanupListenerResources(
         ListenerItem listenerItem,
         FreeLibrarySafeHandle? moduleHandle,
         bool classRegistered,
         string className,
         HWND windowHandle)
     {
-        if (!listenerItem.NotificationHandle.IsNull)
-        {
-            PInvoke.UnregisterDeviceNotification(listenerItem.NotificationHandle);
-            listenerItem.NotificationHandle = HDEVNOTIFY.Null;
-        }
+        UnregisterNotificationHandle(listenerItem);
 
         if (!windowHandle.IsNull)
         {
             PInvoke.DestroyWindow(windowHandle);
-            listenerItem.WindowHandle = HWND.Null;
+            lock (_sync)
+            {
+                listenerItem.WindowHandle = HWND.Null;
+            }
         }
 
         if (classRegistered && moduleHandle is not null)
@@ -480,6 +509,28 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
             {
                 PInvoke.UnregisterClass(pClassName, listenerItem.ModuleHandle);
             }
+        }
+
+        // Only release after UnregisterClass; native code may invoke the proc until then.
+        listenerItem.WindowProc = null;
+    }
+
+    /// <summary>
+    ///     Atomically takes ownership of <see cref="ListenerItem.NotificationHandle" /> under
+    ///     <see cref="_sync" /> so UnregisterDeviceNotification runs at most once per handle.
+    /// </summary>
+    private void UnregisterNotificationHandle(ListenerItem listenerItem)
+    {
+        HDEVNOTIFY notificationHandle;
+        lock (_sync)
+        {
+            notificationHandle = listenerItem.NotificationHandle;
+            listenerItem.NotificationHandle = HDEVNOTIFY.Null;
+        }
+
+        if (!notificationHandle.IsNull)
+        {
+            PInvoke.UnregisterDeviceNotification(notificationHandle);
         }
     }
 
@@ -507,7 +558,8 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         lock (_sync)
         {
             toStop = _listeners
-                .Where(i => interfaceGuid == null || i.InterfaceGuid == interfaceGuid)
+                .Where(i => !i.IsStopping &&
+                            (interfaceGuid == null || i.InterfaceGuid == interfaceGuid))
                 .ToList();
 
             foreach (ListenerItem listenerItem in toStop)
@@ -521,11 +573,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
         foreach (ListenerItem listenerItem in toStop)
         {
-            if (!listenerItem.NotificationHandle.IsNull)
-            {
-                PInvoke.UnregisterDeviceNotification(listenerItem.NotificationHandle);
-                listenerItem.NotificationHandle = HDEVNOTIFY.Null;
-            }
+            UnregisterNotificationHandle(listenerItem);
 
             HWND windowHandle;
             lock (_sync)
@@ -540,7 +588,12 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
             if (!listenerItem.Thread.Join(TimeSpan.FromSeconds(3)))
             {
-                // Leave timed-out listeners registered; the thread may still be running.
+                // Keep the item so the thread can finish cleanup, but allow StartListen to replace it.
+                lock (_sync)
+                {
+                    listenerItem.IsStopping = true;
+                }
+
                 continue;
             }
 
@@ -593,7 +646,7 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         ListenerItem listenerItem;
         lock (_sync)
         {
-            listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid);
+            listenerItem = _listeners.Single(i => i.InterfaceGuid == interfaceGuid && !i.IsStopping);
         }
 
         DEV_BROADCAST_DEVICEINTERFACE dbcc = new()
@@ -614,7 +667,10 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
             );
 
-            listenerItem.NotificationHandle = notificationHandle;
+            lock (_sync)
+            {
+                listenerItem.NotificationHandle = notificationHandle;
+            }
         }
         finally
         {
