@@ -9,6 +9,7 @@ using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Nefarius.Utilities.DeviceManagement.Internal;
 
 namespace Nefarius.Utilities.DeviceManagement.PnP;
 
@@ -192,33 +193,16 @@ public partial class PnPDevice : IPnPDevice, IEquatable<PnPDevice>
     /// </example>
     public bool IsVirtual(Func<IPnPDevice, bool>? excludeIfMatches = null)
     {
-        IPnPDevice device = this;
-
-        while (device is not null)
-        {
-            if (excludeIfMatches != null && excludeIfMatches(device))
-            {
-                return false;
-            }
-
-            string? parentId = device.GetProperty<string>(DevicePropertyKey.Device_Parent);
-
-            if (string.IsNullOrEmpty(parentId))
-            {
-                continue;
-            }
-
-            if (parentId!.Equals(@"HTREE\ROOT\0", StringComparison.OrdinalIgnoreCase))
-            {
-                break;
-            }
-
-            device = GetDeviceByInstanceId(parentId, DeviceLocationFlags.Phantom);
-        }
-
-        return device is not null &&
-               (device.InstanceId.StartsWith(@"ROOT\SYSTEM", StringComparison.OrdinalIgnoreCase)
-                || device.InstanceId.StartsWith(@"ROOT\USB", StringComparison.OrdinalIgnoreCase));
+        return VirtualDeviceEvaluator.WalkAndEvaluate(
+            InstanceId,
+            instanceId => DeviceManagementNative.Current.GetParentInstanceId(instanceId),
+            excludeIfMatches is null
+                ? null
+                : instanceId =>
+                {
+                    IPnPDevice device = GetDeviceByInstanceId(instanceId, DeviceLocationFlags.Phantom);
+                    return excludeIfMatches(device);
+                });
     }
 
     /// <summary>

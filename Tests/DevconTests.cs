@@ -8,25 +8,35 @@ namespace Tests;
 
 public class DevconTests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
-
     /// <summary>
     ///     Tests <see cref="Devcon.FindInDeviceClassByHardwareId(System.Guid,string)" />.
     /// </summary>
     [Test]
+    [Category(TestCategories.CI)]
     public void TestFindInDeviceClassByHardwareId()
     {
-        // High precision event timer
-        const string hardwareId = @"ACPI\VEN_PNP&DEV_0103";
+        // Discover a present HID interface device. Use its reported class GUID — interface
+        // devices are not always under DeviceClassIds.HumanInterfaceDevices on cloud VMs.
+        Assert.That(
+            Devcon.FindByInterfaceGuid(DeviceInterfaceIds.HidDevice, out _, out string? instanceId),
+            Is.True,
+            "Expected at least one HID device interface.");
+
+        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        Guid classGuid = device.GetProperty<Guid>(DevicePropertyKey.Device_ClassGuid);
+        Assert.That(classGuid, Is.Not.EqualTo(Guid.Empty));
+
+        string[]? hardwareIds = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
+        Assert.That(hardwareIds, Is.Not.Null.And.Not.Empty);
+
+        string hardwareId = hardwareIds![0];
+
         Assert.Multiple(() =>
         {
             Assert.That(
-                Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.System, hardwareId,
-                    out IEnumerable<string>? instances), Is.True);
-            Assert.That(instances.Count(), Is.EqualTo(1));
+                Devcon.FindInDeviceClassByHardwareId(classGuid, hardwareId,
+                    out IEnumerable<string>? instances, presentOnly: true), Is.True);
+            Assert.That(instances.Any(id => id.Equals(instanceId, StringComparison.OrdinalIgnoreCase)), Is.True);
         });
 
         // not a class GUID
@@ -42,6 +52,7 @@ public class DevconTests
     ///     Looks for nonexistent hardware ID.
     /// </summary>
     [Test]
+    [Category(TestCategories.CI)]
     public void TestFindInDeviceClassByHardwareIdWithNonexistent()
     {
         Assert.Multiple(() =>
@@ -56,6 +67,8 @@ public class DevconTests
     ///     Requires BthPS3 being installed for this test to work.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestFindInDeviceClassByHardwareIdWithPartial()
     {
         string partialHardwareId = @"BTHENUM\{1cb831ea-79cd-4508-b0fc-85f7c85ae8e0}";
@@ -72,10 +85,12 @@ public class DevconTests
     ///     Requires two Xbox controllers, either 360 or One or mixed, connected for this test to work.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestFindXusbByInterfaceGuid()
     {
         AnsiConsole.MarkupLine("[yellow]Connect TWO Xbox Controllers for this test![/]");
-        
+
         // Requires two Xbox controllers, either 360 or One or mixed
         Guid xusbInterfaceGuid = Guid.Parse("{EC87F1E3-C13B-4100-B5F7-8B84D54260CB}");
         Assert.Multiple(() =>

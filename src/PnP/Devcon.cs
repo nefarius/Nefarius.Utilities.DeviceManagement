@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.InteropServices;
 
 using Windows.Win32;
@@ -9,6 +8,7 @@ using Windows.Win32.Devices.DeviceAndDriverInstallation;
 using Windows.Win32.Foundation;
 
 using Nefarius.Utilities.DeviceManagement.Exceptions;
+using Nefarius.Utilities.DeviceManagement.Internal;
 
 using Win32Exception = System.ComponentModel.Win32Exception;
 
@@ -58,87 +58,28 @@ public static class Devcon
     /// <param name="presentOnly">True to filter currently plugged in devices, false to get all matching devices.</param>
     /// <param name="allowPartial">True to match substrings, false to match the exact ID value.</param>
     /// <returns>True if found, false otherwise.</returns>
-    public static unsafe bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
+    public static bool FindInDeviceClassByHardwareId(Guid target, string hardwareId,
         out IEnumerable<string> instanceIds, bool presentOnly, bool allowPartial = false /* backwards compatibility */)
     {
-        instanceIds = new List<string>();
-        bool found = false;
-        SetupApi.SP_DEVINFO_DATA deviceInfoData = new();
-        deviceInfoData.cbSize = Marshal.SizeOf(deviceInfoData);
-        HDEVINFO deviceInfoSet = SetupApi.SetupDiGetClassDevs(
-            ref target,
-            IntPtr.Zero,
-            HWND.Null,
-            presentOnly ? (uint)SETUP_DI_GET_CLASS_DEVS_FLAGS.DIGCF_PRESENT : 0
-        );
+        List<string> matches = new();
 
-        try
+        foreach (string instanceId in DeviceManagementNative.Current.EnumerateDeviceInstanceIds(target, presentOnly))
         {
-            for (
-                uint i = 0;
-                SetupApi.SetupDiEnumDeviceInfo(deviceInfoSet, i, ref deviceInfoData);
-                i++
-            )
+            string[]? property = DeviceManagementNative.Current.GetHardwareIds(instanceId, presentOnly);
+
+            if (property is null)
             {
-                CONFIGRET ret = PInvoke.CM_Get_Device_ID_Size(out uint charsRequired, deviceInfoData.DevInst, 0);
-
-                if (ret != CONFIGRET.CR_SUCCESS)
-                {
-                    throw new ConfigManagerException("Failed to get device ID size.", ret);
-                }
-
-                uint nBytes = (charsRequired + 1) * 2;
-#pragma warning disable CA2014
-                // ReSharper disable once StackAllocInsideLoop
-                char* ptrInstanceBuf = stackalloc char[(int)nBytes];
-#pragma warning restore CA2014
-
-                ret = PInvoke.CM_Get_Device_IDW(deviceInfoData.DevInst, ptrInstanceBuf, charsRequired, 0);
-
-                if (ret != CONFIGRET.CR_SUCCESS)
-                {
-                    throw new ConfigManagerException("Failed to get device ID.", ret);
-                }
-
-                string instanceId = new string(ptrInstanceBuf).ToUpperInvariant();
-
-                PnPDevice device = PnPDevice.GetDeviceByInstanceId(
-                    instanceId,
-                    presentOnly
-                        ? DeviceLocationFlags.Normal
-                        : DeviceLocationFlags.Phantom
-                );
-
-                string[]? property = device.GetProperty<string[]>(DevicePropertyKey.Device_HardwareIds);
-
-                if (property is null)
-                {
-                    continue;
-                }
-
-                List<string> hardwareIds = property.Select(id => id.ToUpperInvariant()).ToList();
-
-                if (
-                    /* partial match */
-                    (allowPartial && hardwareIds.Any(id => id.Contains(hardwareId.ToUpperInvariant()))) ||
-                    /* exact match */
-                    (!allowPartial && hardwareIds.Contains(hardwareId, StringComparer.OrdinalIgnoreCase))
-                )
-                {
-                    ((List<string>)instanceIds).Add(instanceId);
-                    found = true;
-                }
+                continue;
             }
-        }
-        finally
-        {
-            if (deviceInfoSet != IntPtr.Zero)
+
+            if (HardwareIdMatcher.Matches(property, hardwareId, allowPartial))
             {
-                SetupApi.SetupDiDestroyDeviceInfoList(deviceInfoSet);
+                matches.Add(instanceId);
             }
         }
 
-        return found;
+        instanceIds = matches;
+        return matches.Count > 0;
     }
 
     /// <summary>

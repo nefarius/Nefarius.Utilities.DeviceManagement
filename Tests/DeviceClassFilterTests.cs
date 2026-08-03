@@ -1,11 +1,13 @@
 ﻿using Nefarius.Utilities.DeviceManagement.Exceptions;
 using Nefarius.Utilities.DeviceManagement.PnP;
 
-using NUnit.Framework.Legacy;
-
 namespace Tests;
 #pragma warning disable CS1591
 
+[Explicit]
+[Category(TestCategories.Destructive)]
+[Category(TestCategories.Admin)]
+[Category(TestCategories.Hardware)]
 public class DeviceClassFilterTests
 {
     /// <summary>
@@ -22,11 +24,6 @@ public class DeviceClassFilterTests
     ///     Requires USBPcap to be installed to work!
     /// </summary>
     private const string Service03 = "USBPcap";
-
-    [SetUp]
-    public void Setup()
-    {
-    }
 
     /// <summary>
     ///     Tests for <see cref="DeviceClassFilters" />.

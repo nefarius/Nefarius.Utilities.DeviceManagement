@@ -9,21 +9,28 @@ namespace Tests;
 
 public class PnPDeviceTests
 {
-    [SetUp]
-    public void Setup()
-    {
-    }
+    private const string DualSenseHardwareId = @"USB\VID_054C&PID_0CE6";
 
     /// <summary>
     ///     Requires one physical (or virtual) DualSense controller.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
+    [Category(TestCategories.Destructive)]
+    [Category(TestCategories.Admin)]
     public void TestPnPDeviceInstallCustomDriver()
     {
-        const string instanceId = @"USB\VID_054C&PID_0CE6&MI_03\9&DC32669&3&0003";
+        Assert.That(
+            Devcon.FindInDeviceClassByHardwareId(DeviceClassIds.Usb, DualSenseHardwareId,
+                out IEnumerable<string>? instances, true, true),
+            Is.True,
+            "Connect a DualSense (VID_054C&PID_0CE6) for this test.");
 
-        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
+        string? instanceId = instances.FirstOrDefault();
+        Assert.That(instanceId, Is.Not.Null.And.Not.Empty);
 
+        PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId!);
         device.InstallCustomDriver("winusb.inf");
     }
 
@@ -31,13 +38,17 @@ public class PnPDeviceTests
     ///     Requires one emulated X360 controller.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
+    [Category(TestCategories.Destructive)]
+    [Category(TestCategories.Admin)]
     public void TestPnPDeviceInstallNullDriver()
     {
         Assert.That(Devcon.FindByInterfaceGuid(DeviceInterfaceIds.XUsbDevice, out string? path, out string? instanceId),
-            Is.True);
+            Is.True,
+            "Connect an emulated X360 controller for this test.");
 
         PnPDevice device = PnPDevice.GetDeviceByInstanceId(instanceId);
-
         device.InstallNullDriver();
     }
 
@@ -45,6 +56,7 @@ public class PnPDeviceTests
     ///     Tests grabbing driver metadata from the first found HID device.
     /// </summary>
     [Test]
+    [Category(TestCategories.CI)]
     public void TestGetDriverMeta()
     {
         Assert.Multiple(() =>
@@ -52,17 +64,19 @@ public class PnPDeviceTests
             Assert.That(
                 Devcon.FindByInterfaceGuid(DeviceInterfaceIds.HidDevice, out string? path, out string? instanceId),
                 Is.True);
-            Assert.That(instanceId, Is.Not.Null.Or.Empty);
+            Assert.That(instanceId, Is.Not.Null.And.Not.Empty);
 
             PnPDevice? device = PnPDevice.GetDeviceByInterfaceId(path);
             Assert.That(device, Is.Not.Null);
 
-            DriverMeta? meta = device.GetCurrentDriver();
+            DriverMeta? meta = device!.GetCurrentDriver();
             Assert.That(meta, Is.Not.Null);
         });
     }
 
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestGetInstanceIdFromInterfaceId()
     {
         AnsiConsole.MarkupLine("[yellow]Connect ONE Xbox Controller for this test![/]");
@@ -84,6 +98,8 @@ public class PnPDeviceTests
     ///     Requires one emulated X360 controller.
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestPnPDeviceIsVirtual()
     {
         AnsiConsole.MarkupLine("[yellow]Connect ONE VIRTUAL Xbox 360 Controller for this test![/]");
@@ -112,6 +128,8 @@ public class PnPDeviceTests
     ///     https://github.com/nefarius/Nefarius.Utilities.DeviceManagement/issues/85
     /// </summary>
     [Test]
+    [Explicit]
+    [Category(TestCategories.Hardware)]
     public void TestPnPDeviceGetBooleanBluetoothProperty()
     {
         int instances = 0;
