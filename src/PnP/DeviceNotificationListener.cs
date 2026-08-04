@@ -411,17 +411,39 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
 
                 if (windowHandle.IsNull)
                 {
-                    throw new Win32Exception("Failed to create device notification message window.");
+                    Exception createFailure;
+                    lock (_sync)
+                    {
+                        // WM_CREATE may have already stored a RegisterDeviceNotification failure.
+                        createFailure = listenerItem.StartupException ??
+                                        new Win32Exception(
+                                            "Failed to create device notification message window.");
+                        listenerItem.StartupException = createFailure;
+                    }
+
+                    throw createFailure;
                 }
 
+                Exception? registrationFailure = null;
                 lock (_sync)
                 {
                     listenerItem.WindowHandle = windowHandle;
 
-                    if (listenerItem.Cancellation.IsCancellationRequested)
+                    if (listenerItem.NotificationHandle.IsNull)
+                    {
+                        listenerItem.StartupException ??= new Win32Exception(
+                            "Failed to register device notification.");
+                        registrationFailure = listenerItem.StartupException;
+                    }
+                    else if (listenerItem.Cancellation.IsCancellationRequested)
                     {
                         return;
                     }
+                }
+
+                if (registrationFailure is not null)
+                {
+                    throw registrationFailure;
                 }
             }
 
@@ -613,7 +635,12 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         {
             case PInvoke.WM_CREATE:
                 {
-                    RegisterUsbDeviceNotification(listenerItem, new HANDLE(hwnd.Value));
+                    // Must not throw across the native callback; return -1 to fail CreateWindowEx.
+                    if (!RegisterUsbDeviceNotification(listenerItem, new HANDLE(hwnd.Value)))
+                    {
+                        return new LRESULT(-1);
+                    }
+
                     break;
                 }
             case PInvoke.WM_DEVICECHANGE:
@@ -641,7 +668,11 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
         }
     }
 
-    private unsafe void RegisterUsbDeviceNotification(ListenerItem listenerItem, HANDLE windowHandle)
+    /// <returns>
+    ///     True when a notification handle was assigned to <paramref name="listenerItem" />; false on failure
+    ///     (with <see cref="ListenerItem.StartupException" /> set) or if the item is already stopping.
+    /// </returns>
+    private unsafe bool RegisterUsbDeviceNotification(ListenerItem listenerItem, HANDLE windowHandle)
     {
         DEV_BROADCAST_DEVICEINTERFACE dbcc = new()
         {
@@ -661,6 +692,18 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 REGISTER_NOTIFICATION_FLAGS.DEVICE_NOTIFY_WINDOW_HANDLE
             );
 
+            if (notificationHandle.IsNull)
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+                lock (_sync)
+                {
+                    listenerItem.StartupException ??= new Win32Exception(
+                        "Failed to register device notification.", errorCode);
+                }
+
+                return false;
+            }
+
             bool assignHandle;
             lock (_sync)
             {
@@ -671,10 +714,13 @@ public sealed class DeviceNotificationListener : IDeviceNotificationListener, ID
                 }
             }
 
-            if (!assignHandle && !notificationHandle.IsNull)
+            if (!assignHandle)
             {
                 PInvoke.UnregisterDeviceNotification(notificationHandle);
+                return false;
             }
+
+            return true;
         }
         finally
         {
