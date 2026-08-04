@@ -2,6 +2,12 @@
 
 Namespace: Nefarius.Utilities.DeviceManagement.Drivers
 
+#### Caution
+
+Use Nefarius.Utilities.DeviceManagement.PnP.DeviceClassFilters instead.
+
+---
+
 Utility class to simplify interaction with filter driver entries.
 
 ```csharp
@@ -9,7 +15,11 @@ public static class FilterDrivers
 ```
 
 Inheritance [Object](https://learn.microsoft.com/dotnet/api/system.object) → [FilterDrivers](./nefarius.utilities.devicemanagement.drivers.filterdrivers.md)<br>
-Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md)
+Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullablecontextattribute.md), [NullableAttribute](./system.runtime.compilerservices.nullableattribute.md), [ObsoleteAttribute](https://learn.microsoft.com/dotnet/api/system.obsoleteattribute)
+
+**Remarks:**
+
+Prefer [DeviceClassFilters](./nefarius.utilities.devicemanagement.pnp.deviceclassfilters.md) which validates services and uses SetupAPI class registry keys.
 
 ## Methods
 

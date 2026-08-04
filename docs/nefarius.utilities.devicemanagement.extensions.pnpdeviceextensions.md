@@ -33,7 +33,7 @@ The [DriverMeta](./nefarius.utilities.devicemanagement.drivers.drivermeta.md) in
 #### Exceptions
 
 [InvalidOperationException](https://learn.microsoft.com/dotnet/api/system.invalidoperationexception)<br>
-Thrown if registry access failed.
+Thrown if registry access failed or required driver values are missing/malformed.
 
 ### <a id="methods-tousbpnpdevice"/>**ToUsbPnPDevice(PnPDevice)**
 

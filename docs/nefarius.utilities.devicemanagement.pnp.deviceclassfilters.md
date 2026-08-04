@@ -165,7 +165,7 @@ public static void RemoveLower(Guid classGuid, string service)
 The device class GUID to modify.
 
 `service` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
-The driver service name to add.
+The driver service name to remove.
 
 #### Exceptions
 
@@ -190,7 +190,7 @@ public static void RemoveUpper(Guid classGuid, string service)
 The device class GUID to modify.
 
 `service` [String](https://learn.microsoft.com/dotnet/api/system.string)<br>
-The driver service name to add.
+The driver service name to remove.
 
 #### Exceptions
 

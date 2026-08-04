@@ -235,12 +235,23 @@ This call DOES NOT invoke device and driver uninstall routines, as soon as the d
 
 ### <a id="methods-restart"/>**Restart()**
 
+#### Caution
+
+This method can cause unintended side-effects, see remarks for details.
+
+---
+
 Attempts to restart this device. Device restart may fail if it has open handles that currently can not be
  force-closed.
 
 ```csharp
 void Restart()
 ```
+
+**Remarks:**
+
+This method removes and re-enumerates (adds) the device node, which might cause unintended side effects. If
+ this is the behavior you seek, consider using [PnPDevice.RemoveAndSetup()](./nefarius.utilities.devicemanagement.pnp.pnpdevice.md#removeandsetup) instead.
 
 ### <a id="methods-setproperty"/>**SetProperty&lt;T&gt;(DevicePropertyKey, T)**
 

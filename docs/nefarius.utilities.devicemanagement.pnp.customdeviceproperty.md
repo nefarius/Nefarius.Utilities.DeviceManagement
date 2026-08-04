@@ -16,7 +16,7 @@ Attributes [NullableContextAttribute](./system.runtime.compilerservices.nullable
 
 ### <a id="properties-categoryguid"/>**CategoryGuid**
 
-The [Guid](https://learn.microsoft.com/dotnet/api/system.guid) for teh category this property belongs to.
+The [Guid](https://learn.microsoft.com/dotnet/api/system.guid) for the category this property belongs to.
 
 ```csharp
 public Guid CategoryGuid { get; }

@@ -76,7 +76,7 @@ public static bool Find(Guid target, ref String path, ref String instanceId, int
 #### Parameters
 
 `target` [Guid](https://learn.microsoft.com/dotnet/api/system.guid)<br>
-The class GUID to enumerate.
+The interface GUID to enumerate.
 
 `path` [String&](https://learn.microsoft.com/dotnet/api/system.string&)<br>
 The device path of the enumerated device.
@@ -89,7 +89,7 @@ Optional instance ID (zero-based) specifying the device to process on multiple m
 
 #### Returns
 
-True if at least one device was found with the provided class, false otherwise.
+True if at least one device was found with the provided interface, false otherwise.
 
 **Remarks:**
 
@@ -271,7 +271,7 @@ True on success, false otherwise.
 
 ### <a id="methods-remove"/>**Remove(Guid, String)**
 
-Removed a device node identified by class GUID, path and instance ID.
+Removes a device node identified by class GUID and instance ID.
 
 ```csharp
 public static bool Remove(Guid classGuid, string instanceId)
@@ -291,7 +291,7 @@ True on success, false otherwise.
 
 ### <a id="methods-remove"/>**Remove(Guid, String, ref Boolean)**
 
-Removed a device node identified by interface GUID and instance ID.
+Removes a device node identified by class GUID and instance ID.
 
 ```csharp
 public static bool Remove(Guid classGuid, string instanceId, ref Boolean rebootRequired)
