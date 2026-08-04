@@ -23,6 +23,14 @@ public class FilterServiceListTests
     }
 
     [Test]
+    public void Add_DoesNotDuplicateCaseInsensitiveEntry()
+    {
+        IReadOnlyList<string> result = FilterServiceList.Add(new[] { "HidHide" }, "HIDHIDE");
+
+        Assert.That(result, Is.EqualTo(new[] { "HidHide" }));
+    }
+
+    [Test]
     public void Add_AppendsDistinctService()
     {
         IReadOnlyList<string> result = FilterServiceList.Add(new[] { "HidHide" }, "USBPcap");

@@ -47,7 +47,7 @@ public sealed class DeviceClassFilters
     ///     Removes an entry from the device class upper filters.
     /// </summary>
     /// <param name="classGuid">The device class GUID to modify.</param>
-    /// <param name="service">The driver service name to add.</param>
+    /// <param name="service">The driver service name to remove.</param>
     /// <remarks>
     ///     If the provided service entry doesn't exist or the entire filter value is not present, this method does
     ///     nothing.
@@ -100,7 +100,7 @@ public sealed class DeviceClassFilters
     ///     Removes an entry from the device class lower filters.
     /// </summary>
     /// <param name="classGuid">The device class GUID to modify.</param>
-    /// <param name="service">The driver service name to add.</param>
+    /// <param name="service">The driver service name to remove.</param>
     /// <remarks>
     ///     If the provided service entry doesn't exist or the entire filter value is not present, this method does
     ///     nothing.
@@ -183,74 +183,16 @@ public sealed class DeviceClassFilters
         // value exists
         if (status == WIN32_ERROR.ERROR_SUCCESS)
         {
-            byte* buffer = stackalloc byte[(int)sizeRequired];
-
-            status = PInvoke.RegQueryValueEx(
-                key,
-                filter,
-                out type,
-                new Span<byte>(buffer, (int)sizeRequired),
-                ref sizeRequired
-            );
-
-            if (status != WIN32_ERROR.ERROR_SUCCESS)
-            {
-                throw new Win32Exception("Failed to query value");
-            }
-
-            List<string> elements = ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired).ToList();
+            List<string> elements = ReadMultiSzValue(key, filter, ref type, sizeRequired);
             IReadOnlyList<string> updated = FilterServiceList.Add(elements, service);
-
-            IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
-
-            try
-            {
-                status = PInvoke.RegSetValueEx(
-                    key,
-                    filter,
-                    type,
-                    new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
-                );
-
-                if (status != WIN32_ERROR.ERROR_SUCCESS)
-                {
-                    throw new Win32Exception("Failed to write value");
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(rawBuffer);
-            }
-
+            WriteMultiSzValue(key, filter, updated);
             return;
         }
 
         if (status == WIN32_ERROR.ERROR_FILE_NOT_FOUND)
         {
-            type = REG_VALUE_TYPE.REG_MULTI_SZ;
             IReadOnlyList<string> updated = FilterServiceList.Add(null, service);
-
-            IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
-
-            try
-            {
-                status = PInvoke.RegSetValueEx(
-                    key,
-                    filter,
-                    type,
-                    new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
-                );
-
-                if (status != WIN32_ERROR.ERROR_SUCCESS)
-                {
-                    throw new Win32Exception("Failed to write value");
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(rawBuffer);
-            }
-
+            WriteMultiSzValue(key, filter, updated);
             return;
         }
 
@@ -280,45 +222,9 @@ public sealed class DeviceClassFilters
         // value exists
         if (status == WIN32_ERROR.ERROR_SUCCESS)
         {
-            byte* buffer = stackalloc byte[(int)sizeRequired];
-
-            status = PInvoke.RegQueryValueEx(
-                key,
-                filter,
-                out type,
-                new Span<byte>(buffer, (int)sizeRequired),
-                ref sizeRequired
-            );
-
-            if (status != WIN32_ERROR.ERROR_SUCCESS)
-            {
-                throw new Win32Exception("Failed to query value");
-            }
-
-            List<string> elements = ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired).ToList();
+            List<string> elements = ReadMultiSzValue(key, filter, ref type, sizeRequired);
             IReadOnlyList<string> updated = FilterServiceList.Remove(elements, service);
-
-            IntPtr rawBuffer = updated.StringArrayToMultiSzPointer(out int length);
-
-            try
-            {
-                status = PInvoke.RegSetValueEx(
-                    key,
-                    filter,
-                    type,
-                    new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
-                );
-
-                if (status != WIN32_ERROR.ERROR_SUCCESS)
-                {
-                    throw new Win32Exception("Failed to write value");
-                }
-            }
-            finally
-            {
-                Marshal.FreeHGlobal(rawBuffer);
-            }
-
+            WriteMultiSzValue(key, filter, updated);
             return;
         }
 
@@ -356,22 +262,7 @@ public sealed class DeviceClassFilters
             // value exists
             case WIN32_ERROR.ERROR_SUCCESS:
                 {
-                    byte* buffer = stackalloc byte[(int)sizeRequired];
-
-                    status = PInvoke.RegQueryValueEx(
-                        key,
-                        filter,
-                        out type,
-                        new Span<byte>(buffer, (int)sizeRequired),
-                        ref sizeRequired
-                    );
-
-                    if (status != WIN32_ERROR.ERROR_SUCCESS)
-                    {
-                        throw new Win32Exception("Failed to query value");
-                    }
-
-                    return ((IntPtr)buffer).MultiSzPointerToStringArray((int)sizeRequired)
+                    return ReadMultiSzValue(key, filter, ref type, sizeRequired)
                         .Where(e => !string.IsNullOrWhiteSpace(e));
                 }
             case WIN32_ERROR.ERROR_FILE_NOT_FOUND:
@@ -399,5 +290,63 @@ public sealed class DeviceClassFilters
         }
 
         throw new Win32Exception("Unexpected failure", (int)status);
+    }
+
+    private static unsafe List<string> ReadMultiSzValue(
+        SafeRegistryHandle key,
+        string filter,
+        ref REG_VALUE_TYPE type,
+        uint sizeRequired)
+    {
+        IntPtr buffer = Marshal.AllocHGlobal((int)sizeRequired);
+
+        try
+        {
+            WIN32_ERROR status = PInvoke.RegQueryValueEx(
+                key,
+                filter,
+                out type,
+                new Span<byte>((byte*)buffer.ToPointer(), (int)sizeRequired),
+                ref sizeRequired
+            );
+
+            if (status != WIN32_ERROR.ERROR_SUCCESS)
+            {
+                throw new Win32Exception("Failed to query value", (int)status);
+            }
+
+            return buffer.MultiSzPointerToStringArray((int)sizeRequired).ToList();
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(buffer);
+        }
+    }
+
+    private static unsafe void WriteMultiSzValue(
+        SafeRegistryHandle key,
+        string filter,
+        IReadOnlyList<string> values)
+    {
+        IntPtr rawBuffer = values.StringArrayToMultiSzPointer(out int length);
+
+        try
+        {
+            WIN32_ERROR status = PInvoke.RegSetValueEx(
+                key,
+                filter,
+                REG_VALUE_TYPE.REG_MULTI_SZ,
+                new ReadOnlySpan<byte>(rawBuffer.ToPointer(), length)
+            );
+
+            if (status != WIN32_ERROR.ERROR_SUCCESS)
+            {
+                throw new Win32Exception("Failed to write value", (int)status);
+            }
+        }
+        finally
+        {
+            Marshal.FreeHGlobal(rawBuffer);
+        }
     }
 }

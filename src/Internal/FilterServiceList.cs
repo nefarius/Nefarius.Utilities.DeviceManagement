@@ -10,8 +10,7 @@ namespace Nefarius.Utilities.DeviceManagement.Internal;
 internal static class FilterServiceList
 {
     /// <summary>
-    ///     Adds a service to the filter list without introducing empty entries or duplicates
-    ///     (same <see cref="Enumerable.Distinct{TSource}(IEnumerable{TSource})" /> semantics as production).
+    ///     Adds a service to the filter list without introducing empty entries or case-insensitive duplicates.
     /// </summary>
     public static IReadOnlyList<string> Add(IEnumerable<string>? existing, string service)
     {
@@ -20,7 +19,7 @@ internal static class FilterServiceList
         return source
             .Concat(new[] { service })
             .Where(e => !string.IsNullOrWhiteSpace(e))
-            .Distinct()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
 
@@ -35,7 +34,7 @@ internal static class FilterServiceList
         elements.RemoveAll(e => e.Equals(service, StringComparison.OrdinalIgnoreCase));
 
         return elements
-            .Distinct()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
 }

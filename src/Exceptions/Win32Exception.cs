@@ -30,9 +30,10 @@ public class Win32Exception : Exception
     /// </summary>
     /// <param name="message">The error message.</param>
     /// <param name="errorCode">The error code.</param>
-    internal Win32Exception(string message, int errorCode) : this(message)
+    internal Win32Exception(string message, int errorCode) : base(message)
     {
         ErrorCode = errorCode;
+        ErrorMessage = GetMessageFor(errorCode);
     }
 
     /// <summary>

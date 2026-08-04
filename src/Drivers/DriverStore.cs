@@ -211,7 +211,18 @@ internal enum DriverStoreCopyFlag : uint
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class DriverStore
 {
-    private static readonly string WinDir = Environment.GetEnvironmentVariable("WINDIR");
+    private static readonly string WinDir = GetWindowsDirectory();
+
+    private static string GetWindowsDirectory()
+    {
+        string? winDir = Environment.GetEnvironmentVariable("WINDIR");
+        if (string.IsNullOrWhiteSpace(winDir))
+        {
+            throw new InvalidOperationException("The WINDIR environment variable is not set.");
+        }
+
+        return winDir;
+    }
 
     /// <summary>
     ///     Gets a list of existing packages (absolute INF paths) in the local driver store.

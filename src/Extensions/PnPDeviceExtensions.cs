@@ -28,7 +28,9 @@ public static class PnPDeviceExtensions
     /// </summary>
     /// <param name="device">The <see cref="PnPDevice" /> to fetch driver info for.</param>
     /// <returns>The <see cref="DriverMeta" /> instance.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if registry access failed.</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown if registry access failed or required driver values are missing/malformed.
+    /// </exception>
     public static DriverMeta GetCurrentDriver(this PnPDevice device)
     {
         string driverKey = device.GetProperty<string>(DevicePropertyKey.Device_Driver);
@@ -41,16 +43,32 @@ public static class PnPDeviceExtensions
             throw new InvalidOperationException("Failed to open driver registry key.");
         }
 
-        return new DriverMeta
+        string? driverDate = key.GetValue("DriverDate") as string;
+        string? driverVersion = key.GetValue("DriverVersion") as string;
+
+        if (string.IsNullOrWhiteSpace(driverDate) || string.IsNullOrWhiteSpace(driverVersion))
         {
-            DriverDate =
-                DateTime.ParseExact(key.GetValue("DriverDate") as string, "M-d-yyyy", CultureInfo.InvariantCulture),
-            DriverDescription = key.GetValue("DriverDesc") as string,
-            DriverVersion = Version.Parse((key.GetValue("DriverVersion") as string)!),
-            InfPath = key.GetValue("InfPath") as string,
-            InfSection = key.GetValue("InfSection") as string,
-            MatchingDeviceId = key.GetValue("MatchingDeviceId") as string,
-            ProviderName = key.GetValue("ProviderName") as string
-        };
+            throw new InvalidOperationException("Driver registry key is missing DriverDate or DriverVersion.");
+        }
+
+        try
+        {
+            return new DriverMeta
+            {
+                DriverDate =
+                    DateTime.ParseExact(driverDate, "M-d-yyyy", CultureInfo.InvariantCulture),
+                DriverDescription = key.GetValue("DriverDesc") as string,
+                DriverVersion = Version.Parse(driverVersion),
+                InfPath = key.GetValue("InfPath") as string,
+                InfSection = key.GetValue("InfSection") as string,
+                MatchingDeviceId = key.GetValue("MatchingDeviceId") as string,
+                ProviderName = key.GetValue("ProviderName") as string
+            };
+        }
+        catch (Exception ex) when (ex is FormatException or ArgumentException or OverflowException)
+        {
+            throw new InvalidOperationException("Driver registry key contains malformed DriverDate or DriverVersion.",
+                ex);
+        }
     }
 }

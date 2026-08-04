@@ -28,7 +28,7 @@ public partial class DevicePropertyKey : IEquatable<DevicePropertyKey>
     }
 
     /// <summary>
-    ///     The <see cref="Guid" /> for teh category this property belongs to.
+    ///     The <see cref="Guid" /> for the category this property belongs to.
     /// </summary>
     public Guid CategoryGuid { get; }
 

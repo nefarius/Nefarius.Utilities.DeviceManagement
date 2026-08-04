@@ -5,11 +5,17 @@ using System.Linq;
 
 using Microsoft.Win32;
 
+using Nefarius.Utilities.DeviceManagement.PnP;
+
 namespace Nefarius.Utilities.DeviceManagement.Drivers;
 
 /// <summary>
 ///     Utility class to simplify interaction with filter driver entries.
 /// </summary>
+/// <remarks>
+///     Prefer <see cref="DeviceClassFilters" /> which validates services and uses SetupAPI class registry keys.
+/// </remarks>
+[Obsolete("Use Nefarius.Utilities.DeviceManagement.PnP.DeviceClassFilters instead.")]
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class FilterDrivers
 {
@@ -20,7 +26,7 @@ public static class FilterDrivers
     /// <returns>A list of filter service names.</returns>
     public static IEnumerable<string> GetDeviceClassUpperFilters(Guid classGuid)
     {
-        RegistryKey key = Registry.LocalMachine.OpenSubKey(
+        using RegistryKey? key = Registry.LocalMachine.OpenSubKey(
             $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", false);
 
         if (key is null)
@@ -40,7 +46,7 @@ public static class FilterDrivers
     /// <returns>A list of filter service names.</returns>
     public static IEnumerable<string> GetDeviceClassLowerFilters(Guid classGuid)
     {
-        RegistryKey key = Registry.LocalMachine.OpenSubKey(
+        using RegistryKey? key = Registry.LocalMachine.OpenSubKey(
             $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", false);
 
         if (key is null)
@@ -60,25 +66,7 @@ public static class FilterDrivers
     /// <param name="serviceName">The driver service name to remove.</param>
     public static void RemoveDeviceClassUpperFilter(Guid classGuid, string serviceName)
     {
-        RegistryKey key = Registry.LocalMachine.OpenSubKey(
-            $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", true);
-
-        if (key is null)
-        {
-            return;
-        }
-
-        List<string> entries = key.GetValue("UpperFilters") is string[] filters
-            ? new List<string>(filters)
-            : new List<string>();
-
-        if (!entries.Contains(serviceName, StringComparer.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        entries.Remove(serviceName);
-        key.SetValue("UpperFilters", entries.ToArray(), RegistryValueKind.MultiString);
+        RemoveFilter(classGuid, "UpperFilters", serviceName);
     }
 
     /// <summary>
@@ -88,25 +76,7 @@ public static class FilterDrivers
     /// <param name="serviceName">The driver service name to remove.</param>
     public static void RemoveDeviceClassLowerFilter(Guid classGuid, string serviceName)
     {
-        RegistryKey key = Registry.LocalMachine.OpenSubKey(
-            $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", true);
-
-        if (key is null)
-        {
-            return;
-        }
-
-        List<string> entries = key.GetValue("LowerFilters") is string[] filters
-            ? new List<string>(filters)
-            : new List<string>();
-
-        if (!entries.Contains(serviceName, StringComparer.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        entries.Remove(serviceName);
-        key.SetValue("LowerFilters", entries.ToArray(), RegistryValueKind.MultiString);
+        RemoveFilter(classGuid, "LowerFilters", serviceName);
     }
 
     /// <summary>
@@ -116,25 +86,7 @@ public static class FilterDrivers
     /// <param name="serviceName">The driver service name to add.</param>
     public static void AddDeviceClassUpperFilter(Guid classGuid, string serviceName)
     {
-        RegistryKey key = Registry.LocalMachine.OpenSubKey(
-            $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", true);
-
-        if (key is null)
-        {
-            return;
-        }
-
-        List<string> entries = key.GetValue("UpperFilters") is string[] filters
-            ? new List<string>(filters)
-            : new List<string>();
-
-        if (entries.Contains(serviceName, StringComparer.OrdinalIgnoreCase))
-        {
-            return;
-        }
-
-        entries.Add(serviceName);
-        key.SetValue("UpperFilters", entries.ToArray(), RegistryValueKind.MultiString);
+        AddFilter(classGuid, "UpperFilters", serviceName);
     }
 
     /// <summary>
@@ -144,7 +96,12 @@ public static class FilterDrivers
     /// <param name="serviceName">The driver service name to add.</param>
     public static void AddDeviceClassLowerFilter(Guid classGuid, string serviceName)
     {
-        RegistryKey key = Registry.LocalMachine.OpenSubKey(
+        AddFilter(classGuid, "LowerFilters", serviceName);
+    }
+
+    private static void AddFilter(Guid classGuid, string valueName, string serviceName)
+    {
+        using RegistryKey? key = Registry.LocalMachine.OpenSubKey(
             $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", true);
 
         if (key is null)
@@ -152,7 +109,7 @@ public static class FilterDrivers
             return;
         }
 
-        List<string> entries = key.GetValue("LowerFilters") is string[] filters
+        List<string> entries = key.GetValue(valueName) is string[] filters
             ? new List<string>(filters)
             : new List<string>();
 
@@ -162,6 +119,29 @@ public static class FilterDrivers
         }
 
         entries.Add(serviceName);
-        key.SetValue("LowerFilters", entries.ToArray(), RegistryValueKind.MultiString);
+        key.SetValue(valueName, entries.ToArray(), RegistryValueKind.MultiString);
+    }
+
+    private static void RemoveFilter(Guid classGuid, string valueName, string serviceName)
+    {
+        using RegistryKey? key = Registry.LocalMachine.OpenSubKey(
+            $@"SYSTEM\CurrentControlSet\Control\Class\{classGuid:B}", true);
+
+        if (key is null)
+        {
+            return;
+        }
+
+        List<string> entries = key.GetValue(valueName) is string[] filters
+            ? new List<string>(filters)
+            : new List<string>();
+
+        int removed = entries.RemoveAll(e => e.Equals(serviceName, StringComparison.OrdinalIgnoreCase));
+        if (removed == 0)
+        {
+            return;
+        }
+
+        key.SetValue(valueName, entries.ToArray(), RegistryValueKind.MultiString);
     }
 }
