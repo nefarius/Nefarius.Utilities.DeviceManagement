@@ -40,6 +40,9 @@ jobs:
   deploy:
     needs: test-windows
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,7 +63,11 @@ jobs:
       - name: Make Nuget Packages
         run: dotnet pack -c Release
 
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
+        with:
+          user: Nefarius
+
       - name: Publish To Nuget
-        run: dotnet nuget push bin/*.nupkg -k $NUGET_AUTH_TOKEN -s https://api.nuget.org/v3/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push bin/*.nupkg --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
