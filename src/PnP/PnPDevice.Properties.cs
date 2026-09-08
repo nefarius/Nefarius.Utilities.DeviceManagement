@@ -120,6 +120,10 @@ public partial class PnPDevice
     /// <typeparam name="T">The type of the property.</typeparam>
     /// <param name="propertyKey">The <see cref="DevicePropertyKey" /> to update.</param>
     /// <param name="propertyValue">The value to set.</param>
+    /// <remarks>
+    ///     Passing an empty <see cref="byte" />[] deletes the property via <c>DEVPROP_TYPE_EMPTY</c>, a null buffer, and
+    ///     size 0. Non-empty arrays are written as <c>DEVPROP_TYPE_BINARY</c>.
+    /// </remarks>
     public unsafe void SetProperty<T>(DevicePropertyKey propertyKey, T propertyValue)
     {
         if (typeof(T) != propertyKey.PropertyType)
@@ -138,13 +142,18 @@ public partial class PnPDevice
 
         IntPtr buffer = DevicePropertyMarshal.Write(propertyValue!, managedType, out uint propBufSize);
 
+        if (managedType == typeof(byte[]) && propBufSize == 0)
+        {
+            nativePropType = DEVPROPTYPE.DEVPROP_TYPE_EMPTY;
+        }
+
         try
         {
             CONFIGRET ret = PInvoke.CM_Set_DevNode_Property(
                 _instanceHandle,
                 &nativePropKey,
                 nativePropType,
-                (byte*)buffer.ToPointer(),
+                buffer == IntPtr.Zero ? null : (byte*)buffer.ToPointer(),
                 propBufSize,
                 0
             );
@@ -156,7 +165,10 @@ public partial class PnPDevice
         }
         finally
         {
-            Marshal.FreeHGlobal(buffer);
+            if (buffer != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
         }
     }
 

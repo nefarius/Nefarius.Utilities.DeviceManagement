@@ -158,7 +158,8 @@ internal static class DevicePropertyMarshal
     ///     Caller must free the returned pointer with <see cref="Marshal.FreeHGlobal" />.
     /// </summary>
     /// <remarks>
-    ///     A zero-length <see cref="byte" />[] buffer makes <c>CM_Set_DevNode_Property</c> delete the property.
+    ///     A zero-length <see cref="byte" />[] returns <see cref="IntPtr.Zero" /> and size 0. Combined with
+    ///     <c>DEVPROP_TYPE_EMPTY</c> that is the native contract for deleting the property.
     /// </remarks>
     public static IntPtr Write(object propertyValue, Type managedType, out uint propBufSize)
     {
@@ -316,6 +317,12 @@ internal static class DevicePropertyMarshal
         if (managedType == typeof(byte[]))
         {
             byte[] value = (byte[])propertyValue;
+            if (value.Length == 0)
+            {
+                propBufSize = 0;
+                return IntPtr.Zero;
+            }
+
             return WriteBytes(value, out propBufSize);
         }
 

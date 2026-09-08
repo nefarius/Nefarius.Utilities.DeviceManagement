@@ -59,6 +59,18 @@ public class DevicePropertyMarshalTests
     }
 
     [Test]
+    public void Write_EmptyByteArray_ReturnsNullBuffer()
+    {
+        IntPtr buffer = DevicePropertyMarshal.Write(Array.Empty<byte>(), typeof(byte[]), out uint size);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(buffer, Is.EqualTo(IntPtr.Zero));
+            Assert.That(size, Is.Zero);
+        });
+    }
+
+    [Test]
     public void RoundTrip_FloatingPoint()
     {
         RoundTrip(-1.5f, typeof(float));
@@ -144,7 +156,10 @@ public class DevicePropertyMarshalTests
         }
         finally
         {
-            Marshal.FreeHGlobal(buffer);
+            if (buffer != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
         }
     }
 }
