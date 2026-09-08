@@ -441,6 +441,11 @@ The [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.deviceproperty
 `propertyValue` T<br>
 The value to set.
 
+**Remarks:**
+
+Passing an empty [Byte](https://learn.microsoft.com/dotnet/api/system.byte)[] deletes the property via `DEVPROP_TYPE_EMPTY`, a null buffer, and
+ size 0. Non-empty arrays are written as `DEVPROP_TYPE_BINARY`.
+
 ### <a id="methods-tostring"/>**ToString()**
 
 ```csharp
