@@ -15,7 +15,7 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 
 public partial class PnPDevice
 {
-    private static readonly IDictionary<DEVPROPTYPE, Type> NativeToManagedTypeMap =
+    internal static readonly IDictionary<DEVPROPTYPE, Type> NativeToManagedTypeMap =
         new Dictionary<DEVPROPTYPE, Type>
         {
             { DEVPROPTYPE.DEVPROP_TYPE_SBYTE, typeof(sbyte) },
