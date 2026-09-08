@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 
+using Windows.Win32.Foundation;
+
 using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.Internal;
@@ -11,6 +13,32 @@ namespace Nefarius.Utilities.DeviceManagement.Internal;
 /// </summary>
 internal static class DevicePropertyMarshal
 {
+    /// <summary>
+    ///     Returns whether <paramref name="managedType" /> can be converted by <see cref="Read" /> and <see cref="Write" />.
+    /// </summary>
+    internal static bool IsSupported(Type managedType)
+    {
+        return managedType == typeof(string)
+               || managedType == typeof(string[])
+               || managedType == typeof(sbyte)
+               || managedType == typeof(byte)
+               || managedType == typeof(short)
+               || managedType == typeof(ushort)
+               || managedType == typeof(int)
+               || managedType == typeof(uint)
+               || managedType == typeof(long)
+               || managedType == typeof(ulong)
+               || managedType == typeof(float)
+               || managedType == typeof(double)
+               || managedType == typeof(decimal)
+               || managedType == typeof(DateTime)
+               || managedType == typeof(DateTimeOffset)
+               || managedType == typeof(Guid)
+               || managedType == typeof(bool)
+               || managedType == typeof(byte[])
+               || managedType == typeof(DEVPROPKEY);
+    }
+
     /// <summary>
     ///     Reads a managed value from a native property buffer.
     /// </summary>
@@ -66,6 +94,32 @@ internal static class DevicePropertyMarshal
             return (ulong)Marshal.ReadInt64(buffer);
         }
 
+        if (managedType == typeof(float))
+        {
+            return BitConverter.ToSingle(ReadBytes(buffer, sizeof(float)), 0);
+        }
+
+        if (managedType == typeof(double))
+        {
+            return BitConverter.ToDouble(ReadBytes(buffer, sizeof(double)), 0);
+        }
+
+        if (managedType == typeof(decimal))
+        {
+            // OLE DECIMAL: wReserved(2) scale(1) sign(1) Hi32(4) Lo64(8).
+            byte scale = Marshal.ReadByte(buffer, 2);
+            byte sign = Marshal.ReadByte(buffer, 3);
+            int hi = Marshal.ReadInt32(buffer, 4);
+            long lo64 = Marshal.ReadInt64(buffer, 8);
+
+            return new decimal((int)(lo64 & 0xFFFFFFFF), (int)(lo64 >> 32), hi, (sign & 0x80) != 0, scale);
+        }
+
+        if (managedType == typeof(DateTime))
+        {
+            return DateTime.FromOADate(BitConverter.ToDouble(ReadBytes(buffer, sizeof(double)), 0));
+        }
+
         if (managedType == typeof(DateTimeOffset))
         {
             return DateTimeOffset.FromFileTime(Marshal.ReadInt64(buffer));
@@ -76,9 +130,24 @@ internal static class DevicePropertyMarshal
             return Marshal.PtrToStructure<Guid>(buffer);
         }
 
+        if (managedType == typeof(DEVPROPKEY))
+        {
+            return Marshal.PtrToStructure<DEVPROPKEY>(buffer);
+        }
+
         if (managedType == typeof(bool))
         {
             return Marshal.ReadByte(buffer) != 0;
+        }
+
+        if (managedType == typeof(byte[]))
+        {
+            if (size == 0)
+            {
+                return Array.Empty<byte>();
+            }
+
+            return ReadBytes(buffer, (int)size);
         }
 
         throw new NotImplementedException($"Type {managedType} not supported.");
@@ -88,6 +157,10 @@ internal static class DevicePropertyMarshal
     ///     Allocates and fills a native property buffer for the given managed value.
     ///     Caller must free the returned pointer with <see cref="Marshal.FreeHGlobal" />.
     /// </summary>
+    /// <remarks>
+    ///     A zero-length <see cref="byte" />[] returns <see cref="IntPtr.Zero" /> and size 0. Combined with
+    ///     <c>DEVPROP_TYPE_EMPTY</c> that is the native contract for deleting the property.
+    /// </remarks>
     public static IntPtr Write(object propertyValue, Type managedType, out uint propBufSize)
     {
         if (managedType == typeof(string))
@@ -170,6 +243,42 @@ internal static class DevicePropertyMarshal
             return buffer;
         }
 
+        if (managedType == typeof(float))
+        {
+            return WriteBytes(BitConverter.GetBytes((float)propertyValue), out propBufSize);
+        }
+
+        if (managedType == typeof(double))
+        {
+            return WriteBytes(BitConverter.GetBytes((double)propertyValue), out propBufSize);
+        }
+
+        if (managedType == typeof(decimal))
+        {
+            decimal value = (decimal)propertyValue;
+            int[] bits = decimal.GetBits(value);
+            int lo = bits[0];
+            int mid = bits[1];
+            int hi = bits[2];
+            byte scale = (byte)((bits[3] >> 16) & 0xFF);
+            byte sign = (bits[3] & unchecked((int)0x80000000)) != 0 ? (byte)0x80 : (byte)0;
+
+            propBufSize = 16;
+            IntPtr buffer = Marshal.AllocHGlobal((int)propBufSize);
+            Marshal.WriteInt16(buffer, 0, 0);
+            Marshal.WriteByte(buffer, 2, scale);
+            Marshal.WriteByte(buffer, 3, sign);
+            Marshal.WriteInt32(buffer, 4, hi);
+            Marshal.WriteInt64(buffer, 8, ((long)mid << 32) | (uint)lo);
+            return buffer;
+        }
+
+        if (managedType == typeof(DateTime))
+        {
+            DateTime value = (DateTime)propertyValue;
+            return WriteBytes(BitConverter.GetBytes(value.ToOADate()), out propBufSize);
+        }
+
         if (managedType == typeof(DateTimeOffset))
         {
             DateTimeOffset value = (DateTimeOffset)propertyValue;
@@ -188,6 +297,15 @@ internal static class DevicePropertyMarshal
             return buffer;
         }
 
+        if (managedType == typeof(DEVPROPKEY))
+        {
+            DEVPROPKEY value = (DEVPROPKEY)propertyValue;
+            propBufSize = (uint)Marshal.SizeOf<DEVPROPKEY>();
+            IntPtr buffer = Marshal.AllocHGlobal((int)propBufSize);
+            Marshal.StructureToPtr(value, buffer, false);
+            return buffer;
+        }
+
         if (managedType == typeof(bool))
         {
             propBufSize = sizeof(byte);
@@ -196,6 +314,37 @@ internal static class DevicePropertyMarshal
             return buffer;
         }
 
+        if (managedType == typeof(byte[]))
+        {
+            byte[] value = (byte[])propertyValue;
+            if (value.Length == 0)
+            {
+                propBufSize = 0;
+                return IntPtr.Zero;
+            }
+
+            return WriteBytes(value, out propBufSize);
+        }
+
         throw new NotImplementedException($"Type {managedType} not supported.");
+    }
+
+    private static byte[] ReadBytes(IntPtr buffer, int length)
+    {
+        byte[] value = new byte[length];
+        Marshal.Copy(buffer, value, 0, length);
+        return value;
+    }
+
+    private static IntPtr WriteBytes(byte[] bytes, out uint propBufSize)
+    {
+        propBufSize = (uint)bytes.Length;
+        IntPtr buffer = Marshal.AllocHGlobal(bytes.Length == 0 ? 1 : bytes.Length);
+        if (bytes.Length > 0)
+        {
+            Marshal.Copy(bytes, 0, buffer, bytes.Length);
+        }
+
+        return buffer;
     }
 }
