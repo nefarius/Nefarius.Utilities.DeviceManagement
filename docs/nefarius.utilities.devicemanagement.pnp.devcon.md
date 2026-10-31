@@ -59,6 +59,28 @@ The fully qualified absolute path to the INF to remove from the driver store.
 `forceDelete` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
 Remove the driver store copy, if true.
 
+### <a id="methods-enumeratedevices"/>**EnumerateDevices(Boolean)**
+
+Enumerates device nodes on the system and returns a lightweight, read-only summary of each.
+
+```csharp
+public static IReadOnlyList<DeviceSummary> EnumerateDevices(bool presentOnly)
+```
+
+#### Parameters
+
+`presentOnly` [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)<br>
+True (default) to only include currently present devices, false to also include phantom (ghost) devices.
+
+#### Returns
+
+A snapshot list of [DeviceSummary](./nefarius.utilities.devicemanagement.pnp.devicesummary.md) entries. Devices that vanish during enumeration are skipped.
+
+#### Exceptions
+
+[ConfigManagerException](./nefarius.utilities.devicemanagement.exceptions.configmanagerexception.md)<br>
+The device ID list could not be retrieved.
+
 ### <a id="methods-find"/>**Find(Guid, ref String, ref String, Int32)**
 
 #### Caution

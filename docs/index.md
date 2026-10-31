@@ -6,6 +6,8 @@
 
 - [DriverStore](./nefarius.utilities.devicemanagement.drivers.driverstore.md)
 
+- [DriverStorePackage](./nefarius.utilities.devicemanagement.drivers.driverstorepackage.md)
+
 - [FilterDrivers](./nefarius.utilities.devicemanagement.drivers.filterdrivers.md)
 
 ## Namespace Nefarius.Utilities.DeviceManagement.Exceptions
@@ -47,6 +49,8 @@
 - [DeviceNotificationListener](./nefarius.utilities.devicemanagement.pnp.devicenotificationlistener.md)
 
 - [DevicePropertyKey](./nefarius.utilities.devicemanagement.pnp.devicepropertykey.md)
+
+- [DeviceSummary](./nefarius.utilities.devicemanagement.pnp.devicesummary.md)
 
 - [IDeviceNotificationListener](./nefarius.utilities.devicemanagement.pnp.idevicenotificationlistener.md)
 
