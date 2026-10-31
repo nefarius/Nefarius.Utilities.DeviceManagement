@@ -174,3 +174,7 @@ This library benefits from these awesome projects ❤ (appearance in no special 
 - [XMLDoc2Markdown](https://charlesdevandiere.github.io/xmldoc2md/)
 - [ManagedDevcon](https://github.com/nefarius/ManagedDevcon)
 - [Driver Updater](https://github.com/WOA-Project/DriverUpdater)
+
+## Credits
+
+- The read-only driver store and device enumeration queries (`DriverStore.GetPackages`, `Devcon.EnumerateDevices`) are modelled on the MIT-licensed [nefcon](https://github.com/nefarius/nefcon) / [neflib](https://github.com/nefarius/neflib) implementation.
