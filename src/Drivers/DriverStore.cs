@@ -1,4 +1,4 @@
-﻿/*
+/*
 
 Copyright (c) 2017-2021, The LumiaWOA Authors
 
@@ -32,6 +32,8 @@ using System.Text;
 
 using Windows.Win32.Foundation;
 
+using Nefarius.Utilities.DeviceManagement.Internal;
+using Nefarius.Utilities.DeviceManagement.PnP;
 using Nefarius.Utilities.DeviceManagement.Util;
 
 namespace Nefarius.Utilities.DeviceManagement.Drivers;
@@ -260,6 +262,129 @@ public static class DriverStore
         }
     }
 
+    /// <summary>
+    ///     Enumerates the packages staged in the local driver store (read-only query).
+    /// </summary>
+    /// <param name="includeInbox">
+    ///     False (default) to only return third-party packages, true to also include inbox packages shipped with
+    ///     Windows.
+    /// </param>
+    /// <returns>
+    ///     A snapshot of the staged packages, including the instance IDs of devices bound to each package by their
+    ///     installed driver INF name.
+    /// </returns>
+    /// <remarks>
+    ///     Uses the undocumented <c>DriverStoreOfflineEnumDriverPackageW</c> export of <c>drvstore.dll</c> against the
+    ///     live Windows directory, then reads <c>Provider</c>, <c>DriverVer</c> and class information from each staged
+    ///     INF via SetupAPI. Packages whose INF cannot be opened are still returned with the unreadable fields unset.
+    /// </remarks>
+    /// <exception cref="Win32Exception">The driver store could not be enumerated.</exception>
+    public static IReadOnlyList<DriverStorePackage> GetPackages(bool includeInbox = false)
+    {
+        List<RawPackage> raw = new();
+
+        uint ntStatus = DriverStoreNative.DriverStoreOfflineEnumDriverPackage(
+            (driverPackageInfPath, ptr, unknown) =>
+            {
+                DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo info =
+                    (DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo)Marshal.PtrToStructure(ptr,
+                        typeof(DriverStoreNative.DriverStoreOfflineEnumDriverPackageInfo));
+
+                bool inbox = info.InboxInf != 0;
+
+                if (includeInbox || !inbox)
+                {
+                    raw.Add(new RawPackage(driverPackageInfPath, info.PublishedInfName ?? string.Empty,
+                        ArchitectureToString(info.ProcessorArchitecture), inbox));
+                }
+
+                return 1;
+            }, IntPtr.Zero, WinDir);
+
+        if ((ntStatus & 0x80000000) != 0)
+        {
+            throw new Win32Exception(NtStatusUtil.ConvertNtStatusToWin32Error(ntStatus));
+        }
+
+        // devices keyed by their installed driver INF name (oemNN.inf or inbox INF name)
+        Dictionary<string, List<string>> devicesByInf = new(StringComparer.OrdinalIgnoreCase);
+        foreach (DeviceSummary device in Devcon.EnumerateDevices(false))
+        {
+            if (string.IsNullOrEmpty(device.DriverInfPath))
+            {
+                continue;
+            }
+
+            if (!devicesByInf.TryGetValue(device.DriverInfPath!, out List<string>? list))
+            {
+                list = new List<string>();
+                devicesByInf[device.DriverInfPath!] = list;
+            }
+
+            list.Add(device.InstanceId);
+        }
+
+        List<DriverStorePackage> packages = new(raw.Count);
+
+        foreach (RawPackage entry in raw)
+        {
+            string infPath = entry.InfPath, published = entry.Published, arch = entry.Arch;
+            bool inbox = entry.Inbox;
+            string? original = InfVersionReader.GetOriginalInfName(infPath);
+            InfVersionReader.InfIdentity? identity = InfVersionReader.Read(infPath);
+
+            // inbox packages are usually referenced by their original INF name
+            string key = published.Length > 0 ? published : original ?? string.Empty;
+            IReadOnlyList<string> bound = key.Length > 0 && devicesByInf.TryGetValue(key, out List<string>? ids)
+                ? ids.ToArray()
+                : Array.Empty<string>();
+
+            packages.Add(new DriverStorePackage(
+                published,
+                infPath,
+                original,
+                identity?.Provider,
+                identity?.ClassName,
+                identity?.ClassGuid ?? Guid.Empty,
+                identity?.DriverVersion,
+                identity?.DriverDate,
+                arch,
+                inbox,
+                bound));
+        }
+
+        return packages;
+    }
+
+    private sealed class RawPackage
+    {
+        public RawPackage(string infPath, string published, string arch, bool inbox)
+        {
+            InfPath = infPath;
+            Published = published;
+            Arch = arch;
+            Inbox = inbox;
+        }
+
+        public string InfPath { get; }
+        public string Published { get; }
+        public string Arch { get; }
+        public bool Inbox { get; }
+    }
+
+    private static string ArchitectureToString(ProcessorArchitecture architecture)
+    {
+        return architecture switch
+        {
+            ProcessorArchitecture.PROCESSOR_ARCHITECTURE_INTEL => "x86",
+            ProcessorArchitecture.PROCESSOR_ARCHITECTURE_AMD64 => "amd64",
+            ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ARM => "arm",
+            ProcessorArchitecture.PROCESSOR_ARCHITECTURE_ARM64 => "arm64",
+            ProcessorArchitecture.PROCESSOR_ARCHITECTURE_IA64 => "ia64",
+            ProcessorArchitecture.PROCESSOR_ARCHITECTURE_NEUTRAL => "neutral",
+            _ => architecture.ToString()
+        };
+    }
     /// <summary>
     ///     Removes a driver identified by absolute package path.
     /// </summary>

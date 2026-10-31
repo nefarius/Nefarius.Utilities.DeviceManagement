@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
@@ -25,6 +25,18 @@ namespace Nefarius.Utilities.DeviceManagement.PnP;
 [SuppressMessage("ReSharper", "OutParameterValueIsAlwaysDiscarded.Global")]
 public static class Devcon
 {
+    /// <summary>
+    ///     Enumerates device nodes on the system and returns a lightweight, read-only summary of each.
+    /// </summary>
+    /// <param name="presentOnly">
+    ///     True (default) to only include currently present devices, false to also include phantom (ghost) devices.
+    /// </param>
+    /// <returns>A snapshot list of <see cref="DeviceSummary" /> entries. Devices that vanish during enumeration are skipped.</returns>
+    /// <exception cref="ConfigManagerException">The device ID list could not be retrieved.</exception>
+    public static IReadOnlyList<DeviceSummary> EnumerateDevices(bool presentOnly = true)
+    {
+        return DeviceEnumerator.Enumerate(presentOnly);
+    }
     /// <summary>
     ///     Attempts to find a device within a specified device class by a given hardware ID.
     /// </summary>
